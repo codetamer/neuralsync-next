@@ -1,0 +1,59 @@
+'use client';
+
+import { motion, HTMLMotionProps } from 'framer-motion';
+import { cn } from '../../lib/utils';
+import { ReactNode } from 'react';
+import { audio } from '../../engine/AudioEngine';
+
+interface NeonButtonProps extends HTMLMotionProps<"button"> {
+    children: ReactNode;
+    variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+    size?: 'sm' | 'md' | 'lg';
+    className?: string;
+    glow?: boolean;
+}
+
+export const NeonButton = ({
+    children,
+    variant = 'primary',
+    size = 'md',
+    className,
+    glow = true,
+    ...props
+}: NeonButtonProps) => {
+
+    const variants = {
+        primary: "bg-neon-teal/10 border-neon-teal/50 text-neon-teal hover:bg-neon-teal/20 hover:border-neon-teal hover:shadow-neon-teal",
+        secondary: "bg-neon-purple/10 border-neon-purple/50 text-neon-purple hover:bg-neon-purple/20 hover:border-neon-purple hover:shadow-neon-purple",
+        danger: "bg-neon-red/10 border-neon-red/50 text-neon-red hover:bg-neon-red/20 hover:border-neon-red",
+        ghost: "bg-transparent border-transparent text-neural-muted hover:text-neural-text hover:bg-white/5",
+    };
+
+    const sizes = {
+        sm: "px-4 py-2 text-sm",
+        md: "px-6 py-3 text-base",
+        lg: "px-8 py-4 text-lg font-semibold",
+    };
+
+    return (
+        <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onMouseEnter={() => audio.playHover()}
+            onClick={(e) => {
+                audio.playClick();
+                props.onClick?.(e);
+            }}
+            className={cn(
+                "relative rounded-xl border backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2",
+                variants[variant],
+                sizes[size],
+                glow && variant !== 'ghost' ? "shadow-[0_0_15px_rgba(0,0,0,0.2)]" : "",
+                className
+            )}
+            {...props}
+        >
+            {children}
+        </motion.button>
+    );
+};
