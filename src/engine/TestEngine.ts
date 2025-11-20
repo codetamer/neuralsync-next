@@ -1,7 +1,7 @@
 // Core Test Engine - Orchestrates 51-stage assessment flow
 
 import type { ResponseData, FinalScores } from '../utils/storage';
-import { PERSONALITY_ITEMS, LOGIC_PUZZLES, EQ_SCENARIOS } from '../data/testContent';
+import { PERSONALITY_ITEMS, LOGIC_PUZZLES, EQ_SCENARIOS, VISUAL_PUZZLES } from '../data/testContent';
 
 export type StageType = 'matrix' | 'stroop' | 'bart' | 'personality' | 'intro' | 'scenario';
 export type DifficultyLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
@@ -23,13 +23,16 @@ const generateStages = (): StageDefinition[] => {
 
     let stageCount = 1;
 
-    // Block 1: IQ - Logic Puzzles (10 Stages)
-    LOGIC_PUZZLES.forEach((puzzle, index) => {
+    // Block 1: IQ - Logic & Visual Puzzles (30 Stages)
+    // Combine text and visual puzzles
+    const iqContent = [...LOGIC_PUZZLES, ...VISUAL_PUZZLES];
+
+    iqContent.forEach((puzzle, index) => {
         stages.push({
             stage: stageCount++,
-            type: 'matrix', // Reusing matrix type for logic puzzles
-            title: `Logic Protocol ${index + 1}`,
-            difficulty: Math.min(10, index + 2) as DifficultyLevel,
+            type: 'matrix',
+            title: `Cognitive Protocol ${index + 1}`,
+            difficulty: Math.min(10, Math.floor(index / 3) + 1) as DifficultyLevel,
             description: 'Analyze the pattern and deduce the correct output.',
             contentId: puzzle.id
         });
@@ -84,35 +87,52 @@ function scoreToPercentile(score: number, mean: number, sd: number): number {
 }
 
 function calculateIQ(responses: ResponseData[]): { score: number, percentile: number } {
-    // Filter for IQ stages (logic puzzles)
-    // In our new structure, stages 1-10 are IQ
-    const iqResponses = responses.filter(r => r.stage >= 1 && r.stage <= 10);
+    // Filter for IQ stages (matrix type)
+    const iqResponses = responses.filter(r => {
+        const stageDef = STAGE_DEFINITIONS[r.stage];
+        return stageDef && stageDef.type === 'matrix';
+    });
 
     if (iqResponses.length === 0) return { score: 100, percentile: 50 };
 
     let rawScore = 0;
+    let maxPossibleScore = 0;
 
     iqResponses.forEach(r => {
         // Find the puzzle to check correct answer
         const stageDef = STAGE_DEFINITIONS[r.stage];
         const puzzle = LOGIC_PUZZLES.find(p => p.id === stageDef.contentId);
 
+        // IRT Principle: Difficulty-weighted scoring
+        // Harder questions worth more points (difficulty ranges 1-10)
+        const difficulty = stageDef.difficulty || 5;
+        const difficultyWeight = difficulty / 10; // 0.1 to 1.0
+        maxPossibleScore += difficultyWeight * 1.2; // Max with speed bonus
+
         if (puzzle) {
             // Check if user choice matches correct index
-            // Assuming choice is stored as string index "0", "1", etc. or number
             if (Number(r.choice) === puzzle.correctIndex) {
-                rawScore += 1;
+                rawScore += difficultyWeight;
 
-                // Speed bonus for correct answers under 10s
-                if (r.latency_ms < 10000) rawScore += 0.2;
+                // Speed bonus: proportional to difficulty (harder questions get bigger bonus)
+                if (r.latency_ms < 10000) rawScore += difficultyWeight * 0.2;
+            }
+        } else {
+            // Check Visual Puzzles
+            const vPuzzle = VISUAL_PUZZLES.find(p => p.id === stageDef.contentId);
+            if (vPuzzle) {
+                if (Number(r.choice) === vPuzzle.correctIndex) {
+                    rawScore += difficultyWeight;
+                    if (r.latency_ms < 10000) rawScore += difficultyWeight * 0.2;
+                }
             }
         }
     });
 
     // Normalize to IQ scale (Mean 100, SD 15)
-    // Max raw score is ~12 (10 correct + bonuses)
-    // Let's map 0-12 to 70-145 range roughly
-    const standardizedScore = 70 + (rawScore / 12) * 75;
+    // Map performance percentage to IQ range (70-145)
+    const percentage = Math.min(1, rawScore / maxPossibleScore);
+    const standardizedScore = 70 + (percentage * 75);
 
     return {
         score: Math.round(standardizedScore),
@@ -122,7 +142,11 @@ function calculateIQ(responses: ResponseData[]): { score: number, percentile: nu
 
 function calculateEQ(responses: ResponseData[]): { score: number, percentile: number } {
     // EQ Stages are 11-20
-    const eqResponses = responses.filter(r => r.stage >= 11 && r.stage <= 20);
+    // EQ Stages are scenario type
+    const eqResponses = responses.filter(r => {
+        const stageDef = STAGE_DEFINITIONS[r.stage];
+        return stageDef && stageDef.type === 'scenario';
+    });
 
     if (eqResponses.length === 0) return { score: 100, percentile: 50 };
 
@@ -154,7 +178,11 @@ function calculateEQ(responses: ResponseData[]): { score: number, percentile: nu
 
 function calculatePersonality(responses: ResponseData[]) {
     // Personality Stages are 22-51 (Stage 21 is Risk)
-    const pResponses = responses.filter(r => r.stage >= 22);
+    // Personality Stages are personality type
+    const pResponses = responses.filter(r => {
+        const stageDef = STAGE_DEFINITIONS[r.stage];
+        return stageDef && stageDef.type === 'personality';
+    });
 
     const scores = {
         openness: 0,
@@ -171,33 +199,25 @@ function calculatePersonality(responses: ResponseData[]) {
         const item = PERSONALITY_ITEMS.find(i => i.id === stageDef.contentId);
 
         if (item) {
-            let val = Number(r.choice); // 1-5 scale
+            let val = Number(r.choice); // 1-7 scale
 
-            // Reverse coding
+            // Reverse coding for 1-7 scale
             if (item.reverse) {
-                val = 6 - val;
+                val = 8 - val;
             }
 
-            // Latency Weighting (Certainty)
-            // Fast responses (but not too fast) imply higher certainty
-            let certainty = 1.0;
-            if (r.latency_ms < 3000 && r.latency_ms > 800) certainty = 1.2;
-            if (r.latency_ms > 8000) certainty = 0.8;
-
-            // We add the weighted value, but track count to average later
-            // Actually, standard scoring usually sums. Let's just sum raw values for now
-            // and use certainty to slightly boost/dampen the *impact* of this item?
-            // Let's stick to standard scoring for reliability, maybe just use certainty for tie-breaking or "intensity"
-
+            // Standard Big Five scoring: sum raw values
+            // Note: Research shows response latency is NOT a standard component of Big Five scoring
+            // Latency may indicate item quality but should not alter trait scores
             scores[item.category] += val;
             counts[item.category]++;
         }
     });
 
-    // Convert to percentages (max score per trait is 6 items * 5 = 30)
+    // Convert to 0-100 scale (standard normalization)
     const normalize = (val: number, count: number) => {
         if (count === 0) return 50;
-        const max = count * 5;
+        const max = count * 7;
         const min = count * 1;
         // Map min-max to 0-100
         return Math.round(((val - min) / (max - min)) * 100);
@@ -217,15 +237,26 @@ export function calculateFinalScores(responses: ResponseData[]): FinalScores {
     const eqResult = calculateEQ(responses);
     const ocean = calculatePersonality(responses);
 
-    // Risk (Stage 21)
-    const riskResponse = responses.find(r => r.stage === 21);
+    // Risk Assessment (BART - Balloon Analogue Risk Task)
+    const riskResponse = responses.find(r => {
+        const stageDef = STAGE_DEFINITIONS[r.stage];
+        return stageDef && stageDef.type === 'bart';
+    });
     let riskTolerance = 50;
+    let riskPercentile = 50;
     if (riskResponse) {
-        // BART choice is usually pumps. Let's assume max 30 pumps.
+        // BART Standard Scoring: Adjusted average pumps (non-exploded balloons)
+        // Higher pumps = higher risk tolerance (non-linear relationship)
         const pumps = Number(riskResponse.choice);
-        riskTolerance = Math.min(99, Math.max(1, pumps * 3));
+        const maxPumps = 30; // Assumed maximum
+
+        // Non-linear scaling: Risk tolerance increases exponentially with pumps
+        // Uses sigmoid-like transformation for psychological accuracy
+        const normalized = pumps / maxPumps; // 0-1
+        // Transform: Low pumps (0-10) = 10-40, Medium (10-20) = 40-70, High (20-30) = 70-95
+        riskTolerance = Math.round(10 + 85 * Math.pow(normalized, 1.5));
+        riskPercentile = Math.round(riskTolerance);
     }
-    const riskPercentile = Math.round(riskTolerance); // Simplified
 
     // HEXACO mapping from OCEAN (Approximation)
     const hexaco = {
@@ -260,7 +291,8 @@ export function calculateFinalScores(responses: ResponseData[]): FinalScores {
         riskPercentile,
         hexaco,
         ocean,
-        apexTraits
+        apexTraits,
+        rawResponses: responses
     };
 }
 

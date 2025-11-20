@@ -35,6 +35,7 @@ export interface FinalScores {
         score: number;
         description: string;
     }[];
+    rawResponses: ResponseData[];
 }
 
 export interface SessionData {

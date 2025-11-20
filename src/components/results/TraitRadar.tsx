@@ -12,13 +12,13 @@ interface TraitRadarProps {
 
 export const TraitRadar = ({ data }: TraitRadarProps) => {
     return (
-        <div className="w-full h-[300px] md:h-[400px]">
+        <div className="w-full h-[400px] flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-                    <PolarGrid stroke="#ffffff20" />
+                <RadarChart key={JSON.stringify(data)} cx="50%" cy="50%" outerRadius="90%" data={data}>
+                    <PolarGrid stroke="rgba(255, 255, 255, 0.1)" />
                     <PolarAngleAxis
                         dataKey="subject"
-                        tick={{ fill: '#94a3b8', fontSize: 12 }}
+                        tick={{ fill: 'rgba(255, 255, 255, 0.7)', fontSize: 11, fontWeight: 600 }}
                     />
                     <PolarRadiusAxis
                         angle={30}
@@ -27,21 +27,24 @@ export const TraitRadar = ({ data }: TraitRadarProps) => {
                         axisLine={false}
                     />
                     <Radar
-                        name="Personality Profile"
+                        name="Trait Score"
                         dataKey="A"
-                        stroke="#22d3ee"
+                        stroke="#00f3ff"
                         strokeWidth={3}
-                        fill="#22d3ee"
+                        fill="#00f3ff"
                         fillOpacity={0.3}
+                        isAnimationActive={true}
+                        animationDuration={1500}
+                        animationEasing="ease-out"
                     />
                     <Tooltip
                         contentStyle={{
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            border: '1px solid rgba(255,255,255,0.1)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            border: '1px solid rgba(0, 243, 255, 0.3)',
                             borderRadius: '8px',
                             color: '#fff'
                         }}
-                        itemStyle={{ color: '#22d3ee' }}
+                        itemStyle={{ color: '#00f3ff' }}
                     />
                 </RadarChart>
             </ResponsiveContainer>

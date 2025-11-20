@@ -13,6 +13,16 @@ export interface LogicPuzzle {
     explanation: string;
 }
 
+export interface VisualPuzzle {
+    id: string;
+    type: 'grid' | 'sequence' | 'rotation' | 'odd-one-out';
+    question: string;
+    shapes: string[]; // CSS classes or SVG paths for the pattern
+    options: string[]; // CSS classes or SVG paths for the options
+    correctIndex: number;
+    explanation: string;
+}
+
 export interface ScenarioItem {
     id: string;
     scenario: string;
@@ -143,6 +153,197 @@ export const LOGIC_PUZZLES: LogicPuzzle[] = [
         options: ['Arctic', 'Atlantic', 'Pacific', 'Indian'],
         correctIndex: 2, // Pacific
         explanation: 'PACIFIC unscrambled.'
+    }
+];
+
+// 20 Visual Puzzles (Raven's, Rotation, Series)
+export const VISUAL_PUZZLES: VisualPuzzle[] = [
+    // --- Raven's Matrices (Pattern Completion) ---
+    {
+        id: 'VIS1',
+        type: 'grid',
+        question: 'Complete the pattern.',
+        shapes: ['square-solid', 'circle-solid', 'triangle-solid', 'square-outline', 'circle-outline', 'triangle-outline', 'square-dot', 'circle-dot', '?'],
+        options: ['triangle-dot', 'square-cross', 'circle-cross', 'triangle-solid'],
+        correctIndex: 0,
+        explanation: 'Row 1: Solid shapes. Row 2: Outline shapes. Row 3: Shapes with a dot. Column sequence: Square, Circle, Triangle. Missing: Triangle with a dot.'
+    },
+    {
+        id: 'VIS2',
+        type: 'grid',
+        question: 'Find the missing piece.',
+        shapes: ['arrow-up', 'arrow-right', 'arrow-down', 'arrow-right', 'arrow-down', 'arrow-left', 'arrow-down', 'arrow-left', '?'],
+        options: ['arrow-up', 'arrow-right', 'arrow-down', 'arrow-left'],
+        correctIndex: 0,
+        explanation: 'Each row rotates 90 degrees clockwise. Row 3: Down -> Left -> Up.'
+    },
+    {
+        id: 'VIS3',
+        type: 'grid',
+        question: 'Complete the matrix.',
+        shapes: ['1-dot', '2-dots', '3-dots', '2-dots', '3-dots', '4-dots', '3-dots', '4-dots', '?'],
+        options: ['4-dots', '5-dots', '6-dots', '1-dot'],
+        correctIndex: 1,
+        explanation: 'Arithmetic progression. Row 1: 1,2,3. Row 2: 2,3,4. Row 3: 3,4,5.'
+    },
+    {
+        id: 'VIS4',
+        type: 'grid',
+        question: 'Which shape fits?',
+        shapes: ['circle-sm', 'circle-md', 'circle-lg', 'square-sm', 'square-md', 'square-lg', 'diamond-sm', 'diamond-md', '?'],
+        options: ['diamond-lg', 'diamond-sm', 'circle-lg', 'square-lg'],
+        correctIndex: 0,
+        explanation: 'Columns are shapes (Circle, Square, Diamond). Rows are sizes (Small, Medium, Large). Missing: Diamond Large.'
+    },
+    {
+        id: 'VIS5',
+        type: 'grid',
+        question: 'Logical deduction.',
+        shapes: ['line-h', 'line-v', 'plus', 'line-v', 'plus', 'line-h', 'plus', 'line-h', '?'],
+        options: ['line-v', 'plus', 'circle', 'square'],
+        correctIndex: 0,
+        explanation: 'XOR Logic. Row 1: H + V = Plus. Row 2: V + Plus = H (visual subtraction). Row 3: Plus + H = V.'
+    },
+
+    // --- Spatial Rotation ---
+    {
+        id: 'VIS6',
+        type: 'rotation',
+        question: 'Which option is a rotation of the main shape?',
+        shapes: ['L-shape-0'],
+        options: ['L-shape-flip', 'L-shape-90', 'L-shape-distorted', 'Z-shape'],
+        correctIndex: 1,
+        explanation: 'Option B is the L-shape rotated 90 degrees. Others are flipped or different shapes.'
+    },
+    {
+        id: 'VIS7',
+        type: 'rotation',
+        question: 'Identify the rotated figure.',
+        shapes: ['F-shape-0'],
+        options: ['F-shape-180', 'F-shape-mirror', 'E-shape', 'T-shape'],
+        correctIndex: 0,
+        explanation: 'Option A is the F-shape rotated 180 degrees.'
+    },
+    {
+        id: 'VIS8',
+        type: 'rotation',
+        question: 'Find the matching 3D block.',
+        shapes: ['cube-pattern-A'],
+        options: ['cube-pattern-B', 'cube-pattern-A-rot', 'cube-pattern-C', 'cube-pattern-D'],
+        correctIndex: 1,
+        explanation: 'Mental rotation of a cube with specific face patterns.'
+    },
+    {
+        id: 'VIS9',
+        type: 'rotation',
+        question: 'Which shape is the same as the reference?',
+        shapes: ['spiral-cw'],
+        options: ['spiral-ccw', 'spiral-cw-rot', 'spiral-distorted', 'circle'],
+        correctIndex: 1,
+        explanation: 'Clockwise spiral rotated is still a clockwise spiral.'
+    },
+    {
+        id: 'VIS10',
+        type: 'rotation',
+        question: 'Select the rotated version.',
+        shapes: ['triangle-asym'],
+        options: ['triangle-asym-mirror', 'triangle-asym-rot', 'triangle-equi', 'triangle-iso'],
+        correctIndex: 1,
+        explanation: 'Asymmetrical triangle rotated.'
+    },
+
+    // --- Visual Series ---
+    {
+        id: 'VIS11',
+        type: 'sequence',
+        question: 'What comes next?',
+        shapes: ['clock-12', 'clock-3', 'clock-6', 'clock-9', '?'],
+        options: ['clock-12', 'clock-1', 'clock-6', 'clock-10'],
+        correctIndex: 0,
+        explanation: 'Clock hand moving 90 degrees clockwise. Next is 12 o\'clock.'
+    },
+    {
+        id: 'VIS12',
+        type: 'sequence',
+        question: 'Continue the sequence.',
+        shapes: ['bar-1', 'bar-2', 'bar-3', 'bar-4', '?'],
+        options: ['bar-3', 'bar-5', 'bar-1', 'bar-0'],
+        correctIndex: 1,
+        explanation: 'Adding one bar each step.'
+    },
+    {
+        id: 'VIS13',
+        type: 'sequence',
+        question: 'Next in the pattern?',
+        shapes: ['poly-3', 'poly-4', 'poly-5', 'poly-6', '?'],
+        options: ['poly-7', 'poly-8', 'poly-3', 'circle'],
+        correctIndex: 0,
+        explanation: 'Sides of polygon increasing: Triangle, Square, Pentagon, Hexagon. Next is Heptagon.'
+    },
+    {
+        id: 'VIS14',
+        type: 'sequence',
+        question: 'Predict the next state.',
+        shapes: ['moon-new', 'moon-crescent', 'moon-half', 'moon-gibbous', '?'],
+        options: ['moon-full', 'moon-new', 'moon-crescent', 'sun'],
+        correctIndex: 0,
+        explanation: 'Phases of the moon progression.'
+    },
+    {
+        id: 'VIS15',
+        type: 'sequence',
+        question: 'Follow the movement.',
+        shapes: ['grid-tl', 'grid-tr', 'grid-br', 'grid-bl', '?'],
+        options: ['grid-tl', 'grid-center', 'grid-tr', 'grid-br'],
+        correctIndex: 0,
+        explanation: 'Dot moving clockwise in corners. Returns to Top-Left.'
+    },
+
+    // --- Odd One Out ---
+    {
+        id: 'VIS16',
+        type: 'odd-one-out',
+        question: 'Which shape does not belong?',
+        shapes: ['circle', 'oval', 'square', 'ellipse'],
+        options: ['circle', 'oval', 'square', 'ellipse'],
+        correctIndex: 2,
+        explanation: 'Square has corners; others are curvilinear.'
+    },
+    {
+        id: 'VIS17',
+        type: 'odd-one-out',
+        question: 'Identify the outlier.',
+        shapes: ['parallel-h', 'parallel-v', 'parallel-d', 'intersecting'],
+        options: ['parallel-h', 'parallel-v', 'parallel-d', 'intersecting'],
+        correctIndex: 3,
+        explanation: 'First three are parallel lines; last one intersects.'
+    },
+    {
+        id: 'VIS18',
+        type: 'odd-one-out',
+        question: 'Find the intruder.',
+        shapes: ['3D-cube', '3D-sphere', '3D-pyramid', '2D-square'],
+        options: ['3D-cube', '3D-sphere', '3D-pyramid', '2D-square'],
+        correctIndex: 3,
+        explanation: 'Square is 2D; others are 3D solids.'
+    },
+    {
+        id: 'VIS19',
+        type: 'odd-one-out',
+        question: 'Which one is different?',
+        shapes: ['fill-100', 'fill-75', 'fill-50', 'outline'],
+        options: ['fill-100', 'fill-75', 'fill-50', 'outline'],
+        correctIndex: 3,
+        explanation: 'First three have some fill; last is purely outline (or 0% fill).'
+    },
+    {
+        id: 'VIS20',
+        type: 'odd-one-out',
+        question: 'Spot the odd one.',
+        shapes: ['sym-x', 'sym-y', 'sym-xy', 'asym'],
+        options: ['sym-x', 'sym-y', 'sym-xy', 'asym'],
+        correctIndex: 3,
+        explanation: 'First three have symmetry; last is asymmetrical.'
     }
 ];
 

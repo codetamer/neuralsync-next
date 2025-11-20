@@ -62,9 +62,9 @@ export const BartStage = () => {
 
             // Pulse animation with increasing intensity
             controls.start({
-                scale: [1, 1.05 + burstProb * 0.2, 1],
-                x: [0, -2 * burstProb, 2 * burstProb, 0],
-                transition: { duration: 0.1 }
+                scale: [1, 1.05 + burstProb * 0.4, 1], // More swelling
+                ...getShakeParams(),
+                transition: { duration: 0.2 } // Faster shake
             });
         }
     };
@@ -87,9 +87,22 @@ export const BartStage = () => {
 
     // Color interpolation based on risk
     const getCoreColor = () => {
-        if (riskLevel < 0.3) return '#22d3ee'; // Teal
-        if (riskLevel < 0.6) return '#f59e0b'; // Orange
-        return '#ef4444'; // Red
+        // Interpolate from Teal (#22d3ee) to Red (#ef4444) based on riskLevel
+        // Simple step function for now, but could be smooth lerp
+        if (riskLevel < 0.2) return '#22d3ee'; // Teal (Safe)
+        if (riskLevel < 0.4) return '#4ade80'; // Green (Low Risk)
+        if (riskLevel < 0.6) return '#facc15'; // Yellow (Caution)
+        if (riskLevel < 0.8) return '#f97316'; // Orange (Danger)
+        return '#ef4444'; // Red (Critical)
+    };
+
+    // Shake intensity based on risk
+    const getShakeParams = () => {
+        const intensity = riskLevel * 10;
+        return {
+            x: [0, -intensity, intensity, -intensity / 2, intensity / 2, 0],
+            y: [0, intensity / 2, -intensity / 2, intensity / 4, -intensity / 4, 0],
+        };
     };
 
     return (
