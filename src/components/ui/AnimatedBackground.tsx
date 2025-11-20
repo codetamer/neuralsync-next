@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { cn } from '../../lib/utils';
 
 interface Particle {
     id: number;
@@ -22,56 +23,76 @@ const generateParticles = (count: number): Particle[] => {
     }));
 };
 
+import { useThemeStore } from '../../store/useThemeStore';
+
 export const AnimatedBackground = () => {
     const particles = useMemo(() => generateParticles(25), []);
+    const { theme } = useThemeStore();
+
+    // Theme Configuration
+    const isZenith = theme === 'zenith';
+
+    // Colors
+    const colors = {
+        orb1: isZenith
+            ? 'linear-gradient(135deg, rgba(167, 139, 250, 0.3), rgba(56, 189, 248, 0.2))' // Lavender/Sky
+            : 'linear-gradient(135deg, rgba(189, 0, 255, 0.3), rgba(0, 243, 255, 0.2))',   // Purple/Cyan
+        orb2: isZenith
+            ? 'linear-gradient(225deg, rgba(56, 189, 248, 0.3), rgba(74, 222, 128, 0.2))' // Sky/Mint
+            : 'linear-gradient(225deg, rgba(0, 243, 255, 0.3), rgba(0, 255, 148, 0.2))',   // Cyan/Green
+        orb3: isZenith
+            ? 'linear-gradient(90deg, rgba(74, 222, 128, 0.2), rgba(167, 139, 250, 0.15))' // Mint/Lavender
+            : 'linear-gradient(90deg, rgba(0, 255, 148, 0.2), rgba(189, 0, 255, 0.15))',   // Green/Purple
+        orb4: isZenith
+            ? 'linear-gradient(180deg, rgba(244, 114, 182, 0.2), rgba(167, 139, 250, 0.15))' // Pink/Lavender
+            : 'linear-gradient(180deg, rgba(255, 0, 85, 0.2), rgba(189, 0, 255, 0.15))',     // Red/Purple
+        orb5: isZenith
+            ? 'linear-gradient(45deg, rgba(74, 222, 128, 0.15), rgba(56, 189, 248, 0.2))' // Mint/Sky
+            : 'linear-gradient(45deg, rgba(0, 255, 148, 0.15), rgba(0, 243, 255, 0.2))',   // Green/Cyan
+
+        // Neural Network Stops
+        stop1: isZenith ? 'rgb(56, 189, 248)' : 'rgb(0, 243, 255)',   // Sky vs Cyan
+        stop2: isZenith ? 'rgb(167, 139, 250)' : 'rgb(189, 0, 255)',  // Lavender vs Purple
+        stop3: isZenith ? 'rgb(74, 222, 128)' : 'rgb(0, 255, 148)',   // Mint vs Green
+    };
 
     return (
-        <div className="fixed inset-0 -z-10 overflow-hidden bg-neural-bg">
+        <div className="fixed inset-0 -z-10 overflow-hidden bg-neural-bg transition-colors duration-700">
             {/* Base gradient mesh */}
-            <div className="absolute inset-0 bg-gradient-to-br from-neural-bg via-black to-neural-bg opacity-90" />
+            <div className={cn(
+                "absolute inset-0 bg-gradient-to-br opacity-90 transition-colors duration-700",
+                isZenith
+                    ? "from-neural-bg via-[#1a1f35] to-neural-bg"
+                    : "from-[#0B1120] via-[#1a103c] to-[#0B1120]" // Deep Blue -> Deep Purple -> Deep Blue
+            )} />
 
-            {/* Enhanced Floating Orbs - Using inline styles for guaranteed animation */}
+            {/* Enhanced Floating Orbs */}
             <div
-                className="absolute top-[-15%] left-[-15%] w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-40"
-                style={{
-                    background: 'linear-gradient(135deg, rgba(189, 0, 255, 0.3), rgba(59, 130, 246, 0.2))',
-                    animation: 'float1 22s ease-in-out infinite',
-                }}
+                className="absolute top-[-15%] left-[-15%] w-[55vw] h-[55vw] rounded-full blur-[140px] opacity-40 transition-all duration-1000"
+                style={{ background: colors.orb1, animation: 'float1 22s ease-in-out infinite' }}
             />
 
             <div
-                className="absolute bottom-[-20%] right-[-20%] w-[70vw] h-[70vw] rounded-full blur-[160px] opacity-30"
-                style={{
-                    background: 'linear-gradient(225deg, rgba(59, 130, 246, 0.3), rgba(0, 240, 255, 0.2))',
-                    animation: 'float2 28s ease-in-out infinite',
-                }}
+                className="absolute bottom-[-20%] right-[-20%] w-[70vw] h-[70vw] rounded-full blur-[160px] opacity-30 transition-all duration-1000"
+                style={{ background: colors.orb2, animation: 'float2 28s ease-in-out infinite' }}
             />
 
             <div
-                className="absolute top-[35%] left-[25%] w-[45vw] h-[45vw] rounded-full blur-[120px] opacity-35"
-                style={{
-                    background: 'linear-gradient(90deg, rgba(0, 240, 255, 0.2), rgba(189, 0, 255, 0.15))',
-                    animation: 'float3 18s ease-in-out infinite',
-                }}
+                className="absolute top-[35%] left-[25%] w-[45vw] h-[45vw] rounded-full blur-[120px] opacity-35 transition-all duration-1000"
+                style={{ background: colors.orb3, animation: 'float3 18s ease-in-out infinite' }}
             />
 
             <div
-                className="absolute top-[60%] right-[15%] w-[50vw] h-[50vw] rounded-full blur-[130px] opacity-28"
-                style={{
-                    background: 'linear-gradient(180deg, rgba(255, 0, 85, 0.2), rgba(189, 0, 255, 0.15))',
-                    animation: 'float4 25s ease-in-out infinite',
-                }}
+                className="absolute top-[60%] right-[15%] w-[50vw] h-[50vw] rounded-full blur-[130px] opacity-28 transition-all duration-1000"
+                style={{ background: colors.orb4, animation: 'float4 25s ease-in-out infinite' }}
             />
 
             <div
-                className="absolute bottom-[20%] left-[40%] w-[40vw] h-[40vw] rounded-full blur-[110px] opacity-32"
-                style={{
-                    background: 'linear-gradient(45deg, rgba(0, 255, 148, 0.15), rgba(0, 240, 255, 0.2))',
-                    animation: 'float5 20s ease-in-out infinite',
-                }}
+                className="absolute bottom-[20%] left-[40%] w-[40vw] h-[40vw] rounded-full blur-[110px] opacity-32 transition-all duration-1000"
+                style={{ background: colors.orb5, animation: 'float5 20s ease-in-out infinite' }}
             />
 
-            {/* Floating Particles - Simple CSS version */}
+            {/* Floating Particles */}
             {particles.map((particle) => (
                 <div
                     key={particle.id}
@@ -86,13 +107,13 @@ export const AnimatedBackground = () => {
                 />
             ))}
 
-            {/* Neural Network Connections - Simplified */}
+            {/* Neural Network Connections */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
                 <defs>
                     <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style={{ stopColor: 'rgb(0, 240, 255)', stopOpacity: 0.4 }} />
-                        <stop offset="50%" style={{ stopColor: 'rgb(189, 0, 255)', stopOpacity: 0.3 }} />
-                        <stop offset="100%" style={{ stopColor: 'rgb(59, 130, 246)', stopOpacity: 0.4 }} />
+                        <stop offset="0%" stopColor={colors.stop1} stopOpacity="0.4" className="transition-all duration-700" />
+                        <stop offset="50%" stopColor={colors.stop2} stopOpacity="0.3" className="transition-all duration-700" />
+                        <stop offset="100%" stopColor={colors.stop3} stopOpacity="0.4" className="transition-all duration-700" />
                     </linearGradient>
                 </defs>
                 {particles.slice(0, 12).map((p1, i) =>
@@ -118,7 +139,7 @@ export const AnimatedBackground = () => {
                 )}
             </svg>
 
-            {/* Enhanced Grid Overlay with pulsing animation */}
+            {/* Enhanced Grid Overlay */}
             <div
                 className="absolute inset-0 animate-pulse-slow"
                 style={{

@@ -2,16 +2,21 @@ import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-display" });
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "NeuralSync - Comprehensive IQ, EQ & Personality Assessment",
-  description: "Advanced psychometric testing platform for cognitive performance, emotional intelligence, and personality analysis.",
+  title: "NeuralSync",
+  description: "Advanced Psychometric Evaluation System",
   icons: {
-    icon: '/logo.svg',
-    shortcut: '/logo.svg',
-    apple: '/logo.svg',
+    icon: "/logo.svg",
   },
 };
 
@@ -22,8 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${outfit.variable} antialiased font-sans`}>
-        {children}
+      <body
+        className={`${inter.variable} ${outfit.variable} antialiased min-h-screen relative`}
+      >
+        <div className="relative z-10">
+          {children}
+        </div>
       </body>
     </html>
   );

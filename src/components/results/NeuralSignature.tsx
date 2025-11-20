@@ -137,7 +137,7 @@ export const NeuralSignature = ({ data }: NeuralSignatureProps) => {
                                 if (active && payload && payload.length) {
                                     const data = payload[0].payload;
                                     return (
-                                        <div className="bg-black/95 border border-neon-teal/40 p-4 rounded-lg shadow-[0_0_20px_rgba(0,243,255,0.3)] backdrop-blur-md">
+                                        <div className="bg-neural-bg/95 border border-neon-teal/40 p-4 rounded-lg shadow-[0_0_20px_rgba(74,222,128,0.3)] backdrop-blur-md">
                                             <div className="text-neon-teal font-bold mb-2 border-b border-white/10 pb-2">
                                                 LEVEL {data.level}
                                             </div>

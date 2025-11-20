@@ -114,12 +114,12 @@ export const BartStage = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-neural-bg/80 backdrop-blur-sm p-4"
                     >
                         <GlassCard className="max-w-md w-full p-8 text-center space-y-6 border-neon-teal/30">
                             <Info className="w-12 h-12 text-neon-teal mx-auto" />
                             <h2 className="text-2xl font-display font-bold text-white">MISSION BRIEFING</h2>
-                            <div className="text-neural-muted space-y-4 text-left bg-black/20 p-4 rounded-lg">
+                            <div className="text-neural-muted space-y-4 text-left bg-neural-card p-4 rounded-lg">
                                 <p>1. <span className="text-white font-bold">CHARGE</span> the core to increase potential energy ($).</p>
                                 <p>2. <span className="text-white font-bold">STABILIZE</span> to bank your earnings before critical mass.</p>
                                 <p>3. <span className="text-neon-red font-bold">WARNING:</span> Higher charge = Higher risk of meltdown.</p>

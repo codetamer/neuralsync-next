@@ -90,7 +90,7 @@ export const ResultsDashboard = () => {
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-black/20 backdrop-blur-md rounded-2xl border border-white/10 p-4 flex items-center justify-center min-h-[400px]"
+                    className="bg-neural-card backdrop-blur-md rounded-2xl border border-white/10 p-4 flex items-center justify-center min-h-[400px]"
                 >
                     <TraitRadar data={radarData} />
                 </motion.div>

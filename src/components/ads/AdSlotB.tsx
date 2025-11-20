@@ -47,7 +47,7 @@ export const AdSlotB = ({ onComplete }: AdSlotBProps) => {
                 </div>
 
                 {/* Ad Container */}
-                <div className="w-full aspect-video bg-black/50 rounded-xl border border-white/10 flex items-center justify-center relative overflow-hidden group">
+                <div className="w-full aspect-video bg-neural-bg/50 rounded-xl border border-white/10 flex items-center justify-center relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-tr from-neon-purple/10 to-neon-blue/10 opacity-50" />
                     <span className="font-mono text-sm text-neural-muted group-hover:text-white transition-colors">
                         ADVERTISEMENT_SLOT_B_INTERSTITIAL

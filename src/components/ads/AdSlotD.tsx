@@ -42,7 +42,7 @@ export const AdSlotD = ({ onComplete }: AdSlotDProps) => {
                 </div>
 
                 {/* Video Ad Container */}
-                <div className="relative w-full aspect-video bg-black rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-neon-purple/20">
+                <div className="relative w-full aspect-video bg-neural-bg rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-neon-purple/20">
                     {/* Progress Bar */}
                     <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 z-20">
                         <motion.div
@@ -64,7 +64,7 @@ export const AdSlotD = ({ onComplete }: AdSlotDProps) => {
                     </div>
 
                     {/* Countdown Overlay */}
-                    <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur px-3 py-1 rounded-lg text-xs font-mono text-white border border-white/10">
+                    <div className="absolute bottom-4 right-4 bg-neural-bg/80 backdrop-blur px-3 py-1 rounded-lg text-xs font-mono text-white border border-white/10">
                         {timeLeft > 0 ? `AD ENDS IN ${timeLeft}s` : 'AD COMPLETED'}
                     </div>
                 </div>

@@ -1,9 +1,12 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { AnimatedBackground } from '../ui/AnimatedBackground';
+import { ThemeToggle } from '../ui/ThemeToggle';
+import { Logo } from '../ui/Logo';
 import { AdSlotA } from '../ads/AdSlotA';
 import { useTestStore } from '../../store/useTestStore';
+import { useThemeStore } from '../../store/useThemeStore';
 import { NeonButton } from '../ui/NeonButton';
 import { Home, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
@@ -60,6 +63,13 @@ export const AppShell = ({ children }: AppShellProps) => {
 
     const progress = getProgress();
 
+    const { theme } = useThemeStore();
+
+    // Apply theme to document root
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', theme);
+    }, [theme]);
+
     return (
         <div className="min-h-screen w-full text-white overflow-x-hidden font-sans selection:bg-neon-teal/30">
             <AnimatedBackground />
@@ -77,9 +87,9 @@ export const AppShell = ({ children }: AppShellProps) => {
             <div className="relative z-10 flex flex-col min-h-screen">
                 <AdSlotA />
 
-                <header className="w-full p-4 flex justify-between items-center border-b border-white/5 bg-black/20 backdrop-blur-sm">
+                <header className="w-full p-4 flex justify-between items-center border-b border-white/5 bg-neural-card backdrop-blur-sm">
                     <div className="flex items-center gap-3">
-                        <img src="/logo.svg" alt="NeuralSync Logo" className="w-12 h-12" />
+                        <Logo className="w-12 h-12" />
                         <h1 className="text-xl font-display font-bold tracking-wide">
                             NEURAL<span className="text-neon-teal">SYNC</span>
                         </h1>
@@ -105,7 +115,7 @@ export const AppShell = ({ children }: AppShellProps) => {
 
                 {/* Progress Bar */}
                 {currentStage > 0 && !isTestComplete && (
-                    <div className="w-full bg-black/40 backdrop-blur-sm border-b border-white/5">
+                    <div className="w-full bg-neural-card backdrop-blur-sm border-b border-white/5">
                         <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-between">
                             <div className="flex-1 mr-4">
                                 <div className="flex items-center justify-between mb-1">
@@ -147,7 +157,7 @@ export const AppShell = ({ children }: AppShellProps) => {
                     {children}
                 </main>
 
-                <footer className="border-t border-white/5 bg-black/20 backdrop-blur-sm">
+                <footer className="border-t border-white/5 bg-neural-card backdrop-blur-sm">
                     <div className="max-w-7xl mx-auto px-6 py-6">
                         {/* Social Links - Centered */}
                         <div className="flex justify-center items-center gap-4 mb-4">
@@ -201,6 +211,7 @@ export const AppShell = ({ children }: AppShellProps) => {
                         <div className="pt-4 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-neural-muted font-mono">
                             <p>© 2025 NeuralSync • Advanced Psychometrics Division</p>
                             <div className="flex items-center gap-6">
+                                <ThemeToggle />
                                 <button
                                     onClick={() => window.location.reload()}
                                     className="hover:text-neon-teal transition-colors"

@@ -52,7 +52,7 @@ export const MatrixStage = () => {
                 </div>
             </div>
 
-            <GlassCard className="p-8 md:p-12 flex flex-col gap-8 items-center bg-black/20">
+            <GlassCard className="p-8 md:p-12 flex flex-col gap-8 items-center bg-neural-card">
                 <h3 className="text-xl md:text-2xl text-center font-medium leading-relaxed text-white/90">
                     {puzzle.question}
                 </h3>

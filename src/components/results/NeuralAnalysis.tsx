@@ -255,7 +255,7 @@ export const NeuralAnalysis = ({ iq, eq, risk, personalityType, ocean }: NeuralA
             </div>
 
             {/* Terminal View */}
-            <div className="bg-black/90 rounded-lg p-4 font-mono text-xs md:text-sm text-green-400 min-h-[300px] overflow-hidden border border-white/10 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] relative">
+            <div className="bg-neural-bg/90 rounded-lg p-4 font-mono text-xs md:text-sm text-neon-teal min-h-[300px] overflow-hidden border border-white/10 shadow-[inset_0_0_20px_rgba(15,23,42,0.8)] relative">
                 {/* Scanline Effect */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-10 pointer-events-none bg-[length:100%_2px,3px_100%]" />
 

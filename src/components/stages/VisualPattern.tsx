@@ -199,7 +199,7 @@ const renderShape = (shapeId: string, className?: string) => {
 
         return (
             <div className={cn("w-full h-full flex items-center justify-center", isRot && "rotate-90")}>
-                <div className="w-16 h-16 border-4 border-neon-teal relative bg-black/50">
+                <div className="w-16 h-16 border-4 border-neon-teal relative bg-neural-bg/50">
                     {type === 'A' && <div className="absolute inset-0 bg-neon-teal/20" />}
                     {type === 'B' && <div className="absolute inset-2 border-2 border-neon-teal" />}
                     {type === 'C' && <div className="absolute inset-0 flex items-center justify-center"><div className="w-8 h-8 bg-neon-teal rounded-full" /></div>}
@@ -234,7 +234,7 @@ const renderShape = (shapeId: string, className?: string) => {
             <div className="w-full h-full flex items-center justify-center">
                 <div className="w-12 h-12 rounded-full border-2 border-neon-teal relative overflow-hidden">
                     {phase === 'full' && <div className="absolute inset-0 bg-neon-teal" />}
-                    {phase === 'new' && <div className="absolute inset-0 bg-black" />}
+                    {phase === 'new' && <div className="absolute inset-0 bg-neural-bg" />}
                     {phase === 'half' && <div className="absolute inset-0 bg-neon-teal w-1/2" />}
                     {phase === 'crescent' && <div className="absolute inset-0 bg-neon-teal rounded-full -translate-x-4" />}
                     {phase === 'gibbous' && <div className="absolute inset-0 bg-neon-teal rounded-full translate-x-2" />}
@@ -321,7 +321,7 @@ const renderShape = (shapeId: string, className?: string) => {
 export const VisualPattern = ({ type, shapes }: VisualPatternProps) => {
     if (type === 'grid') {
         return (
-            <div className="grid grid-cols-3 gap-4 w-full max-w-md aspect-square p-4 bg-black/40 rounded-xl border border-white/10">
+            <div className="grid grid-cols-3 gap-4 w-full max-w-md aspect-square p-4 bg-neural-card rounded-xl border border-white/10">
                 {shapes.map((shape, i) => (
                     <div key={i} className="aspect-square bg-white/5 rounded-lg flex items-center justify-center p-4 border border-white/5 overflow-hidden">
                         {shape === '?' ? <span className="text-4xl text-neon-teal font-bold animate-pulse">?</span> : renderShape(shape)}
@@ -333,7 +333,7 @@ export const VisualPattern = ({ type, shapes }: VisualPatternProps) => {
 
     if (type === 'sequence') {
         return (
-            <div className="flex gap-4 w-full max-w-3xl justify-center items-center p-8 bg-black/40 rounded-xl border border-white/10 overflow-x-auto">
+            <div className="flex gap-4 w-full max-w-3xl justify-center items-center p-8 bg-neural-card rounded-xl border border-white/10 overflow-x-auto">
                 {shapes.map((shape, i) => (
                     <div key={i} className="w-24 h-24 flex-shrink-0 bg-white/5 rounded-lg flex items-center justify-center p-4 border border-white/5">
                         {shape === '?' ? <span className="text-4xl text-neon-teal font-bold animate-pulse">?</span> : renderShape(shape)}
@@ -345,7 +345,7 @@ export const VisualPattern = ({ type, shapes }: VisualPatternProps) => {
 
     if (type === 'rotation') {
         return (
-            <div className="flex justify-center items-center p-12 bg-black/40 rounded-xl border border-white/10">
+            <div className="flex justify-center items-center p-12 bg-neural-card rounded-xl border border-white/10">
                 <div className="w-40 h-40 bg-white/5 rounded-lg flex items-center justify-center p-8 border border-white/5 shadow-[0_0_30px_rgba(34,211,238,0.1)]">
                     {renderShape(shapes[0])}
                 </div>
@@ -355,7 +355,7 @@ export const VisualPattern = ({ type, shapes }: VisualPatternProps) => {
 
     if (type === 'odd-one-out') {
         return (
-            <div className="grid grid-cols-4 gap-4 w-full max-w-3xl p-6 bg-black/40 rounded-xl border border-white/10">
+            <div className="grid grid-cols-4 gap-4 w-full max-w-3xl p-6 bg-neural-card rounded-xl border border-white/10">
                 {shapes.map((shape, i) => (
                     <div key={i} className="aspect-square bg-white/5 rounded-lg flex items-center justify-center p-4 border border-white/5">
                         {renderShape(shape)}

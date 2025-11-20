@@ -35,7 +35,7 @@ export const CognitiveProfile = ({ iq, eq, risk }: CognitiveProfileProps) => {
                             <span className="text-white/80 font-medium">{metric.label}</span>
                             <span className="text-neon-teal font-mono text-xl">{metric.value}</span>
                         </div>
-                        <div className="h-4 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                        <div className="h-4 bg-neural-card rounded-full overflow-hidden border border-white/5">
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${Math.min(100, (metric.value / 150) * 100)}%` }} // Scale roughly to 150 max

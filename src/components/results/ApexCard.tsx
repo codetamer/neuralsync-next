@@ -13,17 +13,17 @@ interface ApexCardProps {
 export const ApexCard = ({ trait, score, description }: ApexCardProps) => {
     // Determine color based on trait (mock logic for visual variety)
     const getColor = (t: string) => {
-        const colors: Record<string, string> = {
-            'Openness': 'text-neon-purple',
-            'Conscientiousness': 'text-neon-blue',
-            'Extraversion': 'text-neon-orange',
-            'Agreeableness': 'text-neon-green',
-            'Neuroticism': 'text-neon-red'
+        const colors: Record<string, { text: string; bg: string }> = {
+            'Openness': { text: 'text-neon-purple', bg: 'bg-neon-purple' },
+            'Conscientiousness': { text: 'text-neon-blue', bg: 'bg-neon-blue' },
+            'Extraversion': { text: 'text-neon-orange', bg: 'bg-neon-orange' },
+            'Agreeableness': { text: 'text-neon-green', bg: 'bg-neon-green' },
+            'Neuroticism': { text: 'text-neon-red', bg: 'bg-neon-red' }
         };
-        return colors[t] || 'text-neon-teal';
+        return colors[t] || { text: 'text-neon-teal', bg: 'bg-neon-teal' };
     };
 
-    const colorClass = getColor(trait);
+    const { text: textColor, bg: bgColor } = getColor(trait);
 
     return (
         <GlassCard className="relative overflow-hidden p-6 border-white/10 flex flex-col justify-between h-full min-h-[320px]">
@@ -34,10 +34,10 @@ export const ApexCard = ({ trait, score, description }: ApexCardProps) => {
 
             <div className="relative z-10 flex flex-col h-full justify-center space-y-6">
                 <div className="flex items-start gap-4">
-                    <div className={cn("w-1.5 h-12 rounded-full bg-current mt-1 shrink-0 shadow-[0_0_10px_currentColor]", colorClass)} />
+                    <div className={cn("w-1.5 h-12 rounded-full bg-current mt-1 shrink-0 shadow-[0_0_10px_currentColor]", textColor)} />
                     <div className="flex-1 min-w-0">
                         <h3 className="text-xs text-neural-muted font-mono tracking-widest mb-1 uppercase">Dominant Archetype</h3>
-                        <h2 className={cn("text-3xl md:text-4xl font-display font-bold tracking-wide leading-tight break-words drop-shadow-lg", colorClass)}>
+                        <h2 className={cn("text-3xl md:text-4xl font-display font-bold tracking-wide leading-tight break-words drop-shadow-lg", textColor)}>
                             {trait.toUpperCase()}
                         </h2>
                     </div>
@@ -59,7 +59,7 @@ export const ApexCard = ({ trait, score, description }: ApexCardProps) => {
                                 initial={{ width: 0 }}
                                 animate={{ width: `${score}%` }}
                                 transition={{ duration: 1.5, ease: "easeOut" }}
-                                className={cn("h-full shadow-[0_0_15px_currentColor]", colorClass.replace('text-', 'bg-'))}
+                                className={cn("h-full shadow-[0_0_15px_currentColor]", bgColor)}
                             />
                         </div>
                     </div>
@@ -67,7 +67,7 @@ export const ApexCard = ({ trait, score, description }: ApexCardProps) => {
             </div>
 
             {/* Decorative background glow */}
-            <div className={cn("absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[100px] opacity-10 pointer-events-none", colorClass.replace('text-', 'bg-'))} />
+            <div className={cn("absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[100px] opacity-10 pointer-events-none", bgColor)} />
         </GlassCard>
     );
 };

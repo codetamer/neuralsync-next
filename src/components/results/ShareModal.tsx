@@ -104,12 +104,12 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neural-bg/80 backdrop-blur-sm">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
-                        className="bg-neutral-900 border border-white/10 rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-2xl"
+                        className="bg-neural-bg border border-white/10 rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-2xl"
                     >
                         <div className="p-4 border-b border-white/10 flex justify-between items-center">
                             <h3 className="text-lg md:text-xl font-display font-bold text-white flex items-center gap-2">
@@ -122,7 +122,7 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
                         </div>
 
                         <div className="flex-1 overflow-auto p-4 md:p-6 flex flex-col items-center justify-center bg-grid-white/[0.02]">
-                            <div ref={cardRef} className="w-full max-w-[450px] bg-gradient-to-br from-neutral-900 via-neutral-950 to-black p-5 md:p-7 rounded-2xl border border-white/20 shadow-2xl">
+                            <div ref={cardRef} className="w-full max-w-[450px] bg-gradient-to-br from-neural-bg via-slate-900 to-neural-bg p-5 md:p-7 rounded-2xl border border-white/20 shadow-2xl">
                                 <div className="text-center mb-4">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neon-teal/10 border border-neon-teal/30 rounded-full mb-2">
                                         <Brain className="w-3 h-3 text-neon-teal" />
@@ -194,7 +194,7 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
                             <p className="text-xs text-white/50 mt-3 text-center">Card optimized for social sharing</p>
                         </div>
 
-                        <div className="p-4 md:p-6 border-t border-white/10 flex flex-col gap-4 bg-neutral-900">
+                        <div className="p-4 md:p-6 border-t border-white/10 flex flex-col gap-4 bg-neural-bg">
                             <div className="flex flex-wrap gap-3 justify-center">
                                 <NeonButton onClick={handleDownload} disabled={isCapturing} className="text-sm">
                                     <Download className="w-4 h-4 mr-2" />

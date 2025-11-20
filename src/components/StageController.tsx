@@ -110,7 +110,7 @@ export const StageController = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-neural-bg/90 backdrop-blur-md"
                     >
                         <div className="text-center">
                             <motion.div
