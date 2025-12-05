@@ -10,7 +10,8 @@ import { useThemeStore } from '../../store/useThemeStore';
 import { NeonButton } from '../ui/NeonButton';
 import { Home, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
-import { AmbientSound } from '../audio/AmbientSound';
+
+import { audio } from '../../engine/AudioEngine';
 
 interface AppShellProps {
     children: ReactNode;
@@ -70,10 +71,27 @@ export const AppShell = ({ children }: AppShellProps) => {
         document.documentElement.setAttribute('data-theme', theme);
     }, [theme]);
 
+    // Initialize audio on first interaction
+    useEffect(() => {
+        const initAudio = () => {
+            audio.initialize();
+            window.removeEventListener('click', initAudio);
+            window.removeEventListener('keydown', initAudio);
+        };
+
+        window.addEventListener('click', initAudio);
+        window.addEventListener('keydown', initAudio);
+
+        return () => {
+            window.removeEventListener('click', initAudio);
+            window.removeEventListener('keydown', initAudio);
+        };
+    }, []);
+
     return (
         <div className="min-h-screen w-full text-white overflow-x-hidden font-sans selection:bg-neon-teal/30">
             <AnimatedBackground />
-            <AmbientSound muted={muted} />
+            <AnimatedBackground />
 
             <ConfirmationModal
                 isOpen={modalConfig.isOpen}
@@ -105,7 +123,11 @@ export const AppShell = ({ children }: AppShellProps) => {
                         </div>
 
                         <button
-                            onClick={() => setMuted(!muted)}
+                            onClick={() => {
+                                const newMuted = !muted;
+                                setMuted(newMuted);
+                                audio.setMuted(newMuted);
+                            }}
                             className="p-2 rounded-full hover:bg-white/5 text-neural-muted hover:text-white transition-colors"
                         >
                             {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}

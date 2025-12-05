@@ -15,12 +15,13 @@ interface ShareModalProps {
         eq: number;
         eqPercentile: number;
         riskTolerance: number;
-        personality: {
-            openness: number;
-            conscientiousness: number;
+        hexaco: {
+            honesty: number;
+            emotionality: number;
             extraversion: number;
             agreeableness: number;
-            neuroticism: number;
+            conscientiousness: number;
+            openness: number;
         };
         apexTrait: { trait: string; score: number; description: string };
     };
@@ -32,11 +33,12 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
 
     const getArchetype = () => {
-        const { iq, eq, riskTolerance, personality } = scores;
-        if (iq > 130 && personality.openness > 75) return "Visionary Architect";
-        if (iq > 125 && personality.conscientiousness > 80) return "Precision Engineer";
-        if (eq > 125 && personality.agreeableness > 70) return "Harmonic Resonator";
-        if (eq > 120 && personality.extraversion > 75) return "Social Catalyst";
+        const { iq, eq, riskTolerance, hexaco } = scores;
+        if (hexaco.honesty > 80) return "Ethical Guardian";
+        if (iq > 130 && hexaco.openness > 75) return "Visionary Architect";
+        if (iq > 125 && hexaco.conscientiousness > 80) return "Precision Engineer";
+        if (eq > 125 && hexaco.agreeableness > 70) return "Harmonic Resonator";
+        if (eq > 120 && hexaco.extraversion > 75) return "Social Catalyst";
         if (riskTolerance > 80) return "Chaos Navigator";
         if (riskTolerance > 70 && iq > 110) return "Calculated Maverick";
         if (Math.abs(iq - eq) < 15) return "Renaissance Synthesizer";
@@ -45,6 +47,7 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
 
     const archetype = getArchetype();
 
+    // ... (logic for download/copy remains same) ...
     const handleDownload = async () => {
         if (!cardRef.current) return;
         setIsCapturing(true);
@@ -126,10 +129,10 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
                                 <div className="text-center mb-4">
                                     <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neon-teal/10 border border-neon-teal/30 rounded-full mb-2">
                                         <Brain className="w-3 h-3 text-neon-teal" />
-                                        <span className="text-[10px] font-mono font-bold text-neon-teal tracking-wider">NEURALSYNC REDUX</span>
+                                        <span className="text-[10px] font-mono font-bold text-neon-teal tracking-wider">NEURALSYNC v4.2</span>
                                     </div>
                                     <h2 className="text-2xl md:text-3xl font-display font-bold text-white mb-1">Neural Profile</h2>
-                                    <p className="text-xs text-white/60 font-mono">Cognitive & Personality Assessment</p>
+                                    <p className="text-xs text-white/60 font-mono">Multidimensional Psychometric Analysis</p>
                                 </div>
 
                                 <div className="mb-4 p-3 bg-gradient-to-r from-neon-purple/10 to-neon-blue/10 border border-neon-purple/30 rounded-xl text-center">
@@ -161,20 +164,21 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
                                 <div className="mb-4 p-3 bg-neon-green/5 border border-neon-green/30 rounded-xl">
                                     <div className="flex items-center gap-2 mb-1">
                                         <TrendingUp className="w-3 h-3 text-neon-green" />
-                                        <p className="text-[10px] text-white/60 font-mono">APEX TRAIT</p>
+                                        <p className="text-[10px] text-white/60 font-mono">dominating trait</p>
                                     </div>
                                     <p className="text-sm md:text-base font-bold text-white mb-1">{scores.apexTrait.trait}</p>
                                     <p className="text-[10px] text-white/60 leading-relaxed line-clamp-2">{scores.apexTrait.description}</p>
                                 </div>
 
                                 <div className="space-y-1.5 mb-4">
-                                    <p className="text-[10px] text-white/60 font-mono mb-2">BIG FIVE PERSONALITY</p>
+                                    <p className="text-[10px] text-white/60 font-mono mb-2">HEXACO PERSONALITY</p>
                                     {[
-                                        { name: 'Openness', value: scores.personality.openness, color: 'bg-blue-500' },
-                                        { name: 'Conscientiousness', value: scores.personality.conscientiousness, color: 'bg-green-500' },
-                                        { name: 'Extraversion', value: scores.personality.extraversion, color: 'bg-yellow-500' },
-                                        { name: 'Agreeableness', value: scores.personality.agreeableness, color: 'bg-pink-500' },
-                                        { name: 'Neuroticism', value: scores.personality.neuroticism, color: 'bg-red-500' }
+                                        { name: 'Honesty', value: scores.hexaco.honesty, color: 'bg-cyan-500' },
+                                        { name: 'Emotionality', value: scores.hexaco.emotionality, color: 'bg-red-500' },
+                                        { name: 'Extraversion', value: scores.hexaco.extraversion, color: 'bg-yellow-500' },
+                                        { name: 'Agreeableness', value: scores.hexaco.agreeableness, color: 'bg-pink-500' },
+                                        { name: 'Conscientious', value: scores.hexaco.conscientiousness, color: 'bg-green-500' },
+                                        { name: 'Openness', value: scores.hexaco.openness, color: 'bg-blue-500' }
                                     ].map((trait, i) => (
                                         <div key={i} className="flex items-center gap-1.5">
                                             <p className="text-[10px] text-white/60 w-20 font-mono truncate">{trait.name}</p>
@@ -187,7 +191,7 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
                                 </div>
 
                                 <div className="pt-3 border-t border-white/10 text-center">
-                                    <p className="text-[10px] text-white/40 font-mono">neuralsync.ai • Unlock Your Cognitive Potential</p>
+                                    <p className="text-[10px] text-white/40 font-mono">neuralsync.ai • HEXACO-60 Verified</p>
                                 </div>
                             </div>
 

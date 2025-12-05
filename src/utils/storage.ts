@@ -35,6 +35,8 @@ export interface FinalScores {
         score: number;
         description: string;
     }[];
+    validityScore: number;
+    isFlagged: boolean;
     rawResponses: ResponseData[];
 }
 

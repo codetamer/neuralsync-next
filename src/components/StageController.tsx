@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTestStore, STAGE_DEFINITIONS, StageType } from '../store/useTestStore';
+import { useTestStore } from '../store/useTestStore';
+import { StageType } from '../engine/TestEngine';
 import { MatrixStage } from './stages/MatrixStage';
 import { StroopStage } from './stages/StroopStage';
 import { BartStage } from './stages/BartStage';
@@ -9,7 +10,7 @@ import { PersonalityStage } from './stages/PersonalityStage';
 import { ScenarioStage } from './stages/ScenarioStage';
 import { AnimatePresence, motion } from 'framer-motion';
 import { NeonButton } from './ui/NeonButton';
-import { playSFX } from './audio/AmbientSound';
+import { audio } from '../engine/AudioEngine';
 import { ResultsCertificate } from './ResultsCertificate';
 
 const SECTION_TITLES: Record<string, string> = {
@@ -20,18 +21,18 @@ const SECTION_TITLES: Record<string, string> = {
 };
 
 export const StageController = () => {
-    const { currentStage, isTestComplete, nextStage, setSection, currentSection } = useTestStore();
+    const { currentStage, isTestComplete, nextStage, setSection, currentSection, stages } = useTestStore();
     const [showTransition, setShowTransition] = useState(false);
     const [transitionTitle, setTransitionTitle] = useState('');
 
     // Effect 1: Detect Section Change and Trigger Transition
     useEffect(() => {
         if (isTestComplete) {
-            playSFX('levelUp');
+            audio.playSuccess();
             return;
         }
 
-        const stageDef = STAGE_DEFINITIONS[currentStage];
+        const stageDef = stages[currentStage];
         if (!stageDef) return;
 
         // Determine current section based on stage type
@@ -46,12 +47,12 @@ export const StageController = () => {
             setSection(newSection);
             setTransitionTitle(SECTION_TITLES[stageDef.type] || 'NEXT SECTOR');
             setShowTransition(true);
-            playSFX('levelUp');
+            audio.playSuccess();
         } else if (currentStage > 0 && !showTransition) {
             // Normal stage progression (only if not transitioning)
-            playSFX('success');
+            audio.playSuccess();
         }
-    }, [currentStage, isTestComplete, setSection, currentSection]);
+    }, [currentStage, isTestComplete, setSection, currentSection, stages]);
 
     // Effect 2: Handle Transition Timeout
     useEffect(() => {
@@ -67,7 +68,7 @@ export const StageController = () => {
         return <ResultsCertificate />;
     }
 
-    const stageDef = STAGE_DEFINITIONS[currentStage];
+    const stageDef = stages[currentStage];
 
     if (!stageDef) {
         return (
@@ -77,7 +78,7 @@ export const StageController = () => {
                     Unknown stage detected. Please use the menu (top right) to reset the test or return home.
                 </p>
                 <div className="text-sm font-mono text-neural-muted/50">
-                    Current Stage: {currentStage} | Expected: 0-{STAGE_DEFINITIONS.length - 1}
+                    Current Stage: {currentStage} | Expected: 0-{stages.length - 1}
                 </div>
             </div>
         );

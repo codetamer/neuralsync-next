@@ -212,16 +212,26 @@ const renderShape = (shapeId: string, className?: string) => {
     // Polygons
     if (shapeId.includes('poly')) {
         const sides = parseInt(shapeId.split('-')[1]) || 3;
+
+        // Triangle/Square/Hexagon optimization (Keep existing icons if desired, or use dynamic for all)
         if (sides === 3) return <Triangle className={cn(baseClasses, className)} />;
         if (sides === 4) return <Square className={cn(baseClasses, className)} />;
         if (sides === 6) return <Hexagon className={cn(baseClasses, className)} />;
 
-        // Generic polygon fallback using SVG
+        // Dynamic Polygon Generation for 5, 7, 8, etc.
+        const radius = 10;
+        const center = 12;
+        const points = Array.from({ length: sides }).map((_, i) => {
+            const angle = (i * 2 * Math.PI / sides) - (Math.PI / 2); // Start at top
+            const x = center + radius * Math.cos(angle);
+            const y = center + radius * Math.sin(angle);
+            return `${x},${y}`;
+        }).join(' ');
+
         return (
-            <div className="w-full h-full flex items-center justify-center relative">
-                <div className="text-neon-teal font-bold text-xs absolute top-0 right-0">{sides}</div>
-                <Hexagon className={cn(baseClasses, className)} />
-            </div>
+            <svg viewBox="0 0 24 24" className={cn(baseClasses, className)} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points={points} />
+            </svg>
         );
     }
 
