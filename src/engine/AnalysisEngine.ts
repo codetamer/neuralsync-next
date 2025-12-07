@@ -11,6 +11,17 @@ export interface AnalysisInput {
         conscientiousness: number;
         openness: number;
     };
+    cognitive: {
+        fluid: number;
+        crystallized: number;
+        memory: number;
+        speed: number;
+        executive: number;
+    };
+    meta: {
+        biasResistance: number;
+        confidenceCal: number;
+    };
 }
 
 export interface DeepInsight {
@@ -77,7 +88,7 @@ export class AnalysisEngine {
     }
 
     public static generate(results: AnalysisInput): DeepInsight {
-        const { iq, eq, riskTolerance, hexaco } = results;
+        const { iq, eq, riskTolerance, hexaco, cognitive, meta } = results;
 
         const iqPercentile = this.getPercentile(iq, 100, 15);
         const eqPercentile = this.getPercentile(eq, 100, 15);
@@ -215,6 +226,9 @@ export class AnalysisEngine {
         if (iq > 125) strengths.push(`Elite Cognitive Processing (Top ${100 - iqPercentile}%)`);
         if (eq > 125) strengths.push(`Radical Empathy (Top ${100 - eqPercentile}%)`);
         if (riskTolerance > 80) strengths.push("High-Stakes Decision Making");
+        if (cognitive && cognitive.memory > 80) strengths.push("Photographic Working Memory");
+        if (cognitive && cognitive.speed > 80) strengths.push("Hyper-Fast Information Processing");
+        if (meta && meta.biasResistance > 80) strengths.push("Rational Objectivity");
 
         // Tier 2: Combinatorial Strengths (The "Secret Sauce")
         const ha_desc = this.getInteractionDescriptor(hexaco.honesty, hexaco.agreeableness, 'h_a');
@@ -321,6 +335,33 @@ export class AnalysisEngine {
                 title: "Featureless Profile",
                 description: "You lack distinct spikes in capability. While you have no glaring flaws, you also have no defining superpowers.",
                 impact: "Replaceable in almost any role."
+            });
+        }
+
+        // --- COGNITIVE IMBALANCES ---
+        if (cognitive) {
+            if (cognitive.fluid > 80 && cognitive.memory < 40) {
+                detailedWeaknesses.push({
+                    title: "Bottlenecked Genius",
+                    description: "Your abstract reasoning is elite, but your memory buffer is too small to hold all variables at once. You lose track of complex chains of thought.",
+                    impact: "Errors in multi-step problem solving."
+                });
+            }
+            if (cognitive.speed > 80 && cognitive.executive < 40) {
+                detailedWeaknesses.push({
+                    title: "Undisciplined Speed",
+                    description: "You process information incredibly fast but struggle to switch contexts or inhibit wrong impulses. You are prone to 'fast' mistakes.",
+                    impact: "High error rate in dynamic environments."
+                });
+            }
+        }
+
+        // --- META-COGNITION FAILURES ---
+        if (meta && meta.biasResistance < 40) {
+            detailedWeaknesses.push({
+                title: "Cognitive Bias Vulnerability",
+                description: "Your decisions are heavily influenced by irrational framing and sunk costs. You are easily manipulated by sales tactics and emotional narratives.",
+                impact: "Poor investment and strategic choices."
             });
         }
 

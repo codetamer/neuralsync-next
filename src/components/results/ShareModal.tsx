@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import html2canvas from 'html2canvas';
+import { toPng, toBlob } from 'html-to-image';
 import { X, Download, Copy, Share2, Check, Brain, Heart, Zap, TrendingUp } from 'lucide-react';
 import { NeonButton } from '../ui/NeonButton';
 
@@ -47,26 +47,30 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
 
     const archetype = getArchetype();
 
-    // ... (logic for download/copy remains same) ...
     const handleDownload = async () => {
         if (!cardRef.current) return;
         setIsCapturing(true);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 300));
-            const canvas = await html2canvas(cardRef.current, {
+            // Wait for fonts/images to be ready
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const dataUrl = await toPng(cardRef.current, {
+                cacheBust: true,
+                pixelRatio: 3, // High resolution
+                quality: 0.95,
                 backgroundColor: '#050505',
-                scale: 3,
-                useCORS: true,
-                allowTaint: false,
-                logging: false,
+                style: {
+                    margin: '0',
+                }
             });
 
-            const dataUrl = canvas.toDataURL('image/png', 0.95);
             const link = document.createElement('a');
             link.href = dataUrl;
             link.download = `neuralsync-profile-${Date.now()}.png`;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
         } catch (error) {
             console.error('Download failed:', error);
             alert('Failed to generate image. Please try again.');
@@ -80,22 +84,25 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
         setIsCapturing(true);
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 300));
-            const canvas = await html2canvas(cardRef.current, {
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const blob = await toBlob(cardRef.current, {
+                cacheBust: true,
+                pixelRatio: 3,
+                quality: 0.95,
                 backgroundColor: '#050505',
-                scale: 3,
-                useCORS: true,
-                allowTaint: false,
-                logging: false,
+                style: {
+                    margin: '0',
+                }
             });
 
-            const dataUrl = canvas.toDataURL('image/png', 0.95);
-            const blob = await (await fetch(dataUrl)).blob();
-            await navigator.clipboard.write([
-                new ClipboardItem({ 'image/png': blob })
-            ]);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            if (blob) {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            }
         } catch (error) {
             console.error('Copy failed:', error);
             alert('Failed to copy. Please try downloading instead.');

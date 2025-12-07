@@ -3,18 +3,36 @@
 import { useEffect, useState } from 'react';
 import { useTestStore } from '../store/useTestStore';
 import { StageType } from '../engine/TestEngine';
-import { MatrixStage } from './stages/MatrixStage';
+import { MatrixStageEnhanced } from './stages/MatrixStageEnhanced';
 import { StroopStage } from './stages/StroopStage';
 import { BartStage } from './stages/BartStage';
 import { PersonalityStage } from './stages/PersonalityStage';
 import { ScenarioStage } from './stages/ScenarioStage';
+import { NBackStage } from './stages/NBackStage';
+import { DigitSpanStage } from './stages/DigitSpanStage';
+import { SpatialSpanStage } from './stages/SpatialSpanStage';
+import { SymbolMatchStage } from './stages/SymbolMatchStage';
+import { ReactionTimeStage } from './stages/ReactionTimeStage';
+import { VocabularyStage } from './stages/VocabularyStage';
+import { TrailMakingStage } from './stages/TrailMakingStage';
+import { BiasAuditStage } from './stages/BiasAuditStage';
+import { IntroStage } from './stages/IntroStage';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { NeonButton } from './ui/NeonButton';
 import { audio } from '../engine/AudioEngine';
 import { ResultsCertificate } from './ResultsCertificate';
 
 const SECTION_TITLES: Record<string, string> = {
-    'matrix': 'LOGIC SECTOR',
+    'matrix': 'PATTERN ANALYSIS',
+    'nback': 'WORKING MEMORY',
+    'digitspan': 'WORKING MEMORY',
+    'spatialspan': 'WORKING MEMORY',
+    'symbolmatch': 'PROCESSING SPEED',
+    'reactiontime': 'PROCESSING SPEED',
+    'vocabulary': 'CRYSTALLIZED INTELLIGENCE',
+    'trailmaking': 'EXECUTIVE FUNCTION',
+    'biasaudit': 'META-COGNITION',
     'scenario': 'EMOTIONAL INTELLIGENCE',
     'bart': 'RISK ASSESSMENT',
     'personality': 'PERSONALITY PROFILE'
@@ -37,10 +55,12 @@ export const StageController = () => {
 
         // Determine current section based on stage type
         let newSection: 'INTRO' | 'IQ' | 'EQ' | 'RISK' | 'PERSONALITY' = 'INTRO';
-        if (stageDef.type === 'matrix') newSection = 'IQ';
+        if (stageDef.type === 'matrix' || stageDef.type === 'nback' || stageDef.type === 'digitspan' || stageDef.type === 'spatialspan' || stageDef.type === 'symbolmatch' || stageDef.type === 'reactiontime') newSection = 'IQ';
         else if (stageDef.type === 'scenario') newSection = 'EQ';
         else if (stageDef.type === 'bart') newSection = 'RISK';
         else if (stageDef.type === 'personality') newSection = 'PERSONALITY';
+        // Debug doesn't really change sections in a measurable way for the progress bar, 
+        // but we can leave it as previous or default.
 
         // Check for section change
         if (newSection !== currentSection && newSection !== 'INTRO') {
@@ -50,7 +70,7 @@ export const StageController = () => {
             audio.playSuccess();
         } else if (currentStage > 0 && !showTransition) {
             // Normal stage progression (only if not transitioning)
-            audio.playSuccess();
+            // audio.playSuccess(); // Optional feedback
         }
     }, [currentStage, isTestComplete, setSection, currentSection, stages]);
 
@@ -86,20 +106,7 @@ export const StageController = () => {
 
     // Intro Stage
     if (stageDef.type === 'intro') {
-        return (
-            <div className="text-center max-w-2xl mx-auto">
-                <h1 className="text-5xl font-display font-bold text-white mb-6 tracking-tight">
-                    NEURAL<span className="text-neon-teal">SYNC</span>
-                </h1>
-                <p className="text-xl text-neural-muted mb-12 leading-relaxed">
-                    Advanced psychometric evaluation system initialized.
-                    Please ensure you are in a quiet environment.
-                </p>
-                <NeonButton onClick={nextStage} size="lg" className="mx-auto w-64">
-                    BEGIN EVALUATION
-                </NeonButton>
-            </div>
-        );
+        return <IntroStage />;
     }
 
     return (
@@ -153,14 +160,24 @@ export const StageController = () => {
                         transition={{ duration: 0.4 }}
                         className="w-full"
                     >
-                        {stageDef.type === 'matrix' && <MatrixStage />}
+                        {stageDef.type === 'matrix' && <MatrixStageEnhanced />}
+                        {stageDef.type === 'nback' && <NBackStage />}
+                        {stageDef.type === 'digitspan' && <DigitSpanStage />}
+                        {stageDef.type === 'spatialspan' && <SpatialSpanStage />}
+                        {stageDef.type === 'symbolmatch' && <SymbolMatchStage />}
+                        {stageDef.type === 'reactiontime' && <ReactionTimeStage />}
+                        {stageDef.type === 'vocabulary' && <VocabularyStage />}
+                        {stageDef.type === 'trailmaking' && <TrailMakingStage />}
+                        {stageDef.type === 'biasaudit' && <BiasAuditStage />}
                         {stageDef.type === 'stroop' && <StroopStage />}
                         {stageDef.type === 'bart' && <BartStage />}
                         {stageDef.type === 'personality' && <PersonalityStage />}
                         {stageDef.type === 'scenario' && <ScenarioStage />}
+
                     </motion.div>
                 )}
             </AnimatePresence>
+
         </>
     );
 };

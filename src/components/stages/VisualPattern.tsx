@@ -45,10 +45,12 @@ const renderShape = (shapeId: string, className?: string) => {
     if (shapeId.includes('triangle')) {
         if (shapeId.includes('outline')) return withSize(<Triangle className={cn(baseClasses, className)} strokeWidth={3} />);
         if (shapeId.includes('dot')) return withSize(<div className="relative w-full h-full"><Triangle className={cn(baseClasses, className)} strokeWidth={3} /><div className="absolute inset-0 flex items-center justify-center pt-2"><div className="w-2 h-2 bg-neon-teal rounded-full" /></div></div>);
+        if (shapeId.includes('cross')) return withSize(<div className="relative w-full h-full"><Triangle className={cn(baseClasses, className)} strokeWidth={3} /><div className="absolute inset-0 flex items-center justify-center pt-2"><X className="w-4 h-4 text-neon-teal" /></div></div>);
         return withSize(<Triangle className={cn("fill-neon-teal", baseClasses, className)} />);
     }
     if (shapeId.includes('diamond')) {
-        return withSize(<Diamond className={cn(baseClasses, className)} strokeWidth={shapeId.includes('lg') ? 3 : 2} />);
+        const isSolid = shapeId.includes('solid');
+        return withSize(<Diamond className={cn(baseClasses, className, isSolid && "fill-neon-teal")} strokeWidth={shapeId.includes('lg') ? 3 : 2} />);
     }
 
     // Arrows
@@ -192,19 +194,55 @@ const renderShape = (shapeId: string, className?: string) => {
         );
     }
 
-    // Cube Patterns
+    // Cube Patterns (Isometric)
     if (shapeId.includes('cube-pattern')) {
         const type = shapeId.split('-')[2]; // A, B, C, D
         const isRot = shapeId.includes('rot');
 
+        // Isometric Cube SVG
+        // Top Face: (32, 2) (62, 17) (32, 32) (2, 17)
+        // Left Face: (2, 17) (32, 32) (32, 62) (2, 47)
+        // Right Face: (32, 32) (62, 17) (62, 47) (32, 62)
+
         return (
-            <div className={cn("w-full h-full flex items-center justify-center", isRot && "rotate-90")}>
-                <div className="w-16 h-16 border-4 border-neon-teal relative bg-neural-bg/50">
-                    {type === 'A' && <div className="absolute inset-0 bg-neon-teal/20" />}
-                    {type === 'B' && <div className="absolute inset-2 border-2 border-neon-teal" />}
-                    {type === 'C' && <div className="absolute inset-0 flex items-center justify-center"><div className="w-8 h-8 bg-neon-teal rounded-full" /></div>}
-                    {type === 'D' && <div className="absolute inset-0 flex items-center justify-center"><X className="w-12 h-12 text-neon-teal" /></div>}
-                </div>
+            <div className={cn("w-full h-full flex items-center justify-center transition-all duration-500", isRot && "rotate-90")}>
+                <svg viewBox="0 0 64 64" className="w-24 h-24 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
+                    {/* Left Face (Darkest) */}
+                    <path d="M2 17 L32 32 L32 62 L2 47 Z" fill="currentColor" className="text-neon-teal/40" />
+                    {/* Right Face (Medium) */}
+                    <path d="M32 32 L62 17 L62 47 L32 62 Z" fill="currentColor" className="text-neon-teal/60" />
+                    {/* Top Face (Brightest - The Pattern Canvas) */}
+                    <path d="M2 17 L32 2 L62 17 L32 32 Z" fill="currentColor" className="text-neon-teal/10" />
+
+                    {/* Patterns on Top Face */}
+                    <g transform="translate(32, 17)">
+                        {/* A: Solid Fill (Glow) */}
+                        {type === 'A' && (
+                            <path d="M-20 -10 L0 -20 L20 -10 L0 0 Z" className="fill-neon-teal animate-pulse" />
+                        )}
+                        {/* B: Inset Border */}
+                        {type === 'B' && (
+                            <path d="M-15 -7.5 L0 -15 L15 -7.5 L0 0 Z" fill="none" stroke="currentColor" strokeWidth="2" className="text-neon-teal" />
+                        )}
+                        {/* C: Circle/Dot */}
+                        {type === 'C' && (
+                            <circle cx="0" cy="-10" r="6" fill="currentColor" className="text-neon-teal" transform="scale(1, 0.5)" />
+                        )}
+                        {/* D: X Mark */}
+                        {type === 'D' && (
+                            <path d="M-10 -5 L10 -15 M10 -5 L-10 -15" stroke="currentColor" strokeWidth="3" className="text-neon-teal" />
+                        )}
+                        {/* E: Asymmetric Bar (For Rotation Logic) */}
+                        {type === 'E' && (
+                            <path d="M-10 -10 L10 -10" stroke="currentColor" strokeWidth="4" className="text-neon-teal" />
+                        )}
+                    </g>
+
+                    {/* Highlight Borders */}
+                    <path d="M2 17 L32 2 L62 17 L32 32 L2 17" fill="none" stroke="currentColor" strokeWidth="2" className="text-neon-teal" />
+                    <path d="M32 32 L32 62" fill="none" stroke="currentColor" strokeWidth="2" className="text-neon-teal" />
+                    <path d="M2 47 L32 62 L62 47" fill="none" stroke="currentColor" strokeWidth="2" className="text-neon-teal" />
+                </svg>
             </div>
         );
     }
@@ -243,11 +281,18 @@ const renderShape = (shapeId: string, className?: string) => {
         return (
             <div className="w-full h-full flex items-center justify-center">
                 <div className="w-12 h-12 rounded-full border-2 border-neon-teal relative overflow-hidden">
+                    {/* Consistent Waxing (Lit from Right) */}
                     {phase === 'full' && <div className="absolute inset-0 bg-neon-teal" />}
                     {phase === 'new' && <div className="absolute inset-0 bg-neural-bg" />}
-                    {phase === 'half' && <div className="absolute inset-0 bg-neon-teal w-1/2" />}
-                    {phase === 'crescent' && <div className="absolute inset-0 bg-neon-teal rounded-full -translate-x-4" />}
-                    {phase === 'gibbous' && <div className="absolute inset-0 bg-neon-teal rounded-full translate-x-2" />}
+
+                    {/* Half: Right side lit */}
+                    {phase === 'half' && <div className="absolute inset-y-0 right-0 w-1/2 bg-neon-teal" />}
+
+                    {/* Crescent: Large displacement Right leaves sliver on Right */}
+                    {phase === 'crescent' && <div className="absolute inset-0 bg-neon-teal rounded-full translate-x-4" />}
+
+                    {/* Gibbous: Small displacement Right leaves large part on Right, small part empty on Left */}
+                    {phase === 'gibbous' && <div className="absolute inset-0 bg-neon-teal rounded-full translate-x-1" />}
                 </div>
             </div>
         );

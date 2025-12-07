@@ -113,17 +113,51 @@ export const HEXACO_ITEMS: QuestionItem[] = [
     { id: 'O10', text: 'I avoid movies that are difficult to understand.', category: 'openness', reverse: true }, // New
 ];
 
-// --- 2. LOGIC PUZZLES (Pool Expansion + IRT) ---
+// --- 2. LOGIC PUZZLES (Pool Expansion + IRT - 30 Items) ---
 export const LOGIC_PUZZLES: LogicPuzzle[] = [
+    // ========================================================================
+    // COGNITIVE REFLECTION (4 items)
+    // ========================================================================
     {
         id: 'IQ_CRT_1',
         question: 'A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?',
         options: ['$0.05', '$0.10', '$0.01', '$0.15'],
-        correctIndex: 0, // $0.05
+        correctIndex: 0,
         explanation: 'x + (x + 1.00) = 1.10 => 2x = 0.10 => x = 0.05. Cognitive Reflection Test item.',
         difficulty: 6,
         discrimination: 1.5
     },
+    {
+        id: 'IQ_CRT_2',
+        question: 'If it takes 5 machines 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?',
+        options: ['100 minutes', '5 minutes', '500 minutes', '1 minute'],
+        correctIndex: 1,
+        explanation: 'Each machine makes 1 widget in 5 minutes. 100 machines working in parallel still take 5 minutes.',
+        difficulty: 6,
+        discrimination: 1.6
+    },
+    {
+        id: 'IQ_CRT_3',
+        question: 'In a lake, there is a patch of lily pads. Every day, the patch doubles in size. If it takes 48 days to cover the entire lake, how long would it take to cover half the lake?',
+        options: ['24 days', '47 days', '12 days', '36 days'],
+        correctIndex: 1,
+        explanation: 'Exponential growth backwards. One day before full (48) is half (47).',
+        difficulty: 6,
+        discrimination: 1.5
+    },
+    {
+        id: 'IQ_CRT_4',
+        question: 'Emily\'s father has three daughters: April, May, and ___?',
+        options: ['June', 'Emily', 'July', 'March'],
+        correctIndex: 1,
+        explanation: 'The question says "Emily\'s father" so the third daughter is Emily.',
+        difficulty: 4,
+        discrimination: 1.2
+    },
+
+    // ========================================================================
+    // SYLLOGISMS (6 items)
+    // ========================================================================
     {
         id: 'IQ_SYLLOGISM_1',
         question: 'All roses are flowers. Some flowers fade quickly. Therefore:',
@@ -134,244 +168,374 @@ export const LOGIC_PUZZLES: LogicPuzzle[] = [
         discrimination: 1.8
     },
     {
-        id: 'IQ_SEQ_ADV',
+        id: 'IQ_SYLLOGISM_2',
+        question: 'No A are B. All C are A. Therefore:',
+        options: ['No C are B', 'Some C are B', 'All B are C', 'All A are C'],
+        correctIndex: 0,
+        explanation: 'Transitive exclusion. If C is inside A, and A is outside B, then C cannot touch B.',
+        difficulty: 6,
+        discrimination: 1.7
+    },
+    {
+        id: 'IQ_SYLLOGISM_3',
+        question: 'All mammals are warm-blooded. Whales are mammals. Therefore:',
+        options: ['Whales are cold-blooded', 'Whales are warm-blooded', 'Some whales are warm-blooded', 'Whales might be warm-blooded'],
+        correctIndex: 1,
+        explanation: 'Valid syllogism: All A are B, C is A, therefore C is B.',
+        difficulty: 3,
+        discrimination: 0.9
+    },
+    {
+        id: 'IQ_SYLLOGISM_4',
+        question: 'Some doctors are athletes. All athletes are healthy. Therefore:',
+        options: ['All doctors are healthy', 'Some doctors are healthy', 'No doctors are healthy', 'All healthy people are doctors'],
+        correctIndex: 1,
+        explanation: 'Some doctors (the athlete ones) must be healthy.',
+        difficulty: 5,
+        discrimination: 1.3
+    },
+    {
+        id: 'IQ_SYLLOGISM_5',
+        question: 'If it rains, the ground gets wet. The ground is wet. Therefore:',
+        options: ['It rained', 'It might have rained', 'It did not rain', 'The ground is always wet'],
+        correctIndex: 1,
+        explanation: 'Affirming the consequent fallacy. Wet ground could have other causes.',
+        difficulty: 7,
+        discrimination: 1.6
+    },
+    {
+        id: 'IQ_SYLLOGISM_6',
+        question: 'No reptiles have fur. All snakes are reptiles. Therefore:',
+        options: ['Some snakes have fur', 'All snakes have scales', 'No snakes have fur', 'Snakes might have fur'],
+        correctIndex: 2,
+        explanation: 'Valid syllogism: No A have B, C are A, therefore no C have B.',
+        difficulty: 4,
+        discrimination: 1.1
+    },
+
+    // ========================================================================
+    // NUMERICAL SEQUENCES (8 items)
+    // ========================================================================
+    {
+        id: 'IQ_SEQ_1',
         question: 'Sequence: 2, 3, 5, 9, 17, ...',
         options: ['34', '33', '26', '35'],
-        correctIndex: 1, // 33
+        correctIndex: 1,
         explanation: 'Difference powers of 2. +1, +2, +4, +8, next +16. 17+16=33.',
         difficulty: 5,
         discrimination: 1.2
     },
     {
-        id: 'IQ_ANALOGY_ADV',
-        question: 'CRYPTOGRAPHY is to SECRECY as EPITEMOLOGY is to:',
-        options: ['KNOWLEDGE', 'WRITING', 'HISTORY', 'BIOLOGY'],
-        correctIndex: 0, // KNOWLEDGE
-        explanation: 'Cryptography is the study of secrecy. Epistemology is the study of knowledge.',
-        difficulty: 8,
-        discrimination: 1.4
-    },
-    {
-        id: 'IQ_LATERAL_1',
-        question: 'If it takes 5 machines 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?',
-        options: ['100 minutes', '5 minutes', '500 minutes', '1 minute'],
-        correctIndex: 1, // 5 minutes
-        explanation: 'Each machine makes 1 widget in 5 minutes. 100 machines working in parallel still take 5 minutes.',
-        difficulty: 6,
-        discrimination: 1.6
-    },
-    {
-        id: 'IQ_PROB_1',
-        question: 'In a lake, there is a patch of lily pads. Every day, the patch doubles in size. If it takes 48 days to cover the entire lake, how long would it take to cover half the lake?',
-        options: ['24 days', '47 days', '12 days', '36 days'],
-        correctIndex: 1, // 47 days
-        explanation: 'Exponential growth backwards. One day before full (48) is half (47).',
-        difficulty: 6,
-        discrimination: 1.5
-    },
-    {
-        id: 'IQ_SEQ_COMPLEX',
+        id: 'IQ_SEQ_2',
         question: 'Sequence: 1, 4, 27, 256, ...',
         options: ['1024', '3125', '625', '512'],
-        correctIndex: 1, // 3125
+        correctIndex: 1,
         explanation: 'n^n sequence. 1^1, 2^2, 3^3, 4^4. Next is 5^5 = 3125.',
         difficulty: 9,
         discrimination: 2.0
     },
     {
-        id: 'IQ_RELATION_1',
-        question: 'Brother and sisters I have none but this man\'s father is my father\'s son. Who is in the photo?',
-        options: ['His son', 'His father', 'Himself', 'His nephew'],
-        correctIndex: 0,
-        explanation: '"My father\'s son" is Me. "This man\'s father is Me". Therefore, "This man" is my son.',
-        difficulty: 8,
-        discrimination: 1.7
+        id: 'IQ_SEQ_3',
+        question: 'Sequence: 2, 6, 12, 20, 30, ...',
+        options: ['40', '42', '44', '36'],
+        correctIndex: 1,
+        explanation: 'n(n+1) sequence: 1×2, 2×3, 3×4, 4×5, 5×6. Next is 6×7 = 42.',
+        difficulty: 6,
+        discrimination: 1.4
     },
     {
-        id: 'IQ_WORD_1',
+        id: 'IQ_SEQ_4',
+        question: 'Sequence: 1, 1, 2, 3, 5, 8, ...',
+        options: ['11', '12', '13', '10'],
+        correctIndex: 2,
+        explanation: 'Fibonacci sequence. Each number is sum of previous two: 5+8=13.',
+        difficulty: 4,
+        discrimination: 1.0
+    },
+    {
+        id: 'IQ_SEQ_5',
+        question: 'Sequence: 3, 6, 11, 18, 27, ...',
+        options: ['36', '38', '39', '35'],
+        correctIndex: 1,
+        explanation: 'Differences increase by 2: +3, +5, +7, +9, +11. 27+11=38.',
+        difficulty: 5,
+        discrimination: 1.3
+    },
+    {
+        id: 'IQ_SEQ_6',
+        question: 'Sequence: 1, 2, 6, 24, 120, ...',
+        options: ['600', '720', '480', '840'],
+        correctIndex: 1,
+        explanation: 'Factorial sequence: 1!, 2!, 3!, 4!, 5!. Next is 6! = 720.',
+        difficulty: 7,
+        discrimination: 1.5
+    },
+    {
+        id: 'IQ_SEQ_7',
+        question: 'Sequence: 2, 5, 10, 17, 26, ...',
+        options: ['35', '36', '37', '34'],
+        correctIndex: 2,
+        explanation: 'n² + 1 sequence: 1+1, 4+1, 9+1, 16+1, 25+1. Next is 36+1 = 37.',
+        difficulty: 6,
+        discrimination: 1.4
+    },
+    {
+        id: 'IQ_SEQ_8',
+        question: 'Sequence: 0, 1, 1, 2, 4, 7, 13, ...',
+        options: ['20', '24', '22', '21'],
+        correctIndex: 1,
+        explanation: 'Tribonacci: each is sum of previous three. 4+7+13=24.',
+        difficulty: 8,
+        discrimination: 1.8
+    },
+
+    // ========================================================================
+    // VERBAL ANALOGIES (6 items)
+    // ========================================================================
+    {
+        id: 'IQ_ANALOGY_1',
+        question: 'CRYPTOGRAPHY is to SECRECY as EPISTEMOLOGY is to:',
+        options: ['KNOWLEDGE', 'WRITING', 'HISTORY', 'BIOLOGY'],
+        correctIndex: 0,
+        explanation: 'Cryptography is the study of secrecy. Epistemology is the study of knowledge.',
+        difficulty: 8,
+        discrimination: 1.4
+    },
+    {
+        id: 'IQ_ANALOGY_2',
+        question: 'ARCHITECT is to BUILDING as COMPOSER is to:',
+        options: ['PIANO', 'SYMPHONY', 'SINGER', 'CONDUCTOR'],
+        correctIndex: 1,
+        explanation: 'An architect creates buildings. A composer creates symphonies.',
+        difficulty: 4,
+        discrimination: 1.0
+    },
+    {
+        id: 'IQ_ANALOGY_3',
+        question: 'FISH is to SCHOOL as WOLF is to:',
+        options: ['DEN', 'PACK', 'HERD', 'FLOCK'],
+        correctIndex: 1,
+        explanation: 'A group of fish is a school. A group of wolves is a pack.',
+        difficulty: 3,
+        discrimination: 0.9
+    },
+    {
+        id: 'IQ_ANALOGY_4',
+        question: 'MITIGATION is to SEVERITY as AMPLIFICATION is to:',
+        options: ['VOLUME', 'REDUCTION', 'SILENCE', 'INTENSITY'],
+        correctIndex: 3,
+        explanation: 'Mitigation reduces severity. Amplification increases intensity.',
+        difficulty: 7,
+        discrimination: 1.5
+    },
+    {
+        id: 'IQ_ANALOGY_5',
+        question: 'CANVAS is to PAINTER as MARBLE is to:',
+        options: ['SCULPTOR', 'ARCHITECT', 'MASON', 'CARVER'],
+        correctIndex: 0,
+        explanation: 'Painters work with canvas. Sculptors work with marble.',
+        difficulty: 4,
+        discrimination: 1.1
+    },
+    {
+        id: 'IQ_ANALOGY_6',
+        question: 'BIBLIOPHILE is to BOOKS as OENOPHILE is to:',
+        options: ['MUSIC', 'WINE', 'ART', 'FOOD'],
+        correctIndex: 1,
+        explanation: 'A bibliophile loves books. An oenophile loves wine.',
+        difficulty: 8,
+        discrimination: 1.6
+    },
+
+    // ========================================================================
+    // PATTERN RECOGNITION (6 items)
+    // ========================================================================
+    {
+        id: 'IQ_PATTERN_1',
         question: 'Which word is the odd one out?',
         options: ['Nun', 'Level', 'Madam', 'River'],
-        correctIndex: 3, // River
+        correctIndex: 3,
         explanation: 'Others are palindromes. River is not.',
         difficulty: 4,
         discrimination: 1.0
     },
     {
-        id: 'IQ_NUM_GRID',
-        question: 'If 72 x 96 = 6927, 58 x 87 = 7885, then 79 x 86 = ?',
+        id: 'IQ_PATTERN_2',
+        question: 'If 72 × 96 = 6927, 58 × 87 = 7885, then 79 × 86 = ?',
         options: ['6897', '7689', '8976', '9768'],
-        correctIndex: 0, // 6897
-        explanation: 'Mirror logic: The digits are just reversed. 79x86 -> 6897.',
-        difficulty: 5,
-        discrimination: 1.1
-    }
-];
-
-// --- 3. VISUAL PUZZLES (Pool Expansion + IRT) ---
-export const VISUAL_PUZZLES: VisualPuzzle[] = [
-    // Grid / Matrix (Raven's Style)
-    {
-        id: 'VIS1',
-        type: 'grid',
-        question: 'Complete the pattern.',
-        shapes: ['square-solid', 'circle-solid', 'triangle-solid', 'square-outline', 'circle-outline', 'triangle-outline', 'square-dot', 'circle-dot', '?'],
-        options: ['triangle-dot', 'square-cross', 'circle-cross', 'triangle-solid'],
         correctIndex: 0,
-        explanation: 'Row logic: Shape sequence + Fill type sequence.',
-        difficulty: 4,
-        discrimination: 1.0
-    },
-    {
-        id: 'VIS2',
-        type: 'grid',
-        question: 'Find the missing piece.',
-        shapes: ['arrow-up', 'arrow-right', 'arrow-down', 'arrow-right', 'arrow-down', 'arrow-left', 'arrow-down', 'arrow-left', '?'],
-        options: ['arrow-up', 'arrow-right', 'arrow-down', 'arrow-left'],
-        correctIndex: 0, // arrow-up
-        explanation: 'Clockwise rotation per step.',
-        difficulty: 5,
-        discrimination: 1.2
-    },
-    {
-        id: 'VIS3',
-        type: 'grid',
-        question: 'Complete the matrix.',
-        shapes: ['1-dot', '2-dots', '3-dots', '2-dots', '3-dots', '4-dots', '3-dots', '4-dots', '?'],
-        options: ['4-dots', '5-dots', '6-dots', '1-dot'],
-        correctIndex: 1, // 5-dots
-        explanation: 'Simple arithmetic progression.',
-        difficulty: 3,
-        discrimination: 0.9
-    },
-    {
-        id: 'VIS4',
-        type: 'grid',
-        question: 'Which shape fits?',
-        shapes: ['circle-sm', 'circle-md', 'circle-lg', 'square-sm', 'square-md', 'square-lg', 'diamond-sm', 'diamond-md', '?'],
-        options: ['diamond-lg', 'diamond-sm', 'circle-lg', 'square-lg'],
-        correctIndex: 0, // diamond-lg
-        explanation: 'Grid logic: Shape by column, Size by row.',
-        difficulty: 4,
-        discrimination: 1.0
-    },
-    {
-        id: 'VIS5',
-        type: 'grid',
-        question: 'Logical deduction.',
-        shapes: ['line-h', 'line-v', 'plus', 'line-v', 'plus', 'line-h', 'plus', 'line-h', '?'],
-        options: ['line-v', 'plus', 'circle', 'square'],
-        correctIndex: 0, // line-v
-        explanation: 'XOR logic operation on lines.',
-        difficulty: 8,
-        discrimination: 1.8
-    },
-    // New Visual Items
-    {
-        id: 'VIS6_NEW',
-        type: 'grid',
-        question: 'Identify the pattern.',
-        shapes: ['grid-tl', 'grid-tr', 'grid-bl', 'grid-tr', 'grid-bl', 'grid-br', 'grid-bl', 'grid-br', '?'],
-        options: ['grid-tl', 'grid-tr', 'grid-bl', 'grid-br'],
-        correctIndex: 0, // grid-tl
-        explanation: 'Clockwise movement around corners.',
-        difficulty: 6,
-        discrimination: 1.2
-    },
-    {
-        id: 'VIS7_NEW',
-        type: 'grid',
-        question: 'What completes the set?',
-        shapes: ['moon-new', 'moon-crescent', 'moon-half', 'moon-crescent', 'moon-half', 'moon-gibbous', 'moon-half', 'moon-gibbous', '?'],
-        options: ['moon-full', 'moon-new', 'moon-crescent', 'sun'],
-        correctIndex: 0, // moon-full
-        explanation: 'Phases of the moon progression.',
+        explanation: 'Mirror logic: The digits are reversed. 79×86 -> 6897.',
         difficulty: 5,
         discrimination: 1.1
     },
-
-    // Sequence & Rotation
     {
-        id: 'VIS11',
-        type: 'sequence',
-        question: 'What comes next?',
-        shapes: ['clock-12', 'clock-3', 'clock-6', 'clock-9', '?'],
-        options: ['clock-12', 'clock-1', 'clock-6', 'clock-10'],
-        correctIndex: 0, // clock-12
-        explanation: 'Clockwise rotation 90 degrees.',
+        id: 'IQ_PATTERN_3',
+        question: 'Which number does not belong: 2, 5, 10, 17, 26, 35?',
+        options: ['5', '17', '35', '26'],
+        correctIndex: 2,
+        explanation: 'Pattern is n² + 1: 1, 4, 9, 16, 25, 36 +1 = 2, 5, 10, 17, 26, 37. 35 breaks pattern.',
+        difficulty: 7,
+        discrimination: 1.6
+    },
+    {
+        id: 'IQ_PATTERN_4',
+        question: 'Complete: RED, ORANGE, YELLOW, GREEN, ___',
+        options: ['PURPLE', 'BLUE', 'PINK', 'INDIGO'],
+        correctIndex: 1,
+        explanation: 'Rainbow order: ROYGBIV. Blue comes after Green.',
         difficulty: 2,
         discrimination: 0.7
     },
     {
-        id: 'VIS13',
-        type: 'sequence',
-        question: 'Next in the pattern?',
-        shapes: ['poly-3', 'poly-4', 'poly-5', 'poly-6', '?'],
-        options: ['poly-7', 'poly-8', 'poly-3', 'circle'],
-        correctIndex: 0, // poly-7
-        explanation: 'Sides increasing by 1.',
-        difficulty: 3,
-        discrimination: 0.8
+        id: 'IQ_PATTERN_5',
+        question: 'If APPLE = 50, BANANA = 42, then CHERRY = ?',
+        options: ['49', '54', '63', '56'],
+        correctIndex: 2,
+        explanation: 'Sum of letters (A=1, B=2...) × number of letters. CHERRY: (3+8+5+18+18+25) = 63.',
+        difficulty: 8,
+        discrimination: 1.7
     },
     {
-        id: 'VIS6_ROT',
-        type: 'rotation',
-        question: 'Which option is a rotation of the main shape?',
-        shapes: ['L-shape-0'],
-        options: ['L-shape-flip', 'L-shape-90', 'L-shape-distorted', 'Z-shape'],
-        correctIndex: 1, // L-shape-90
-        explanation: 'Simple mental rotation.',
-        difficulty: 6,
-        discrimination: 1.3
-    },
-    {
-        id: 'VIS8',
-        type: 'rotation',
-        question: 'Find the matching 3D block.',
-        shapes: ['cube-pattern-A'],
-        options: ['cube-pattern-B', 'cube-pattern-A-rot', 'cube-pattern-C', 'cube-pattern-D'],
-        correctIndex: 1, // cube-pattern-A-rot
-        explanation: 'Complex 3D mental rotation.',
+        id: 'IQ_PATTERN_6',
+        question: 'Which number comes next: 7, 13, 31, 85, ?',
+        options: ['247', '169', '127', '211'],
+        correctIndex: 0,
+        explanation: '×3+(-8,-8,-8,-8): No, it\'s ×3-8, ×3-8: 7×3-8=13, 13×3-8=31, 31×3-8=85, 85×3-8=247.',
         difficulty: 9,
-        discrimination: 2.0
-    },
-    {
-        id: 'VIS_OVERLAY_1',
-        type: 'odd-one-out',
-        question: 'Which shape cannot be formed by overlapping the others?',
-        shapes: ['circle-triangle', 'triangle-square', 'circle-square', 'star'],
-        options: ['star', 'circle-triangle', 'triangle-square', 'circle-square'],
-        correctIndex: 0, // star
-        explanation: 'Deconstructive logic: Star components do not exist in the other primitives.',
-        difficulty: 4,
-        discrimination: 1.1
-    },
-    {
-        id: 'VIS_PERSPECTIVE_1',
-        type: 'rotation',
-        question: 'Which of these is the top-down view of the pyramid?',
-        shapes: ['pyramid-iso'],
-        options: ['square-cross', 'triangle', 'square', 'circle'],
-        correctIndex: 0, // square-cross
-        explanation: '3D projection: A square pyramid from above looks like a square with an X.',
-        difficulty: 5,
-        discrimination: 1.3
-    },
-    {
-        id: 'VIS_PATTERN_ADV',
-        type: 'sequence',
-        question: 'Select the missing tile.',
-        shapes: ['grid-3x3-1', 'grid-3x3-2', 'grid-3x3-3', 'grid-3x3-4', '?'],
-        options: ['grid-3x3-5', 'grid-3x3-random', 'grid-3x3-empty', 'grid-3x3-full'],
-        correctIndex: 0, // grid-3x3-5
-        explanation: 'Recursive pattern: Each step adds one filled cell in a spiral.',
-        difficulty: 7,
-        discrimination: 1.5
+        discrimination: 1.9
     }
 ];
 
-// --- 4. EQ SCENARIOS (Expanded Pool: 20 Items) ---
+// --- 3. VISUAL PUZZLES (Pool Expansion + IRT) ---
+// --- 3. VISUAL PUZZLES (Raven's Progressive Matrices Style) ---
+export const VISUAL_PUZZLES: VisualPuzzle[] = [
+    // 1. Pattern Completion (Simple)
+    {
+        id: 'VIS_MATRIX_1',
+        type: 'grid',
+        question: 'Identify the missing component based on the pattern trend.',
+        shapes: ['1-dot', '2-dots', '3-dots', '2-dots', '3-dots', '4-dots', '3-dots', '4-dots', '?'],
+        options: ['1-bar', '5-dots', '6-dots', 'square-solid'],
+        correctIndex: 1, // 5-dots
+        explanation: 'Arithmetic Progression: Each cell increases quantity by 1 moving horizontally or vertically.',
+        difficulty: 3,
+        discrimination: 0.8
+    },
+    // 2. Rotation Logic (Clockwise)
+    {
+        id: 'VIS_MATRIX_2',
+        type: 'grid',
+        question: 'Determine the rotation rule and select the final state.',
+        shapes: ['arrow-up', 'arrow-right', 'arrow-down', 'arrow-right', 'arrow-down', 'arrow-left', 'arrow-down', 'arrow-left', '?'],
+        options: ['arrow-right', 'arrow-up', 'circle-outline', 'arrow-down'],
+        correctIndex: 1, // arrow-up
+        explanation: 'Rotation: Each step rotates 90 degrees clockwise.',
+        difficulty: 4,
+        discrimination: 1.0
+    },
+    // 3. Distribution Logic (Sudoku-style uniqueness)
+    {
+        id: 'VIS_MATRIX_3',
+        type: 'grid',
+        question: 'Complete the matrix logic.',
+        shapes: ['square-solid', 'circle-solid', 'triangle-solid', 'circle-solid', 'triangle-solid', 'square-solid', 'triangle-solid', 'square-solid', '?'],
+        options: ['triangle-outline', 'circle-solid', 'diamond-solid', 'square-dot'],
+        correctIndex: 1, // circle-solid
+        explanation: 'Distribution Rule: Each row must contain exactly one Square, one Circle, and one Triangle.',
+        difficulty: 4,
+        discrimination: 1.1
+    },
+    // 4. Superposition / Arithmetic Logic (A + B = C)
+    {
+        id: 'VIS_MATRIX_4',
+        type: 'grid',
+        question: 'Apply the superposition rule.',
+        shapes: ['line-v', 'line-h', 'plus', 'line-h', 'plus', 'line-v', 'plus', 'line-v', '?'],
+        options: ['line-h', 'plus', 'circle', 'square'],
+        correctIndex: 0, // line-h
+        explanation: 'Cyclic Arithmetic: V + H = Plus. If A+B=C, and we see Plus + V, the missing part is H.',
+        difficulty: 6,
+        discrimination: 1.4
+    },
+    // 5. Polygon Progression
+    {
+        id: 'VIS_MATRIX_5',
+        type: 'grid',
+        question: 'Predict the geometric evolution.',
+        shapes: ['poly-3', 'poly-4', 'poly-5', 'poly-4', 'poly-5', 'poly-6', 'poly-5', 'poly-6', '?'],
+        options: ['poly-8', 'poly-7', 'circle', 'poly-3'],
+        correctIndex: 1, // poly-7
+        explanation: 'Side Count Increase: Triangle(3) -> Square(4) -> Pentagon(5). Last row starts 5 -> 6 -> ?(7).',
+        difficulty: 5,
+        discrimination: 1.2
+    },
+    // 6. Phase Logic (Moons)
+    {
+        id: 'VIS_SEQ_MOON',
+        type: 'sequence',
+        question: 'Select the next phase in the cycle.',
+        shapes: ['moon-new', 'moon-crescent', 'moon-half', 'moon-gibbous', '?'],
+        options: ['moon-new', 'moon-full', 'sun', 'moon-crescent'],
+        correctIndex: 1, // moon-full
+        explanation: 'Lunar Cycle: New -> Crescent -> Half -> Gibbous -> Full.',
+        difficulty: 4,
+        discrimination: 0.9
+    },
+    // 7. Clock Arithmetic
+    {
+        id: 'VIS_SEQ_CLOCK',
+        type: 'sequence',
+        question: 'Calculate the next time state.',
+        shapes: ['clock-12', 'clock-3', 'clock-6', 'clock-9', '?'],
+        options: ['clock-1', 'clock-10', 'clock-12', 'clock-6'],
+        correctIndex: 2, // clock-12
+        explanation: 'Modules 12 Arithmetic: +3 hours per step.',
+        difficulty: 3,
+        discrimination: 0.8
+    },
+    // 8. 3D Mental Rotation (Hard)
+    {
+        id: 'VIS_ROT_CUBE',
+        type: 'rotation',
+        question: 'Identify the matching 3D block after 90° rotation.',
+        shapes: ['cube-pattern-E-rot'], // Rotated 90
+        options: ['cube-pattern-B', 'cube-pattern-E', 'cube-pattern-C', 'cube-pattern-D'],
+        correctIndex: 1, // cube-pattern-E (The original unrotated, or compatible state)
+        explanation: 'Spatial Reasoning: The bar on top rotates with the cube.',
+        difficulty: 8,
+        discrimination: 1.8
+    },
+    // 9. Exclusion Logic
+    {
+        id: 'VIS_ODD_1',
+        type: 'odd-one-out',
+        question: 'Which element does not belong to the set?',
+        shapes: ['circle-outline', 'square-outline', 'triangle-outline', 'circle-solid'],
+        options: ['circle-solid', 'triangle-outline', 'square-outline', 'circle-outline'],
+        correctIndex: 0, // circle-solid
+        explanation: 'Consistency Check: All others are outlines; this one is solid/filled.',
+        difficulty: 3,
+        discrimination: 0.9
+    },
+    // 10. Complex Matrix (Color/Fill/Shape)
+    {
+        id: 'VIS_MATRIX_ADV',
+        type: 'grid',
+        question: 'Analyze the transformation matrix.',
+        shapes: ['square-outline', 'square-dot', 'square-cross', 'circle-outline', 'circle-dot', 'circle-cross', 'triangle-outline', 'triangle-dot', '?'],
+        options: ['triangle-solid', 'triangle-cross', 'square-cross', 'circle-dot'],
+        correctIndex: 1, // triangle-cross
+        explanation: 'Grid Logic: Rows define Shape (Square, Circle, Triangle). Columns define Fill (Outline, Dot, Cross).',
+        difficulty: 7,
+        discrimination: 1.6
+    }
+];
+
+// --- 4. EQ SCENARIOS (Expanded Pool: 40 Items) ---
 export const EQ_SCENARIOS: ScenarioItem[] = [
-    // Workplace / Professional
+    // ========================================================================
+    // WORKPLACE / PROFESSIONAL (15 items)
+    // ========================================================================
     {
         id: 'EQ1',
         scenario: 'A colleague takes credit for your idea in a meeting. What is the most effective response?',
@@ -412,7 +576,120 @@ export const EQ_SCENARIOS: ScenarioItem[] = [
             { text: 'Throw a party to force everyone to be happy.', score: 3 }
         ]
     },
-    // Social / Interpersonal
+    {
+        id: 'EQ_WORK_1',
+        scenario: 'Your manager asks you to do something that conflicts with your values but isn\'t illegal.',
+        options: [
+            { text: 'Refuse outright and lecture them on ethics.', score: 1 },
+            { text: 'Do it without question to avoid conflict.', score: 2 },
+            { text: 'Express your concern professionally and propose an alternative approach.', score: 5 },
+            { text: 'Agree but secretly sabotage the task.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_2',
+        scenario: 'A junior colleague makes a mistake that affects your project deadline.',
+        options: [
+            { text: 'Publicly criticize them to set an example.', score: 1 },
+            { text: 'Fix it yourself and never mention it.', score: 3 },
+            { text: 'Help them fix it while explaining what went wrong as a learning moment.', score: 5 },
+            { text: 'Report them directly to management.', score: 2 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_3',
+        scenario: 'You overhear colleagues gossiping negatively about another team member.',
+        options: [
+            { text: 'Join in to fit in with the group.', score: 1 },
+            { text: 'Walk away silently.', score: 3 },
+            { text: 'Redirect the conversation or gently point out the person\'s positive qualities.', score: 5 },
+            { text: 'Report them to HR immediately.', score: 2 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_4',
+        scenario: 'You disagree with a decision made by senior leadership.',
+        options: [
+            { text: 'Publicly voice your disagreement in an all-hands meeting.', score: 2 },
+            { text: 'Comply while openly complaining to coworkers.', score: 1 },
+            { text: 'Follow the decision while seeking an appropriate channel to share your perspective.', score: 5 },
+            { text: 'Ignore the decision and do what you think is right.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_5',
+        scenario: 'A coworker consistently arrives late to meetings, disrupting the flow.',
+        options: [
+            { text: 'Call them out publicly in the next meeting.', score: 1 },
+            { text: 'Adjust meeting times to accommodate them.', score: 2 },
+            { text: 'Speak with them privately to understand and address the issue.', score: 5 },
+            { text: 'Start without them and let them figure it out.', score: 3 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_6',
+        scenario: 'You are passed over for a promotion you expected to get.',
+        options: [
+            { text: 'Confront your manager angrily.', score: 1 },
+            { text: 'Start looking for a new job immediately.', score: 2 },
+            { text: 'Request feedback on what you can improve for next time.', score: 5 },
+            { text: 'Become disengaged and do the minimum work.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_7',
+        scenario: 'You notice a colleague struggling with their workload but haven\'t asked for help.',
+        options: [
+            { text: 'Wait for them to ask you directly.', score: 3 },
+            { text: 'Tell others they can\'t handle their job.', score: 1 },
+            { text: 'Offer assistance proactively without making them feel incompetent.', score: 5 },
+            { text: 'Report to manager that they\'re overwhelmed.', score: 2 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_8',
+        scenario: 'During a team brainstorm, a colleague dismisses your suggestion rudely.',
+        options: [
+            { text: 'Attack their idea in retaliation.', score: 1 },
+            { text: 'Stop contributing to the discussion.', score: 2 },
+            { text: 'Calmly ask them to elaborate on their concerns and build on the discussion.', score: 5 },
+            { text: 'Complain to the team lead after the meeting.', score: 2 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_9',
+        scenario: 'You realize you\'ve been cc\'d on an email chain where others are criticizing your work.',
+        options: [
+            { text: 'Reply-all defensively.', score: 1 },
+            { text: 'Forward it to your manager to handle.', score: 2 },
+            { text: 'Address it privately with the sender, seeking to understand and clarify.', score: 5 },
+            { text: 'Pretend you didn\'t see it.', score: 3 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_10',
+        scenario: 'A new hire is struggling to adapt to team culture and seems isolated.',
+        options: [
+            { text: 'Leave them alone to figure it out.', score: 2 },
+            { text: 'Gossip about their awkwardness with others.', score: 1 },
+            { text: 'Invite them to lunch and introduce them to team members.', score: 5 },
+            { text: 'Tell HR they\'re not fitting in.', score: 2 }
+        ]
+    },
+    {
+        id: 'EQ_WORK_11',
+        scenario: 'You\'re asked to mentor someone you don\'t particularly like.',
+        options: [
+            { text: 'Decline and request someone else.', score: 2 },
+            { text: 'Accept but give minimal effort.', score: 1 },
+            { text: 'Accept and approach it professionally, focusing on their development.', score: 5 },
+            { text: 'Accept but constantly criticize them.', score: 1 }
+        ]
+    },
+
+    // ========================================================================
+    // SOCIAL / INTERPERSONAL (12 items)
+    // ========================================================================
     {
         id: 'EQ10',
         scenario: 'A friend cancels plans with you at the last minute for the third time in a row.',
@@ -437,13 +714,106 @@ export const EQ_SCENARIOS: ScenarioItem[] = [
         id: 'EQ12_NEW',
         scenario: 'You see someone crying on a park bench. They are a stranger.',
         options: [
-            { text: 'Walk past quickly to verify their privacy.', score: 3 },
+            { text: 'Walk past quickly to respect their privacy.', score: 3 },
             { text: 'Stare at them curiously.', score: 1 },
             { text: 'Sit near them quietly, offering a tissue if you have one, without forcing conversation.', score: 5 },
             { text: 'Immediately ask them "What is wrong?" loudly.', score: 2 }
         ]
     },
-    // Micro-expression / Non-verbal Decoding
+    {
+        id: 'EQ_SOC_1',
+        scenario: 'A family member constantly gives unsolicited advice about your life choices.',
+        options: [
+            { text: 'Cut them off completely.', score: 1 },
+            { text: 'Smile and agree but do what you want.', score: 3 },
+            { text: 'Set a kind but firm boundary about your decision-making.', score: 5 },
+            { text: 'Argue with them every time.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_SOC_2',
+        scenario: 'Your roommate has been playing loud music late at night.',
+        options: [
+            { text: 'Play louder music to retaliate.', score: 1 },
+            { text: 'Post passive-aggressive notes.', score: 1 },
+            { text: 'Have a respectful conversation about quiet hours.', score: 5 },
+            { text: 'Move out without saying anything.', score: 2 }
+        ]
+    },
+    {
+        id: 'EQ_SOC_3',
+        scenario: 'A close friend confides something personal and asks you to keep it secret, but it affects another friend.',
+        options: [
+            { text: 'Tell the other friend immediately.', score: 1 },
+            { text: 'Keep the secret no matter what.', score: 3 },
+            { text: 'Encourage the first friend to share it themselves, offering support.', score: 5 },
+            { text: 'Post about it vaguely on social media.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_SOC_4',
+        scenario: 'At a party, you notice someone standing alone looking uncomfortable.',
+        options: [
+            { text: 'Ignore them and enjoy the party.', score: 2 },
+            { text: 'Point them out to your friends.', score: 1 },
+            { text: 'Approach them and start a friendly conversation.', score: 5 },
+            { text: 'Ask the host to deal with them.', score: 2 }
+        ]
+    },
+    {
+        id: 'EQ_SOC_5',
+        scenario: 'You accidentally hurt a friend\'s feelings with an insensitive comment.',
+        options: [
+            { text: 'Defend your comment as "just a joke."', score: 1 },
+            { text: 'Avoid them until it blows over.', score: 2 },
+            { text: 'Apologize sincerely and ask how you can make it right.', score: 5 },
+            { text: 'Blame them for being too sensitive.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_SOC_6',
+        scenario: 'Two of your friends are in conflict and each wants you to take their side.',
+        options: [
+            { text: 'Pick the friend you like more.', score: 2 },
+            { text: 'Avoid both until it\'s resolved.', score: 2 },
+            { text: 'Listen to both without taking sides and encourage direct communication.', score: 5 },
+            { text: 'Spread information between them to fix it.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_SOC_7',
+        scenario: 'You need to decline attending a wedding for financial reasons.',
+        options: [
+            { text: 'Make up an elaborate excuse.', score: 2 },
+            { text: 'Just don\'t respond to the invitation.', score: 1 },
+            { text: 'Politely decline with honesty and send congratulations.', score: 5 },
+            { text: 'Complain about how expensive weddings are.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_SOC_8',
+        scenario: 'Your partner is venting about a problem but you know the solution.',
+        options: [
+            { text: 'Interrupt to share your solution immediately.', score: 2 },
+            { text: 'Zone out because you\'ve heard it before.', score: 1 },
+            { text: 'Listen actively first and ask if they want advice or just support.', score: 5 },
+            { text: 'Tell them to stop complaining.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_SOC_9',
+        scenario: 'A friend has achieved something you secretly wanted for yourself.',
+        options: [
+            { text: 'Downplay their achievement.', score: 1 },
+            { text: 'Act happy but feel bitter inside.', score: 2 },
+            { text: 'Genuinely congratulate them while processing your own feelings privately.', score: 5 },
+            { text: 'Cut off contact out of envy.', score: 1 }
+        ]
+    },
+
+    // ========================================================================
+    // MICRO-EXPRESSION / NON-VERBAL DECODING (5 items)
+    // ========================================================================
     {
         id: 'EQ13_MICRO',
         scenario: 'You are pitching an idea. The investor is smiling with their mouth, but their eyes remain unmoving (no crow\'s feet).',
@@ -459,7 +829,7 @@ export const EQ_SCENARIOS: ScenarioItem[] = [
         scenario: 'While negotiating, the other person briefly touches their neck and avoids eye contact when stating a price.',
         options: [
             { text: 'They are confident in the price.', score: 1 },
-            { text: 'They are likely feeling discomfort or performative deception.', score: 5 },
+            { text: 'They are likely feeling discomfort or being deceptive.', score: 5 },
             { text: 'They are bored.', score: 2 },
             { text: 'They are attracted to you.', score: 1 }
         ]
@@ -474,7 +844,30 @@ export const EQ_SCENARIOS: ScenarioItem[] = [
             { text: 'They are excited.', score: 1 }
         ]
     },
-    // Complex Dilemmas
+    {
+        id: 'EQ_MICRO_1',
+        scenario: 'During an interview, the candidate frequently touches their face when answering about their last job.',
+        options: [
+            { text: 'They have an itch.', score: 2 },
+            { text: 'They may be uncomfortable or withholding information.', score: 5 },
+            { text: 'They are very confident.', score: 1 },
+            { text: 'It\'s just a nervous habit and means nothing.', score: 3 }
+        ]
+    },
+    {
+        id: 'EQ_MICRO_2',
+        scenario: 'When asked about their weekend, a colleague\'s eyebrows briefly rise before they answer.',
+        options: [
+            { text: 'They are trying to remember.', score: 3 },
+            { text: 'They may have been surprised by the question or are about to share something unexpected.', score: 5 },
+            { text: 'They are bored.', score: 1 },
+            { text: 'They are angry.', score: 1 }
+        ]
+    },
+
+    // ========================================================================
+    // COMPLEX DILEMMAS / SELF-REGULATION (8 items)
+    // ========================================================================
     {
         id: 'EQ16_DILEMMA',
         scenario: 'You discover a close friend at work is stealing office supplies. They are struggling financially.',
@@ -523,6 +916,36 @@ export const EQ_SCENARIOS: ScenarioItem[] = [
             { text: 'Fix it silently.', score: 3 },
             { text: 'Admit it to the relevant stakeholders and propose a fix.', score: 5 },
             { text: 'Blame a software bug.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_DILEMMA_1',
+        scenario: 'You witness a senior leader behaving unethically, but reporting could jeopardize your career.',
+        options: [
+            { text: 'Stay quiet to protect yourself.', score: 2 },
+            { text: 'Confront them publicly.', score: 1 },
+            { text: 'Document the behavior and report through proper channels.', score: 5 },
+            { text: 'Spread rumors to undermine them.', score: 1 }
+        ]
+    },
+    {
+        id: 'EQ_DILEMMA_2',
+        scenario: 'Your best friend\'s partner flirts with you when your friend isn\'t around.',
+        options: [
+            { text: 'Flirt back—it\'s harmless.', score: 1 },
+            { text: 'Ignore it and hope it stops.', score: 2 },
+            { text: 'Set a clear boundary and consider telling your friend.', score: 5 },
+            { text: 'Avoid your friend to avoid the situation.', score: 2 }
+        ]
+    },
+    {
+        id: 'EQ_DILEMMA_3',
+        scenario: 'You\'re exhausted and a friend asks for help moving on your only day off.',
+        options: [
+            { text: 'Say yes but resent them the whole time.', score: 2 },
+            { text: 'Make up an excuse.', score: 2 },
+            { text: 'Honestly explain you need rest but offer an alternative way to help.', score: 5 },
+            { text: 'Ghost their message.', score: 1 }
         ]
     }
 ];

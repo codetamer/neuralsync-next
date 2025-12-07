@@ -14,6 +14,8 @@ import { NeonButton } from '../ui/NeonButton';
 import { AnalysisEngine, AnalysisInput } from '../../engine/AnalysisEngine';
 import { getArchetypeTheme } from '../../utils/themeMapping';
 import { ThreeDCard } from '../ui/ThreeDCard';
+import { CognitiveDomainCard } from './CognitiveDomainCard';
+import { ValidationCard } from './ValidationCard';
 
 export const ResultsDashboard = () => {
     const { getResults, resetTest, returnToHome, stages } = useTestStore();
@@ -44,7 +46,9 @@ export const ResultsDashboard = () => {
             iq: results.iq,
             eq: results.eq,
             riskTolerance: results.riskTolerance,
-            hexaco: results.hexaco
+            hexaco: results.hexaco,
+            cognitive: results.cognitive,
+            meta: results.meta
         };
 
         return AnalysisEngine.generate(input);
@@ -145,15 +149,16 @@ export const ResultsDashboard = () => {
                 </motion.div>
             </div>
 
-            {/* Middle Section: Cognitive Profile & Widgets */}
+            {/* Middle Section: Big Numbers & Validation */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
+                    className="h-full"
                 >
-                    <ThreeDCard>
+                    <ThreeDCard className="h-full">
                         <CognitiveProfile
                             iq={results.iq}
                             eq={results.eq}
@@ -167,25 +172,48 @@ export const ResultsDashboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
+                    className="h-full"
                 >
-                    <ThreeDCard>
-                        <AnalysisWidgets
-                            iq={results.iq}
-                            eq={results.eq}
-                            risk={results.riskTolerance}
-                            personalityType={apexTrait.trait}
-                        />
+                    <ThreeDCard className="h-full">
+                        {results.validityScore !== undefined ? (
+                            <ValidationCard
+                                data={results.antigaming}
+                                validityScore={results.validityScore}
+                                isFlagged={results.isFlagged}
+                            />
+                        ) : (
+                            <AnalysisWidgets
+                                iq={results.iq}
+                                eq={results.eq}
+                                risk={results.riskTolerance}
+                                personalityType={apexTrait.trait}
+                            />
+                        )}
                     </ThreeDCard>
                 </motion.div>
             </div>
 
-            {/* Deep Dive Section */}
+            {/* Deep Dive Section: Granular Domains & Text Analysis */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
+                    className="h-full"
+                >
+                    <ThreeDCard className="h-full">
+                        {results.cognitive && (
+                            <CognitiveDomainCard data={results.cognitive} />
+                        )}
+                    </ThreeDCard>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9 }}
                     className="h-full"
                 >
                     <ThreeDCard className="h-full">
@@ -196,12 +224,15 @@ export const ResultsDashboard = () => {
                         />
                     </ThreeDCard>
                 </motion.div>
+            </div>
 
+            {/* Signature Section */}
+            <div className="grid grid-cols-1 gap-8">
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.9 }}
+                    transition={{ delay: 1.0 }}
                     className="h-full"
                 >
                     <ThreeDCard className="h-full">
@@ -242,6 +273,6 @@ export const ResultsDashboard = () => {
                     apexTrait: apexTrait
                 }}
             />
-        </div>
+        </div >
     );
 };

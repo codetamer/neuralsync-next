@@ -15,7 +15,7 @@ export const BartStage = () => {
 
     // Game State
     const [trial, setTrial] = useState(1);
-    const TOTAL_TRIALS = 5;
+    const TOTAL_TRIALS = 10; // Increased from 5 for better reliability
     const [pumps, setPumps] = useState(0);
     const [currentValue, setCurrentValue] = useState(0);
     const [totalEarnings, setTotalEarnings] = useState(0);
@@ -116,7 +116,7 @@ export const BartStage = () => {
 
     // Shake intensity based on risk
     const getShakeParams = () => {
-        const intensity = riskLevel * 10;
+        const intensity = riskLevel * 25; // Increased for visceral feedback
         return {
             x: [0, -intensity, intensity, -intensity / 2, intensity / 2, 0],
             y: [0, intensity / 2, -intensity / 2, intensity / 4, -intensity / 4, 0],
@@ -238,27 +238,32 @@ export const BartStage = () => {
             </div>
 
             {/* Controls */}
-            <GlassCard className="flex gap-6 p-6 items-center">
+            <GlassCard className="flex flex-col md:flex-row gap-8 p-8 items-center justify-center min-w-[500px]">
                 <NeonButton
                     onClick={handlePump}
                     disabled={isExploded || isCashedOut}
-                    className="w-40 h-16 text-lg"
+                    className="w-48 h-14 text-lg font-bold tracking-wider"
                     variant={riskLevel > 0.6 ? 'danger' : 'primary'}
                 >
-                    <Zap className="w-5 h-5 mr-2" />
-                    CHARGE
+                    <Zap className="w-5 h-5 mr-2 fill-current" />
+                    CHARGE ${baseReward}
                 </NeonButton>
 
-                <div className="h-12 w-[1px] bg-white/10" />
+                <div className="flex flex-col items-center gap-1 min-w-[120px]">
+                    <div className="text-[10px] text-neural-muted font-mono uppercase tracking-widest">Risk Level</div>
+                    <div className={cn("text-2xl font-bold font-mono", riskLevel > 0.6 ? "text-neon-red" : "text-neon-teal")}>
+                        {Math.round(riskLevel * 100)}%
+                    </div>
+                </div>
 
                 <NeonButton
                     onClick={handleCashOut}
                     disabled={isExploded || isCashedOut || pumps === 0}
                     variant="secondary"
-                    className="w-40 h-16 text-lg"
+                    className="w-48 h-14 text-lg font-bold tracking-wider"
                 >
                     <Shield className="w-5 h-5 mr-2" />
-                    STABILIZE
+                    SECURE ${currentValue}
                 </NeonButton>
             </GlassCard>
 

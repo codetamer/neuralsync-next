@@ -59,10 +59,10 @@ export const PersonalityStage = () => {
     if (!question) return <div>Loading question...</div>;
 
     return (
-        <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-12 min-h-[60vh] justify-center select-none">
-            <div className="text-center space-y-2">
-                <h2 className="text-3xl font-display font-bold text-white">Identity Matrix</h2>
-                <p className="text-neural-muted">Resonate with the statement.</p>
+        <div className="w-full max-w-2xl mx-auto flex flex-col items-center gap-5 min-h-[50vh] justify-start md:justify-center select-none py-2">
+            <div className="text-center space-y-1">
+                <h2 className="text-2xl font-display font-bold text-white">Identity Matrix</h2>
+                <p className="text-neural-muted text-sm">Resonate with the statement.</p>
             </div>
 
             <AnimatePresence mode="wait">
@@ -72,14 +72,14 @@ export const PersonalityStage = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 1.1 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full flex flex-col items-center gap-16"
+                    className="w-full flex flex-col items-center gap-6"
                 >
-                    <h3 className="text-3xl md:text-4xl text-center font-light leading-relaxed max-w-2xl">
+                    <h3 className="text-2xl md:text-3xl text-center font-light leading-snug max-w-xl px-4 min-h-[80px] flex items-center justify-center">
                         "{question.text}"
                     </h3>
 
                     {/* Orb Resonator Interface */}
-                    <div className="relative w-full max-w-2xl h-32 flex items-center justify-center">
+                    <div className="relative w-full max-w-xl h-24 flex items-center justify-center my-2">
                         {/* Track Line */}
                         <div className="absolute inset-x-0 h-[1px] bg-gradient-to-r from-neon-red/50 via-white/20 to-neon-green/50" />
 

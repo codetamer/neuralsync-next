@@ -25,6 +25,7 @@ interface TestState {
     getResults: () => FinalScores;
     addXp: (amount: number) => void;
     setSection: (section: 'INTRO' | 'IQ' | 'EQ' | 'RISK' | 'PERSONALITY') => void;
+    setStage: (index: number) => void;
 }
 
 export const useTestStore = create<TestState>()(
@@ -108,6 +109,16 @@ export const useTestStore = create<TestState>()(
             addXp: (amount) => set((state) => ({ xp: state.xp + amount })),
 
             setSection: (section) => set({ currentSection: section }),
+
+            // Dev Utils
+            setStage: (index: number) => {
+                const { stages } = get();
+                if (index >= 0 && index < stages.length) {
+                    set({ currentStage: index, isTestComplete: false });
+                } else if (index >= stages.length) {
+                    set({ isTestComplete: true });
+                }
+            },
         }),
         {
             name: 'neuralsync-storage',

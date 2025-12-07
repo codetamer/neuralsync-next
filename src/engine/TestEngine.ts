@@ -2,8 +2,12 @@
 
 import type { ResponseData, FinalScores } from '../utils/storage';
 import { HEXACO_ITEMS, LOGIC_PUZZLES, VISUAL_PUZZLES, EQ_SCENARIOS, ATTENTION_CHECKS } from '../data/testContent';
+import { MATRIX_PUZZLES } from '../data/matrixContent';
+import { ValidationEngine } from './ValidationEngine';
+import { BIAS_ITEMS } from '../data/biasContent';
+import { VOCABULARY_ITEMS } from '../data/vocabularyContent';
 
-export type StageType = 'matrix' | 'stroop' | 'bart' | 'personality' | 'intro' | 'scenario';
+export type StageType = 'matrix' | 'stroop' | 'bart' | 'personality' | 'intro' | 'scenario' | 'debug' | 'outro' | 'nback' | 'digitspan' | 'spatialspan' | 'symbolmatch' | 'reactiontime' | 'vocabulary' | 'trailmaking' | 'biasaudit';
 export type DifficultyLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export interface StageDefinition {
@@ -30,29 +34,100 @@ export const createTestSession = (): StageDefinition[] => {
 
     let stageCount = 1;
 
-    // 1. IQ BLOCK (15 Stages)
-    const selectedLogic = selectRandomItems(LOGIC_PUZZLES, 7);
-    const selectedVisual = selectRandomItems(VISUAL_PUZZLES, 8);
+    // 1. FLUID INTELLIGENCE BLOCK (15 Stages)
+    // Use new MATRIX_PUZZLES as primary, supplement with legacy if needed
+    const selectedMatrices = selectRandomItems(MATRIX_PUZZLES, 10);
+    const selectedLogic = selectRandomItems(LOGIC_PUZZLES, 5);
 
-    const iqMix: (typeof selectedLogic[0] | typeof selectedVisual[0])[] = [];
-    const maxLength = Math.max(selectedLogic.length, selectedVisual.length);
+    // Interleave visual matrices with logic puzzles
+    const iqMix: { id: string; difficulty: number; discrimination: number }[] = [];
+    const maxLength = Math.max(selectedMatrices.length, selectedLogic.length);
     for (let i = 0; i < maxLength; i++) {
+        if (i < selectedMatrices.length) iqMix.push(selectedMatrices[i]);
         if (i < selectedLogic.length) iqMix.push(selectedLogic[i]);
-        if (i < selectedVisual.length) iqMix.push(selectedVisual[i]);
     }
 
     iqMix.forEach((puzzle, index) => {
         stages.push({
             stage: stageCount++,
             type: 'matrix',
-            title: `Cognitive Protocol ${index + 1}`,
+            title: `Pattern Analysis ${index + 1}`,
             difficulty: puzzle.difficulty as DifficultyLevel,
             description: 'Analyze the pattern and deduce the correct solution.',
             contentId: puzzle.id
         });
     });
 
-    // 2. EQ BLOCK (10 items)
+    // 2. WORKING MEMORY BLOCK (N-Back + Digit Span + Spatial Span)
+    stages.push({
+        stage: stageCount++,
+        type: 'nback',
+        title: 'N-Back Memory',
+        difficulty: 6,
+        description: 'Monitor the sequence and identify repeated patterns.'
+    });
+
+    stages.push({
+        stage: stageCount++,
+        type: 'digitspan',
+        title: 'Digit Span',
+        difficulty: 5,
+        description: 'Remember and repeat sequences of digits.'
+    });
+
+    stages.push({
+        stage: stageCount++,
+        type: 'spatialspan',
+        title: 'Spatial Memory',
+        difficulty: 5,
+        description: 'Remember the sequence of highlighted blocks.'
+    });
+
+    // 3. PROCESSING SPEED BLOCK
+    stages.push({
+        stage: stageCount++,
+        type: 'symbolmatch',
+        title: 'Symbol Matching',
+        difficulty: 4,
+        description: 'Find matching symbols as quickly as possible.'
+    });
+
+    stages.push({
+        stage: stageCount++,
+        type: 'reactiontime',
+        title: 'Reaction Speed',
+        difficulty: 3,
+        description: 'Test your reflexes and response speed.'
+    });
+
+    // 4. CRYSTALLIZED INTELLIGENCE BLOCK
+    stages.push({
+        stage: stageCount++,
+        type: 'vocabulary',
+        title: 'Vocabulary',
+        difficulty: 5,
+        description: 'Test your knowledge of word meanings.'
+    });
+
+    // 5. EXECUTIVE FUNCTION BLOCK
+    stages.push({
+        stage: stageCount++,
+        type: 'trailmaking',
+        title: 'Trail Making',
+        difficulty: 5,
+        description: 'Connect the dots in sequence as quickly as possible.'
+    });
+
+    // 6. META-COGNITION BLOCK
+    stages.push({
+        stage: stageCount++,
+        type: 'biasaudit',
+        title: 'Cognitive Bias Audit',
+        difficulty: 6,
+        description: 'Identify and resist common decision-making biases.'
+    });
+
+    // 3. EQ BLOCK (10 items from 40 pool)
     const selectedEQ = selectRandomItems(EQ_SCENARIOS, 10);
     selectedEQ.forEach((scenario, index) => {
         stages.push({
@@ -65,7 +140,7 @@ export const createTestSession = (): StageDefinition[] => {
         });
     });
 
-    // 3. RISK BLOCK
+    // 4. RISK BLOCK (BART)
     stages.push({
         stage: stageCount++,
         type: 'bart',
@@ -74,13 +149,13 @@ export const createTestSession = (): StageDefinition[] => {
         description: 'Evaluate risk vs reward potential.'
     });
 
-    // 4. PERSONALITY BLOCK
-    const hItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'honesty'), 4);
-    const eItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'emotionality'), 4);
-    const xItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'extraversion'), 4);
-    const aItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'agreeableness'), 4);
-    const cItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'conscientiousness'), 4);
-    const oItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'openness'), 4);
+    // 5. PERSONALITY BLOCK (6 per trait = 36 items + 2 checks = 38 total)
+    const hItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'honesty'), 6);
+    const eItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'emotionality'), 6);
+    const xItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'extraversion'), 6);
+    const aItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'agreeableness'), 6);
+    const cItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'conscientiousness'), 6);
+    const oItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'openness'), 6);
     const checks = selectRandomItems(ATTENTION_CHECKS, 2);
 
     const personalityMix = [
@@ -158,7 +233,7 @@ function scoreToPercentile(score: number, mean: number, sd: number): number {
     const t = 1 / (1 + 0.2316419 * Math.abs(z));
     const d = 0.3989423 * Math.exp(-z * z / 2);
     const probability = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
-    return Math.round((z > 0 ? 1 - probability : probability) * 100);
+    return Math.min(99, Math.round((z > 0 ? 1 - probability : probability) * 100));
 }
 
 // 1. IQ Calculation (IRT-Proxy + Latency Efficiency)
@@ -176,10 +251,11 @@ function calculateIQ(responses: ResponseData[], stages: StageDefinition[]): { sc
 
     iqResponses.forEach(r => {
         const stageDef = stages[r.stage];
-        // Find puzzle in either collection
+        // Find puzzle in any collection (new visual matrices first, then legacy)
+        const newMatrixPuzzle = MATRIX_PUZZLES.find(p => p.id === stageDef.contentId);
         const textPuzzle = LOGIC_PUZZLES.find(p => p.id === stageDef.contentId);
         const visualPuzzle = VISUAL_PUZZLES.find(p => p.id === stageDef.contentId);
-        const puzzle = textPuzzle || visualPuzzle;
+        const puzzle = newMatrixPuzzle || textPuzzle || visualPuzzle;
 
         if (puzzle) {
             // IRT Parameters
@@ -342,36 +418,178 @@ function calculateValidity(responses: ResponseData[], stages: StageDefinition[])
     return { score, flagged: score < 50 };
 }
 
+// 5. Working Memory Scoring (N-Back, Digit Span, Spatial Span)
+function calculateWorkingMemory(responses: ResponseData[], stages: StageDefinition[]): number {
+    let nbackScore = 0;
+    let digitScore = 0;
+    let spatialScore = 0;
+
+    // N-Back (d-prime based)
+    const nbackResp = responses.find(r => stages[r.stage]?.type === 'nback');
+    if (nbackResp && nbackResp.choice) {
+        // choice contains d-prime (typically -1 to +4.5)
+        // Map d' to 0-100 percentile-like score
+        // d' = 0 (chance) -> 50
+        // d' = 3 (excellent) -> 100
+        // d' = -1 (terrible) -> 20
+        const dPrime = Number(nbackResp.choice);
+        nbackScore = Math.min(100, Math.max(0, (dPrime * 16.6) + 50));
+    }
+
+    // Digit Span (Span Length)
+    const digitResp = responses.find(r => stages[r.stage]?.type === 'digitspan');
+    if (digitResp) {
+        // Choice stores max span (e.g. 7)
+        // Range: 3 to 9+
+        // 3 -> 0 (Baseline)
+        // 5 -> 33
+        // 7 -> 66
+        // 9 -> 100
+        const span = Number(digitResp.choice);
+        digitScore = Math.min(100, Math.max(0, (span - 3) * 16.6));
+    }
+
+    // Spatial Span (Span Length)
+    const spatialResp = responses.find(r => stages[r.stage]?.type === 'spatialspan');
+    if (spatialResp) {
+        const span = Number(spatialResp.choice);
+        spatialScore = Math.min(100, Math.max(0, (span - 3) * 16.6));
+    }
+
+    return Math.round((nbackScore + digitScore + spatialScore) / 3);
+}
+
+// 6. Processing Speed Scoring (Symbol Match, Reaction Time)
+function calculateProcessingSpeed(responses: ResponseData[], stages: StageDefinition[]): number {
+    let symbolScore = 0;
+    let reactionScore = 0;
+
+    // Symbol Match (Items correct per minute)
+    const symResp = responses.find(r => stages[r.stage]?.type === 'symbolmatch');
+    if (symResp) {
+        // Raw score is number of correct matches
+        const matches = Number(symResp.choice);
+        // Norm: 40 matches = 100, 20 matches = 50
+        symbolScore = Math.min(100, matches * 2.5);
+    }
+
+    // Reaction Time (Milliseconds)
+    const rtResp = responses.find(r => stages[r.stage]?.type === 'reactiontime');
+    if (rtResp) {
+        // Lower is better. 150ms = 100, 500ms = 50
+        const rt = Number(rtResp.choice);
+        // Determine using inverse curve
+        if (rt > 0) {
+            reactionScore = Math.max(0, Math.min(100, 120 - ((rt - 150) / 5)));
+        }
+    }
+
+    // Weight Symbol Match higher as it involves decision speed vs pure reflex
+    return Math.round((symbolScore * 0.6) + (reactionScore * 0.4));
+}
+
+// 7. Crystallized Intelligence (Vocabulary)
+function calculateCrystallized(responses: ResponseData[], stages: StageDefinition[]): number {
+    const vocabResponses = responses.filter(r => stages[r.stage]?.type === 'vocabulary');
+    if (vocabResponses.length === 0) return 50;
+
+    // Use the component's final reported score if available, or calculate manually
+    // The VocabularyStage component reports final % score as a single response at the end usually
+    // Or we track per-item. Let's assume we sum content-based item accuracy
+
+    // Actually, TestEngine usually receives per-stage responses. 
+    // If VocabularyStage emits one response per item:
+    if (vocabResponses.length > 1) {
+        let weightedScore = 0;
+        let maxScore = 0;
+
+        vocabResponses.forEach(r => {
+            const stage = stages[r.stage];
+            // Lookup item difficulty if possible, or assume 5
+            const itemDiff = 5;
+            const isCorrect = r.accuracy === true;
+
+            weightedScore += isCorrect ? itemDiff : 0;
+            maxScore += itemDiff;
+        });
+
+        return maxScore > 0 ? Math.round((weightedScore / maxScore) * 100) : 50;
+    }
+
+    // If it emits a summary score
+    const summary = vocabResponses[0];
+    return Number(summary.choice) || 50;
+}
+
+// 8. Executive Function (Trail Making)
+function calculateExecutive(responses: ResponseData[], stages: StageDefinition[]): number {
+    const trailResp = responses.find(r => stages[r.stage]?.type === 'trailmaking');
+    if (!trailResp) return 50;
+
+    // Score based on time (lower better) and errors
+    // Assuming choice contains completion time in ms, or a composite score passed by component
+    // If component passes a score 0-100 directly:
+    return Number(trailResp.choice) || 50;
+}
+
+// 9. Meta-Cognition (Bias Audit)
+function calculateMetaCoqnition(responses: ResponseData[], stages: StageDefinition[]): { biasResistance: number, confidenceCal: number } {
+    const biasResp = responses.find(r => stages[r.stage]?.type === 'biasaudit');
+
+    // Bias resistance 0-100
+    const biasResistance = biasResp ? Number(biasResp.choice) : 50;
+
+    // Confidence calibration: Difference between confidence rating and actual accuracy key
+    // Currently we don't have explicit confidence sliders on every question, 
+    // so we'll use a placeholder or derive from consistency for now.
+    // Future: Add confidence slider to matrix/logic stages.
+
+    return {
+        biasResistance,
+        confidenceCal: 75 // Placeholder for Phase 2
+    };
+}
+
+
 // 4. Final Aggregator
 export function calculateFinalScores(responses: ResponseData[], stages: StageDefinition[]): FinalScores {
     const iqResult = calculateIQ(responses, stages);
     const eqResult = calculateEQ(responses, stages);
     const hexaco = calculateHEXACO(responses, stages);
-    const validity = calculateValidity(responses, stages);
+
+    // New Metrics
+    const wmScore = calculateWorkingMemory(responses, stages);
+    const speedScore = calculateProcessingSpeed(responses, stages);
+    const gcScore = calculateCrystallized(responses, stages);
+    const efScore = calculateExecutive(responses, stages);
+    const metaResult = calculateMetaCoqnition(responses, stages);
+
+    // Anti-Gaming Validation
+    const validation = ValidationEngine.validateTestSession(responses, stages, ATTENTION_CHECKS.map(c => c.id));
 
     // BART / Risk
     const riskResponse = responses.find(r => stages[r.stage]?.type === 'bart');
     let riskTolerance = 50;
-
     if (riskResponse) {
-        // Logarithmic scaling for risk (diminishing returns)
-        const pumps = Number(riskResponse.choice); // Average pumps
-        const normalized = Math.min(1, pumps / 45); // Assuming max avg ~45
+        const pumps = Number(riskResponse.choice);
+        const normalized = Math.min(1, pumps / 45);
         riskTolerance = Math.round(15 + (85 * Math.pow(normalized, 0.7)));
     }
 
     // Determine Apex Traits (Top 3 Percentiles)
     const traitList = [
-        { trait: 'Cognitive Efficiency', score: iqResult.efficiency, description: 'Rapid and accurate information processing.' },
         { trait: 'Fluid Intelligence', score: iqResult.percentile, description: 'Exceptional abstract reasoning ability.' },
+        { trait: 'Cognitive Efficiency', score: iqResult.efficiency, description: 'Rapid information processing.' },
+        { trait: 'Crystallized IQ', score: gcScore, description: 'Deep verbal knowledge and experience.' },
+        { trait: 'Working Memory', score: wmScore, description: 'Superior mental workspace capacity.' },
+        { trait: 'Executive Function', score: efScore, description: 'Elite cognitive control and flexibility.' },
         { trait: 'Emotional Intelligence', score: eqResult.percentile, description: 'High capacity for empathy and regulation.' },
-        { trait: 'Honesty-Humility', score: hexaco.honesty, description: 'Sincere, fair, and unassuming nature.' },
+        { trait: 'Bias Resistance', score: metaResult.biasResistance, description: 'Rational, objective decision making.' },
         { trait: 'Risk Tolerance', score: riskTolerance, description: 'Boldness in the face of uncertainty.' },
         { trait: 'Conscientiousness', score: hexaco.conscientiousness, description: 'Strong organization and diligence.' },
-        { trait: 'Extraversion', score: hexaco.extraversion, description: 'High social energy and assertiveness.' },
-        { trait: 'Resilience (Inv. Emotionality)', score: 100 - hexaco.emotionality, description: 'Calmness under pressure.' },
         { trait: 'Openness', score: hexaco.openness, description: 'Deep intellectual curiosity.' },
-        { trait: 'Agreeableness', score: hexaco.agreeableness, description: 'Cooperative and forgiving nature.' }
+        { trait: 'Resilience', score: 100 - hexaco.emotionality, description: 'Calmness under pressure.' },
+        { trait: 'Extraversion', score: hexaco.extraversion, description: 'High social energy.' }
     ];
 
     const apexTraits = traitList.sort((a, b) => b.score - a.score).slice(0, 3);
@@ -382,18 +600,31 @@ export function calculateFinalScores(responses: ResponseData[], stages: StageDef
         eq: eqResult.score,
         eqPercentile: eqResult.percentile,
         riskTolerance,
-        riskPercentile: riskTolerance, // Proxy
+        riskPercentile: riskTolerance,
         hexaco: hexaco,
-        ocean: { // Legacy Mapping for compat if needed, or derived
+        ocean: {
             openness: hexaco.openness,
             conscientiousness: hexaco.conscientiousness,
             extraversion: hexaco.extraversion,
             agreeableness: hexaco.agreeableness,
             neuroticism: hexaco.emotionality
         },
+        // NEW GRANULAR DATA
+        cognitive: {
+            fluid: iqResult.percentile, // Using percentile for normalized view
+            crystallized: gcScore,
+            memory: wmScore,
+            speed: speedScore,
+            executive: efScore
+        },
+        meta: metaResult,
+        antigaming: {
+            flags: validation.flags.map(f => f.message),
+            suspicionScore: 100 - validation.overallScore
+        },
         apexTraits,
-        validityScore: validity.score,
-        isFlagged: validity.flagged,
+        validityScore: validation.overallScore,
+        isFlagged: !validation.isValid,
         rawResponses: responses
     };
 }

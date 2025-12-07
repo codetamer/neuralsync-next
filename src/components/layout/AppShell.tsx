@@ -12,6 +12,8 @@ import { Home, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 
 import { audio } from '../../engine/AudioEngine';
+import { DevControls } from '../dev/DevControls';
+
 
 interface AppShellProps {
     children: ReactNode;
@@ -20,6 +22,7 @@ interface AppShellProps {
 export const AppShell = ({ children }: AppShellProps) => {
     const { resetTest, returnToHome, getProgress, currentStage, isTestComplete, xp } = useTestStore();
     const [muted, setMuted] = useState(false);
+    const [showDevControls, setShowDevControls] = useState(false);
     const [modalConfig, setModalConfig] = useState<{
         isOpen: boolean;
         title: string;
@@ -33,6 +36,17 @@ export const AppShell = ({ children }: AppShellProps) => {
         onConfirm: () => { },
         variant: 'primary'
     });
+
+    // Toggle Dev Controls with Shift+D
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.shiftKey && e.key.toLowerCase() === 'd') {
+                setShowDevControls(prev => !prev);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const handleResetClick = () => {
         setModalConfig({
@@ -115,12 +129,7 @@ export const AppShell = ({ children }: AppShellProps) => {
 
                     {/* Gamification Controls */}
                     <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex flex-col items-end">
-                            <span className="text-[10px] text-neural-muted font-mono">SYNAPSE XP</span>
-                            <span className="text-lg font-mono text-neon-purple font-bold tabular-nums">
-                                {xp.toLocaleString()}
-                            </span>
-                        </div>
+
 
                         <button
                             onClick={() => {
@@ -249,6 +258,9 @@ export const AppShell = ({ children }: AppShellProps) => {
                     </div>
                 </footer>
             </div>
+
+            {/* Dev Controls Overlay - Toggle with Shift+D */}
+            {showDevControls && <DevControls />}
         </div>
     );
 };

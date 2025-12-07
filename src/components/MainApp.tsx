@@ -16,9 +16,14 @@ export default function MainApp() {
     const [showResults, setShowResults] = useState(false);
     const [lastTriggeredStage, setLastTriggeredStage] = useState(0);
 
-    // Trigger Interstitials at start of blocks (Stages 6, 11, 16)
+    // Trigger Interstitials at logical section breaks
+    // 15: End of Fluid IQ
+    // 25: End of Cognitive Battery
+    // 35: Start of Personality
+    // 48: Mid-Personality
+    // 60: Late-Personality
     useEffect(() => {
-        const interstitialStages = [6, 11, 16];
+        const interstitialStages = [15, 25, 35, 48, 60];
         if (interstitialStages.includes(currentStage) && currentStage !== lastTriggeredStage) {
             setShowInterstitial(true);
             setLastTriggeredStage(currentStage);
