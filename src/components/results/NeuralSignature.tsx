@@ -46,34 +46,45 @@ export const NeuralSignature = ({ data }: NeuralSignatureProps) => {
     let insightText = "";
     let insightIcon = Brain;
 
+    // Calculate average latency for valid levels to check for "Perfectionist" vs "Rusher" traits
+    const validLevels = chartData.filter(d => d.accuracy > 0);
+    const globalAvgLatency = validLevels.reduce((sum, d) => sum + d.latency, 0) / (validLevels.length || 1);
+
     if (ceilingLevel >= 9) {
-        insightText = `Elite cognitive performance! You maintain peak accuracy (>70%) through Level ${ceilingLevel}. This places you in the top 5% for mental endurance. Focus: Challenge yourself with expert-level complexity to continue growth.`;
-        insightIcon = Award;
-    } else if (ceilingLevel >= 7) {
-        insightText = `Strong cognitive capacity. You sustain high performance up to Level ${ceilingLevel} (top 20%). Your ceiling indicates solid mental resilience. Next step: Target specific difficulty ${ceilingLevel + 1} challenges for breakthrough.`;
-        insightIcon = Target;
-    } else if (ceilingLevel >= 5) {
-        insightText = `Solid foundation. Performance remains reliable through Level ${ceilingLevel}. Strategy: Use spaced repetition on Level ${ceilingLevel + 1} tasks. Break complex problems into smaller chunks to build endurance.`;
-        insightIcon = Brain;
-    } else if (ceilingLevel >= 3) {
-        insightText = `Building capacity. Ceiling at Level ${ceilingLevel} suggests room for foundational strengthening. Action plan: (1) Daily 15-min progressive difficulty drills (2) Focus on accuracy over speed (3) Review Level ${ceilingLevel} patterns.`;
-        insightIcon = TrendingUp;
+        if (globalAvgLatency < 2500) {
+            insightText = `Elite Rapid Processor. You maintain top-tier accuracy (>70%) through Level ${ceilingLevel} with exceptional speed. Your neural efficiency is in the top 1%. Challenge: Competitive algorithmic trading or high-frequency decision roles.`;
+            insightIcon = Award;
+        } else {
+            insightText = `Elite Deep Processor. You solve complex Level ${ceilingLevel} problems with high accuracy. Your methodical approach ensures zero errors but sacrifices raw speed. Optimization: Trust your pattern recognition earlier to reduce verification time.`;
+            insightIcon = Target;
+        }
+    } else if (ceilingLevel >= 6) {
+        if (overallAccuracy > 90 && globalAvgLatency > 4000) {
+            insightText = `High-Precision Analyst. You maintain ${Math.round(overallAccuracy)}% accuracy but your processing speed (${Math.round(globalAvgLatency)}ms) indicates over-verification. You are trading too much time for marginal accuracy gains. Action: Force faster decisions on Levels 1-4.`;
+            insightIcon = Target;
+        } else if (overallAccuracy < 80 && globalAvgLatency < 2000) {
+            insightText = "Impulsive Responder. Your high speed is compromising your pattern fidelity. You are clicking before fully decoding the sequence. Action: Implement a mandatory 2-second 'decoding pause' before moving your cursor.";
+            insightIcon = TrendingUp;
+        } else {
+            insightText = `Balanced Cognitive Efficiency. You sustain adaptable performance up to Level ${ceilingLevel}. Your speed-accuracy trade-off is optimized for general problem solving. Next Step: Push into the 'discomfort zone' of Level ${ceilingLevel + 1} to expand capacity.`;
+            insightIcon = Brain;
+        }
     } else {
-        insightText = `Developing base skills. Current ceiling at Level ${ceilingLevel}. Recommended approach: Start with Level 1-2 mastery (aim for 95% accuracy), then gradually increase difficulty. Consider cognitive training apps (Lumosity, Peak) for systematic progression.`;
+        insightText = `Foundational Developing. The drop-off at Level ${ceilingLevel} suggests a need to strengthen core pattern recognition buffers. Recommended: Focus on 'N-Back' memory training to improve working memory load capacity.`;
         insightIcon = TrendingUp;
     }
 
     const InsightIcon = insightIcon;
 
     return (
-        <GlassCard className="p-6 md:p-8 h-full flex flex-col relative overflow-hidden">
+        <GlassCard className="p-6 md:p-8 flex flex-col relative overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-6 z-10 relative">
                 <div className="flex items-center gap-3 text-neon-teal">
                     <Brain className="w-6 h-6" />
                     <div>
-                        <h3 className="text-xl font-display font-bold tracking-wider">COGNITIVE LOAD CAPACITY</h3>
-                        <p className="text-xs text-white/50 font-mono">ACCURACY & SPEED vs. DIFFICULTY</p>
+                        <h3 className="text-xl font-display font-bold tracking-wider">COGNITIVE EFFICIENCY PROFILE</h3>
+                        <p className="text-xs text-white/50 font-mono">ACCURACY vs. PROCESSING SPEED</p>
                     </div>
                 </div>
                 <div className="text-right">
@@ -89,12 +100,12 @@ export const NeuralSignature = ({ data }: NeuralSignatureProps) => {
                     <span className="text-xs font-mono text-neon-teal font-bold">COGNITIVE CEILING: LEVEL {ceilingLevel}</span>
                 </div>
                 <p className="text-xs text-white/70">
-                    Your performance remains optimal up to difficulty level {ceilingLevel}
+                    Your efficiency holds stable until fatigue onset at Level {ceilingLevel}.
                 </p>
             </div>
 
-            {/* Chart Area */}
-            <div className="flex-1 min-h-[320px] relative z-10">
+            {/* Chart Area - Fixed height to prevent elongation */}
+            <div className="h-[400px] w-full relative z-10">
                 <ResponsiveContainer width="100%" height="100%">
                     <ComposedChart data={chartData} margin={{ top: 10, right: 30, bottom: 20, left: 0 }}>
                         <defs>
@@ -129,7 +140,7 @@ export const NeuralSignature = ({ data }: NeuralSignatureProps) => {
                             orientation="right"
                             stroke="rgba(255,215,0,0.5)"
                             tick={{ fill: 'rgba(255,215,0,0.7)', fontSize: 10 }}
-                            label={{ value: 'Avg Latency (ms)', angle: 90, position: 'insideRight', fill: 'rgba(255,215,0,0.7)', fontSize: 10 }}
+                            label={{ value: 'Latency (ms)', angle: 90, position: 'insideRight', fill: 'rgba(255,215,0,0.7)', fontSize: 10 }}
                         />
 
                         <Tooltip
@@ -147,7 +158,7 @@ export const NeuralSignature = ({ data }: NeuralSignatureProps) => {
                                                     <span className="text-neon-teal font-bold">{data.accuracy}%</span>
                                                 </div>
                                                 <div className="flex justify-between gap-6">
-                                                    <span className="text-white/60">Avg Latency:</span>
+                                                    <span className="text-white/60">latency:</span>
                                                     <span className="text-yellow-400 font-bold">{data.latency}ms</span>
                                                 </div>
                                                 <div className="flex justify-between gap-6">
@@ -198,7 +209,7 @@ export const NeuralSignature = ({ data }: NeuralSignatureProps) => {
                 </div>
                 <div className="flex items-center gap-2 text-xs font-mono">
                     <div className="w-4 h-3 bg-yellow-400/80 rounded"></div>
-                    <span className="text-white/60">Processing Speed</span>
+                    <span className="text-white/60">Cognitive Load (ms)</span>
                 </div>
             </div>
 

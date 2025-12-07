@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useTestStore } from '../../store/useTestStore';
 import { ApexCard } from './ApexCard';
 import { TraitRadar } from './TraitRadar';
@@ -6,14 +6,19 @@ import { AnalysisWidgets } from './AnalysisWidgets';
 import { CognitiveProfile } from './CognitiveProfile';
 import { NeuralAnalysis } from './NeuralAnalysis';
 import { NeuralSignature } from './NeuralSignature';
+import { HeroArchetype } from './HeroArchetype';
 import { ShareModal } from './ShareModal';
-import { STAGE_DEFINITIONS } from '../../engine/TestEngine';
 import { motion } from 'framer-motion';
 import { Share2, Download, Home, RotateCcw } from 'lucide-react';
 import { NeonButton } from '../ui/NeonButton';
+import { AnalysisEngine, AnalysisInput } from '../../engine/AnalysisEngine';
+import { getArchetypeTheme } from '../../utils/themeMapping';
+import { ThreeDCard } from '../ui/ThreeDCard';
+import { CognitiveDomainCard } from './CognitiveDomainCard';
+import { ValidationCard } from './ValidationCard';
 
 export const ResultsDashboard = () => {
-    const { getResults, resetTest, returnToHome } = useTestStore();
+    const { getResults, resetTest, returnToHome, stages } = useTestStore();
     const [results, setResults] = useState<any>(null);
     const [isShareOpen, setIsShareOpen] = useState(false);
     const dashboardRef = useRef<HTMLDivElement>(null);
@@ -33,15 +38,37 @@ export const ResultsDashboard = () => {
         setResults(data);
     }, [getResults]);
 
-    if (!results) return null;
+    // Generate Deep Analysis from Engine
+    const analysis = useMemo(() => {
+        if (!results) return null;
 
-    // Prepare Data for Radar Chart
+        const input: AnalysisInput = {
+            iq: results.iq,
+            eq: results.eq,
+            riskTolerance: results.riskTolerance,
+            hexaco: results.hexaco,
+            cognitive: results.cognitive,
+            meta: results.meta
+        };
+
+        return AnalysisEngine.generate(input);
+    }, [results]);
+
+    // Derive Theme
+    const theme = useMemo(() => {
+        return analysis ? getArchetypeTheme(analysis.archetype) : getArchetypeTheme("Adaptive Generalist");
+    }, [analysis]);
+
+    if (!results || !analysis) return null;
+
+    // Prepare Data for Radar Chart (HEXACO)
     const radarData = [
-        { subject: 'Openness', A: results.ocean.openness, fullMark: 100 },
-        { subject: 'Conscientiousness', A: results.ocean.conscientiousness, fullMark: 100 },
-        { subject: 'Extraversion', A: results.ocean.extraversion, fullMark: 100 },
-        { subject: 'Agreeableness', A: results.ocean.agreeableness, fullMark: 100 },
-        { subject: 'Neuroticism', A: results.ocean.neuroticism, fullMark: 100 },
+        { subject: 'Honesty', A: results.hexaco.honesty, fullMark: 100 },
+        { subject: 'Emotion', A: results.hexaco.emotionality, fullMark: 100 },
+        { subject: 'Extraversion', A: results.hexaco.extraversion, fullMark: 100 },
+        { subject: 'Agreeableness', A: results.hexaco.agreeableness, fullMark: 100 },
+        { subject: 'Conscientious', A: results.hexaco.conscientiousness, fullMark: 100 },
+        { subject: 'Openness', A: results.hexaco.openness, fullMark: 100 },
     ];
 
     // Determine Apex Trait
@@ -50,104 +77,167 @@ export const ResultsDashboard = () => {
         : { trait: 'Unknown', score: 0, description: 'Analysis pending...' };
 
     // Prepare Data for Neural Signature (Latency vs Difficulty)
+    // We must look up the difficulty from the dynamic 'stages' array in the store
     const signatureData = results.rawResponses ? results.rawResponses.map((r: any) => ({
         latency: r.latency_ms,
-        difficulty: STAGE_DEFINITIONS[r.stage]?.difficulty || 5,
+        difficulty: stages[r.stage]?.difficulty || 5,
         accuracy: r.accuracy,
         stage: r.stage
     })) : [];
 
     return (
         <div className="w-full max-w-7xl mx-auto p-4 space-y-8" ref={dashboardRef}>
-            {/* Header */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center space-y-4 mb-12"
-            >
-                <h1 className="text-5xl md:text-7xl font-display font-bold text-white tracking-tighter">
-                    NEURAL<span className="text-neon-teal">PROFILE</span>
-                </h1>
-                <p className="text-xl text-neural-muted">Analysis Complete. Subject Verified.</p>
-            </motion.div>
+
+            {/* HERO REVEAL SECTION */}
+            <HeroArchetype
+                archetype={analysis.archetype}
+                description={analysis.archetypeDesc}
+                matchScore={analysis.matchScore}
+                colorTheme={theme.primary}
+            />
+
+            {/* Validity Warning */}
+            {results.isFlagged && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="max-w-3xl mx-auto bg-red-500/10 border border-red-500/40 rounded-xl p-4 text-center -mt-4 mb-12 backdrop-blur-sm"
+                >
+                    <div className="flex items-center justify-center gap-2 text-red-400 font-mono font-bold mb-1">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        DATA ANOMALY DETECTED
+                    </div>
+                    <p className="text-white/80 text-sm">
+                        Response consistency falls below the reliability threshold ({results.validityScore}%).
+                        Results may not accurately reflect your cognitive profile.
+                    </p>
+                </motion.div>
+            )}
 
             {/* Top Section: Apex Card & Radar */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
+                    whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
                     className="h-full"
                 >
-                    <ApexCard
-                        trait={apexTrait.trait}
-                        score={apexTrait.score}
-                        description={apexTrait.description}
-                    />
+                    <ThreeDCard className="h-full">
+                        <ApexCard
+                            trait={apexTrait.trait}
+                            score={apexTrait.score}
+                            description={apexTrait.description}
+                        />
+                    </ThreeDCard>
                 </motion.div>
 
                 <motion.div
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
+                    whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-neural-card backdrop-blur-md rounded-2xl border border-white/10 p-4 flex items-center justify-center min-h-[400px]"
+                    className="h-full"
                 >
-                    <TraitRadar data={radarData} />
+                    <ThreeDCard className="h-full">
+                        <div className="bg-neural-card backdrop-blur-md rounded-2xl border border-white/10 p-4 flex items-center justify-center min-h-[400px] h-full">
+                            <TraitRadar data={radarData} />
+                        </div>
+                    </ThreeDCard>
                 </motion.div>
             </div>
 
-            {/* Middle Section: Cognitive Profile & Widgets */}
+            {/* Middle Section: Big Numbers & Validation */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
+                    className="h-full"
                 >
-                    <CognitiveProfile
-                        iq={results.iq}
-                        eq={results.eq}
-                        risk={results.riskTolerance}
-                    />
+                    <ThreeDCard className="h-full">
+                        <CognitiveProfile
+                            iq={results.iq}
+                            eq={results.eq}
+                            risk={results.riskTolerance}
+                        />
+                    </ThreeDCard>
                 </motion.div>
 
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
+                    className="h-full"
                 >
-                    <AnalysisWidgets
-                        iq={results.iq}
-                        eq={results.eq}
-                        risk={results.riskTolerance}
-                        personalityType={apexTrait.trait}
-                    />
+                    <ThreeDCard className="h-full">
+                        {results.validityScore !== undefined ? (
+                            <ValidationCard
+                                data={results.antigaming}
+                                validityScore={results.validityScore}
+                                isFlagged={results.isFlagged}
+                            />
+                        ) : (
+                            <AnalysisWidgets
+                                iq={results.iq}
+                                eq={results.eq}
+                                risk={results.riskTolerance}
+                                personalityType={apexTrait.trait}
+                            />
+                        )}
+                    </ThreeDCard>
                 </motion.div>
             </div>
 
-            {/* Deep Dive Section */}
+            {/* Deep Dive Section: Granular Domains & Text Analysis */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                     className="h-full"
                 >
-                    <NeuralAnalysis
-                        iq={results.iq}
-                        eq={results.eq}
-                        risk={results.riskTolerance}
-                        personalityType={apexTrait.trait}
-                        ocean={results.ocean}
-                    />
+                    <ThreeDCard className="h-full">
+                        {results.cognitive && (
+                            <CognitiveDomainCard data={results.cognitive} />
+                        )}
+                    </ThreeDCard>
                 </motion.div>
 
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.9 }}
                     className="h-full"
                 >
-                    <NeuralSignature data={signatureData} />
+                    <ThreeDCard className="h-full">
+                        <NeuralAnalysis
+                            analysis={analysis}
+                            iq={results.iq}
+                            eq={results.eq}
+                        />
+                    </ThreeDCard>
+                </motion.div>
+            </div>
+
+            {/* Signature Section */}
+            <div className="grid grid-cols-1 gap-8">
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.0 }}
+                    className="h-full"
+                >
+                    <ThreeDCard className="h-full">
+                        <NeuralSignature data={signatureData} />
+                    </ThreeDCard>
                 </motion.div>
             </div>
 
@@ -155,6 +245,7 @@ export const ResultsDashboard = () => {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                whileInView={{ opacity: 1 }}
                 transition={{ delay: 1.0 }}
                 className="flex flex-wrap justify-center gap-4 pt-8 pb-12"
             >
@@ -178,10 +269,10 @@ export const ResultsDashboard = () => {
                     eq: results.eq,
                     eqPercentile: results.eqPercentile,
                     riskTolerance: results.riskTolerance,
-                    personality: results.ocean,
+                    hexaco: results.hexaco,
                     apexTrait: apexTrait
                 }}
             />
-        </div>
+        </div >
     );
 };

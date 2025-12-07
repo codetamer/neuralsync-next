@@ -10,7 +10,10 @@ import { useThemeStore } from '../../store/useThemeStore';
 import { NeonButton } from '../ui/NeonButton';
 import { Home, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
-import { AmbientSound } from '../audio/AmbientSound';
+
+import { audio } from '../../engine/AudioEngine';
+import { DevControls } from '../dev/DevControls';
+
 
 interface AppShellProps {
     children: ReactNode;
@@ -19,6 +22,7 @@ interface AppShellProps {
 export const AppShell = ({ children }: AppShellProps) => {
     const { resetTest, returnToHome, getProgress, currentStage, isTestComplete, xp } = useTestStore();
     const [muted, setMuted] = useState(false);
+    const [showDevControls, setShowDevControls] = useState(false);
     const [modalConfig, setModalConfig] = useState<{
         isOpen: boolean;
         title: string;
@@ -32,6 +36,17 @@ export const AppShell = ({ children }: AppShellProps) => {
         onConfirm: () => { },
         variant: 'primary'
     });
+
+    // Toggle Dev Controls with Shift+D
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.shiftKey && e.key.toLowerCase() === 'd') {
+                setShowDevControls(prev => !prev);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const handleResetClick = () => {
         setModalConfig({
@@ -70,10 +85,27 @@ export const AppShell = ({ children }: AppShellProps) => {
         document.documentElement.setAttribute('data-theme', theme);
     }, [theme]);
 
+    // Initialize audio on first interaction
+    useEffect(() => {
+        const initAudio = () => {
+            audio.initialize();
+            window.removeEventListener('click', initAudio);
+            window.removeEventListener('keydown', initAudio);
+        };
+
+        window.addEventListener('click', initAudio);
+        window.addEventListener('keydown', initAudio);
+
+        return () => {
+            window.removeEventListener('click', initAudio);
+            window.removeEventListener('keydown', initAudio);
+        };
+    }, []);
+
     return (
         <div className="min-h-screen w-full text-white overflow-x-hidden font-sans selection:bg-neon-teal/30">
             <AnimatedBackground />
-            <AmbientSound muted={muted} />
+            <AnimatedBackground />
 
             <ConfirmationModal
                 isOpen={modalConfig.isOpen}
@@ -97,15 +129,14 @@ export const AppShell = ({ children }: AppShellProps) => {
 
                     {/* Gamification Controls */}
                     <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex flex-col items-end">
-                            <span className="text-[10px] text-neural-muted font-mono">SYNAPSE XP</span>
-                            <span className="text-lg font-mono text-neon-purple font-bold tabular-nums">
-                                {xp.toLocaleString()}
-                            </span>
-                        </div>
+
 
                         <button
-                            onClick={() => setMuted(!muted)}
+                            onClick={() => {
+                                const newMuted = !muted;
+                                setMuted(newMuted);
+                                audio.setMuted(newMuted);
+                            }}
                             className="p-2 rounded-full hover:bg-white/5 text-neural-muted hover:text-white transition-colors"
                         >
                             {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
@@ -227,6 +258,9 @@ export const AppShell = ({ children }: AppShellProps) => {
                     </div>
                 </footer>
             </div>
+
+            {/* Dev Controls Overlay - Toggle with Shift+D */}
+            {showDevControls && <DevControls />}
         </div>
     );
 };

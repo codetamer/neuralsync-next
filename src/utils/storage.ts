@@ -35,6 +35,23 @@ export interface FinalScores {
         score: number;
         description: string;
     }[];
+    validityScore: number;
+    isFlagged: boolean;
+    cognitive: {
+        fluid: number;        // Gf (Matrices + Logic)
+        crystallized: number; // Gc (Vocabulary)
+        memory: number;       // Gwm (N-back + Span)
+        speed: number;        // Gs (Symbol + RT)
+        executive: number;    // Gex (Trail Making)
+    };
+    meta: {
+        biasResistance: number;
+        confidenceCal: number;
+    };
+    antigaming: {
+        flags: string[];
+        suspicionScore: number;
+    };
     rawResponses: ResponseData[];
 }
 

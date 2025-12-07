@@ -32,22 +32,31 @@ export const AnalysisWidgets = ({ iq, eq, risk, personalityType }: AnalysisWidge
     const eqTier = getTier(eq, [85, 100, 115, 130]);
     const riskTier = risk > 70 ? 'High' : risk > 40 ? 'Balanced' : 'Conservative';
 
-    // Generate insights (always show something meaningful)
+    // Generate insights (Granular coverage for all ranges)
     const getStrengths = () => {
         const strengths = [];
-        if (iq > 115) strengths.push({ icon: Brain, text: `${iqTier.label} pattern recognition (Top ${100 - iqPercentile}%)` });
-        else if (iq > 105) strengths.push({ icon: Brain, text: "Strong analytical capability" });
-        else strengths.push({ icon: Brain, text: "Logical problem-solving skills" });
 
-        if (eq > 115) strengths.push({ icon: Heart, text: `${eqTier.label} emotional intelligence (Top ${100 - eqPercentile}%)` });
-        else if (eq > 105) strengths.push({ icon: Heart, text: "Effective social calibration" });
-        else strengths.push({ icon: Heart, text: "Developing empathy skills" });
+        // IQ Strengths
+        if (iq >= 130) strengths.push({ icon: Brain, text: "Elite Pattern Recognition (Top 2%)" });
+        else if (iq >= 120) strengths.push({ icon: Brain, text: "Advanced Analytical Capability" });
+        else if (iq >= 110) strengths.push({ icon: Brain, text: "Strong Rapid-Learning Ability" });
+        else if (iq >= 90) strengths.push({ icon: Brain, text: "Practical Problem Solving" });
+        else strengths.push({ icon: Brain, text: "Concrete Operational Logic" });
 
-        if (risk > 60) strengths.push({ icon: Zap, text: "Decisive under pressure" });
-        else if (risk > 40) strengths.push({ icon: Zap, text: "Balanced risk assessment" });
-        else strengths.push({ icon: Zap, text: "Cautious decision-making" });
+        // EQ Strengths
+        if (eq >= 130) strengths.push({ icon: Heart, text: "Masterful Social Calibration" });
+        else if (eq >= 120) strengths.push({ icon: Heart, text: "High Empathic Resonance" });
+        else if (eq >= 110) strengths.push({ icon: Heart, text: "Effective Diplomatic Instincts" });
+        else if (eq >= 90) strengths.push({ icon: Heart, text: "Standard Social Awareness" });
+        else strengths.push({ icon: Heart, text: "Independent & Self-Contained" });
 
-        strengths.push({ icon: Sparkles, text: `${personalityType} archetype` });
+        // Risk Strengths
+        if (risk >= 80) strengths.push({ icon: Zap, text: "High-Stakes Decision Confidence" });
+        else if (risk >= 60) strengths.push({ icon: Zap, text: "Dynamic Opportunity Capture" });
+        else if (risk >= 40) strengths.push({ icon: Zap, text: "Balanced Risk Mitigation" });
+        else strengths.push({ icon: Zap, text: "Methodical Safety Optimization" });
+
+        strengths.push({ icon: Sparkles, text: `${personalityType} Archetype Core` });
 
         return strengths;
     };
@@ -55,20 +64,25 @@ export const AnalysisWidgets = ({ iq, eq, risk, personalityType }: AnalysisWidge
     const getOptimizations = () => {
         const optimizations = [];
 
-        // Always provide actionable growth areas
-        if (iq < 110) optimizations.push("Daily logic puzzles & abstract reasoning practice");
-        else if (iq < 125) optimizations.push("Advanced problem-solving challenges");
-        else optimizations.push("Teaching others (Feynman technique)");
+        // IQ Optimizations
+        if (iq < 95) optimizations.push("Pattern Training: Daily 'N-Back' memory exercises");
+        else if (iq < 110) optimizations.push("Abstract Reasoning: Constraint-based logic puzzles");
+        else if (iq < 125) optimizations.push("Cognitive Load: Speed-reading technical material");
+        else optimizations.push("Synthesis: Teaching complex concepts to laymen");
 
-        if (eq < 110) optimizations.push("Social cue analysis & active listening exercises");
-        else if (eq < 125) optimizations.push("Advanced conflict resolution scenarios");
-        else optimizations.push("Emotional regulation mastery");
+        // EQ Optimizations
+        if (eq < 95) optimizations.push("Social Signals: Micro-expression recognition drills");
+        else if (eq < 110) optimizations.push("Active Listening: 'Echoing' conversation partners");
+        else if (eq < 125) optimizations.push("Conflict: Steel-manning opposing arguments");
+        else optimizations.push("Influence: Strategic negotiation mastery");
 
-        if (risk < 30) optimizations.push("Confidence building in uncertain scenarios");
-        else if (risk > 80) optimizations.push("Impulse control & long-term planning");
-        else optimizations.push("Strategic risk-reward optimization");
+        // Risk Optimizations
+        if (risk < 30) optimizations.push("Exposure Therapy: Make one low-info decision daily");
+        else if (risk < 60) optimizations.push("Speed Drills: Halve your decision-making timer");
+        else if (risk < 85) optimizations.push("Bias Audit: Check for 'Gambler's Fallacy'");
+        else optimizations.push("Stabilization: Implement mandatory 'cooling off' periods");
 
-        optimizations.push("Cognitive load management & mindfulness");
+        optimizations.push("Bio-Hack: Optimize sleep for neural plasticity");
 
         return optimizations;
     };

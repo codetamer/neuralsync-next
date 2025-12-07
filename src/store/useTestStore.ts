@@ -1,30 +1,17 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { calculateFinalScores, STAGE_DEFINITIONS } from '../engine/TestEngine';
-export { STAGE_DEFINITIONS };
-import type { FinalScores } from '../utils/storage';
-
-export type StageType = 'matrix' | 'stroop' | 'bart' | 'personality' | 'intro' | 'scenario';
-
-export interface StageDefinition {
-    stage: number;
-    type: StageType;
-    title: string;
-    description: string;
-    contentId?: string;
-}
-
-export interface ResponseData {
-    stage: number;
-    choice: string | number;
-    latency_ms: number;
-    timestamp: string;
-    accuracy: boolean;
-}
+import {
+    calculateFinalScores,
+    createTestSession,
+    adaptStagePath,
+    type StageDefinition
+} from '../engine/TestEngine';
+import type { FinalScores, ResponseData } from '../utils/storage';
 
 interface TestState {
     currentStage: number;
     responses: ResponseData[];
+    stages: StageDefinition[]; // Dynamic sequence of stages
     isTestComplete: boolean;
     xp: number;
     currentSection: 'INTRO' | 'IQ' | 'EQ' | 'RISK' | 'PERSONALITY';
@@ -38,6 +25,7 @@ interface TestState {
     getResults: () => FinalScores;
     addXp: (amount: number) => void;
     setSection: (section: 'INTRO' | 'IQ' | 'EQ' | 'RISK' | 'PERSONALITY') => void;
+    setStage: (index: number) => void;
 }
 
 export const useTestStore = create<TestState>()(
@@ -45,6 +33,7 @@ export const useTestStore = create<TestState>()(
         (set, get) => ({
             currentStage: 0,
             responses: [],
+            stages: createTestSession(), // Initialize with a unique random session
             isTestComplete: false,
             xp: 0,
             currentSection: 'INTRO',
@@ -60,9 +49,30 @@ export const useTestStore = create<TestState>()(
             },
 
             nextStage: () => {
-                const { currentStage } = get();
-                if (currentStage < STAGE_DEFINITIONS.length - 1) {
-                    set({ currentStage: currentStage + 1 });
+                const { currentStage, stages, responses } = get();
+
+                if (currentStage < stages.length - 1) {
+                    // --- CAT LOGIC INTEGRATION ---
+                    // Before moving to next stage, we check if we should adapt the path
+                    // We look at the LAST response to determine if we should adjust difficulty 
+                    const lastResponse = responses[responses.length - 1]; // This is the response for currentStage
+
+                    let newStages = stages;
+                    if (lastResponse && lastResponse.stage === currentStage) {
+                        // Assuming accuracy is calculated in UI or backend, but for CAT we infer or check
+                        // For simplicity, let's assume accuracy is passed in recordResponse or derived
+                        const wasCorrect = lastResponse.accuracy;
+
+                        // Adapt the NEXT stage (currentSection + 1)
+                        if (wasCorrect !== undefined) {
+                            newStages = adaptStagePath(stages, currentStage, wasCorrect);
+                        }
+                    }
+
+                    set({
+                        stages: newStages,
+                        currentStage: currentStage + 1
+                    });
                 } else {
                     set({ isTestComplete: true });
                 }
@@ -72,6 +82,7 @@ export const useTestStore = create<TestState>()(
                 set({
                     currentStage: 0,
                     responses: [],
+                    stages: createTestSession(), // RE-ROLL the session content
                     isTestComplete: false,
                     xp: 0,
                     currentSection: 'INTRO'
@@ -83,18 +94,31 @@ export const useTestStore = create<TestState>()(
             },
 
             getProgress: () => {
-                const { currentStage } = get();
-                return Math.round((currentStage / STAGE_DEFINITIONS.length) * 100);
+                const { currentStage, stages } = get();
+                const total = stages.length || 1;
+                return Math.round((currentStage / total) * 100);
             },
 
             getResults: () => {
-                const { responses } = get();
-                return calculateFinalScores(responses);
+                const { responses, stages } = get();
+                // We MUST pass the dynamic 'stages' array to the calculator
+                // because the user's specific test content is unique to this session
+                return calculateFinalScores(responses, stages);
             },
 
             addXp: (amount) => set((state) => ({ xp: state.xp + amount })),
 
             setSection: (section) => set({ currentSection: section }),
+
+            // Dev Utils
+            setStage: (index: number) => {
+                const { stages } = get();
+                if (index >= 0 && index < stages.length) {
+                    set({ currentStage: index, isTestComplete: false });
+                } else if (index >= stages.length) {
+                    set({ isTestComplete: true });
+                }
+            },
         }),
         {
             name: 'neuralsync-storage',
@@ -102,3 +126,6 @@ export const useTestStore = create<TestState>()(
         }
     )
 );
+
+// Deprecated export proxy to prevent breaking other imports temporarily
+export const STAGE_DEFINITIONS = []; 
