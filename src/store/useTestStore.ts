@@ -13,6 +13,7 @@ interface TestState {
     responses: ResponseData[];
     stages: StageDefinition[]; // Dynamic sequence of stages
     isTestComplete: boolean;
+    isPaused: boolean; // Track if test is paused
     xp: number;
     currentSection: 'INTRO' | 'IQ' | 'EQ' | 'RISK' | 'PERSONALITY';
 
@@ -21,6 +22,7 @@ interface TestState {
     nextStage: () => void;
     resetTest: () => void;
     returnToHome: () => void;
+    resumeTest: () => void;
     getProgress: () => number;
     getResults: () => FinalScores;
     addXp: (amount: number) => void;
@@ -35,6 +37,7 @@ export const useTestStore = create<TestState>()(
             responses: [],
             stages: createTestSession(), // Initialize with a unique random session
             isTestComplete: false,
+            isPaused: false,
             xp: 0,
             currentSection: 'INTRO',
 
@@ -84,13 +87,18 @@ export const useTestStore = create<TestState>()(
                     responses: [],
                     stages: createTestSession(), // RE-ROLL the session content
                     isTestComplete: false,
+                    isPaused: false,
                     xp: 0,
                     currentSection: 'INTRO'
                 });
             },
 
             returnToHome: () => {
-                set({ currentStage: 0, isTestComplete: false });
+                set({ isPaused: true });
+            },
+
+            resumeTest: () => {
+                set({ isPaused: false });
             },
 
             getProgress: () => {

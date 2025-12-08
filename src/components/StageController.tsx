@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTestStore } from '../store/useTestStore';
 import { StageType } from '../engine/TestEngine';
 import { MatrixStageEnhanced } from './stages/MatrixStageEnhanced';
@@ -39,7 +39,7 @@ const SECTION_TITLES: Record<string, string> = {
 };
 
 export const StageController = () => {
-    const { currentStage, isTestComplete, nextStage, setSection, currentSection, stages } = useTestStore();
+    const { currentStage, isTestComplete, nextStage, setSection, currentSection, stages, isPaused, resumeTest, returnToHome } = useTestStore();
     const [showTransition, setShowTransition] = useState(false);
     const [transitionTitle, setTransitionTitle] = useState('');
 
@@ -84,13 +84,37 @@ export const StageController = () => {
         }
     }, [showTransition]);
 
-    if (isTestComplete) {
+    // Initial Mount Check
+    const [isMounted, setIsMounted] = useState(false);
+    const hasCheckedResume = useRef(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+        // Only run this check ONCE when the component mounts
+        if (!hasCheckedResume.current) {
+            hasCheckedResume.current = true;
+            // If we load the app (fresh mount) and have progress or are complete,
+            // we should ensure we are in a PAUSED state so the resume screen shows.
+            // Using logic from closure is risky if hydration is delayed, but with sessionStorage it's usually instant.
+            if ((currentStage > 0 || isTestComplete) && !isPaused) {
+                returnToHome(); // Sets isPaused = true
+            }
+        }
+    }, [currentStage, isTestComplete, isPaused, returnToHome]);
+
+    // Prevent flash of content logic until mount check confirms pause state
+    if (!isMounted) {
+        return null;
+    }
+
+    if (isTestComplete && !isPaused) {
         return <ResultsCertificate />;
     }
 
     const stageDef = stages[currentStage];
 
     if (!stageDef) {
+        // ... (Error UI kept same)
         return (
             <div className="text-center max-w-2xl mx-auto space-y-6">
                 <h1 className="text-4xl font-bold text-neon-red mb-4">SYSTEM ERROR</h1>
@@ -104,9 +128,15 @@ export const StageController = () => {
         );
     }
 
-    // Intro Stage
-    if (stageDef.type === 'intro') {
-        return <IntroStage />;
+    // Intro Stage handling (including Resume Mode)
+    // We render IntroStage if it's the actual Intro Stage OR if we are PAUSED
+    if (stageDef.type === 'intro' || isPaused) {
+        return (
+            <IntroStage
+                isResumeMode={isPaused}
+                onResumeHandled={() => resumeTest()}
+            />
+        );
     }
 
     return (
