@@ -54,7 +54,7 @@ export class AnalysisEngine {
     }
 
     // Combinatorial Logic: Mixing two traits to find a specific descriptor
-    private static getInteractionDescriptor(trait1: number, trait2: number, type: 'h_a' | 'x_e' | 'c_o'): string {
+    private static getInteractionDescriptor(trait1: number, trait2: number, type: 'h_a' | 'x_e' | 'c_o' | 'iq_risk' | 'eq_c'): string {
         const t1High = trait1 > 60;
         const t2High = trait2 > 60;
         const t1Low = trait1 < 40;
@@ -66,6 +66,22 @@ export class AnalysisEngine {
             if (t1High && t2Low) return "Uncompromising Principles"; // Honest but not agreeable
             if (t1Low && t2High) return "Strategic Diploma"; // Politely manipulative
             if (t1Low && t2Low) return "Calculated Self-Interest";
+        }
+
+        // IQ + Risk = INNOVATION STYLE
+        if (type === 'iq_risk') {
+            if (t1High && t2High) return "Frontier Pioneer"; // Smart & Risky
+            if (t1High && t2Low) return "Theoretical Architect"; // Smart & Safe
+            if (t1Low && t2High) return "Intuitive Gambler"; // Not 'smart' but risky
+            if (t1Low && t2Low) return "Practical Traditionalist"; // Not smart, safe
+        }
+
+        // EQ + Conscientiousness = LEADERSHIP STYLE
+        if (type === 'eq_c') {
+            if (t1High && t2High) return "Servant Leader"; // Empathetic & Orderly
+            if (t1High && t2Low) return "Charismatic Visionary"; // Empathetic & Chaotic
+            if (t1Low && t2High) return "Bureaucratic Manager"; // Cold & Orderly
+            if (t1Low && t2Low) return "Transactional Floater"; // Cold & Chaotic
         }
 
         // Extraversion (X) + Emotionality (E) = SOCIAL ENERGY
@@ -123,7 +139,110 @@ export class AnalysisEngine {
                 name: "Visionary Architect",
                 desc: "An architect of abstract systems, combining high intellect with deep openness to novelty.",
                 vector: { iq: 0.9, o: 0.9, c: 0.6 },
-                weights: { iq: 2.0, o: 2.0 } // Critical traits
+                weights: { iq: 2.0, o: 2.0 }
+            },
+            {
+                name: "Ethical Guardian",
+                desc: "A pillar of integrity and stability, prioritizing fairness and duty above self-interest.",
+                vector: { h: 0.9, c: 0.9, risk: 0.3 },
+                weights: { h: 2.0 }
+            },
+            {
+                name: "Strategic Realpolitik",
+                desc: "A master of power dynamics, leveraging high intellect to maneuver complex hierarchies.",
+                vector: { iq: 0.8, h: 0.1, a: 0.3, risk: 0.7 },
+                weights: { h: 2.0, iq: 1.5 }
+            },
+            {
+                name: "Social Catalyst",
+                desc: "A high-energy connector who accelerates group dynamics and drives social momentum.",
+                vector: { eq: 0.9, x: 0.9, e: 0.6 },
+                weights: { eq: 1.5, x: 2.0 }
+            },
+            {
+                name: "Harmonic Resonator",
+                desc: "A stabilizing force in social systems, diffusing conflict through high empathy and agreeableness.",
+                vector: { eq: 0.9, a: 0.9, h: 0.7 },
+                weights: { eq: 1.5, a: 1.5 }
+            },
+            {
+                name: "Chaos Navigator",
+                desc: "Thriving in uncertainty, you use high risk tolerance and fluidity to turn instability into advantage.",
+                vector: { risk: 0.9, c: 0.2, o: 0.8 },
+                weights: { risk: 2.5 }
+            },
+            {
+                name: "Precision Engineer",
+                desc: "Relentless logic paired with methodical discipline. You optimize systems with zero margin for error.",
+                vector: { iq: 0.8, c: 0.9, risk: 0.2, e: 0.3 },
+                weights: { c: 2.0, iq: 1.5 }
+            },
+            {
+                name: "Renaissance Synthesizer",
+                desc: "Equally fluent in logic and emotion, bridging the gap between analytical and human domains.",
+                vector: { iq: 0.8, eq: 0.8, o: 0.8, risk: 0.5 },
+                weights: { iq: 1.5, eq: 1.5 }
+            },
+            // --- NEW EXPANDED ARCHETYPES ---
+            {
+                name: "Benevolent Dictator",
+                desc: "You take charge not for glory, but because you genuinely believe you are the only one who can save the ship.",
+                vector: { x: 0.8, c: 0.8, h: 0.6, a: 0.2 },
+                weights: { x: 1.5, c: 1.5 }
+            },
+            {
+                name: "The Ghost in the Machine",
+                desc: "You operate unseen, influencing systems and outcomes through subtle inputs rather than direct command.",
+                vector: { x: 0.1, iq: 0.8, o: 0.7, e: 0.2 },
+                weights: { x: 2.0, iq: 1.5 }
+            },
+            {
+                name: "Stoic Sentinel",
+                desc: "Unshakeable and enduring. You absorb chaos and output order, asking for nothing in return.",
+                vector: { e: 0.1, c: 0.9, a: 0.6, risk: 0.4 },
+                weights: { e: 2.0 }
+            },
+            {
+                name: "Academic Iconoclast",
+                desc: "You respect knowledge but despise tradition. You learn the rules only to break them more effectively.",
+                vector: { iq: 0.9, o: 0.9, a: 0.3, h: 0.7 },
+                weights: { o: 2.0, a: 1.5 }
+            },
+            {
+                name: "Digital Shaman",
+                desc: "You see the 'soul' in the data. You interpret cold metrics through a lens of human intuition.",
+                vector: { iq: 0.7, eq: 0.8, o: 0.8, c: 0.3 },
+                weights: { eq: 1.5, o: 1.5 }
+            },
+            {
+                name: "Corporate Mercenary",
+                desc: "Efficient, effective, and unattached. You are a high-value asset who executes the mission without emotional baggage.",
+                vector: { h: 0.2, c: 0.8, risk: 0.7, e: 0.2 },
+                weights: { h: 2.0, c: 1.5 }
+            },
+            {
+                name: "Servant Leader",
+                desc: "You lead by empowering others, placing the well-being of the tribe above your own status.",
+                vector: { x: 0.6, a: 0.9, h: 0.9, eq: 0.9 },
+                weights: { a: 2.0, h: 1.5 }
+            },
+            {
+                name: "Adrenaline Scholar",
+                desc: "You crave both intellectual complexity and physical danger. You are the philosopher at the edge of the volcano.",
+                vector: { iq: 0.8, risk: 0.9, o: 0.8 },
+                weights: { risk: 2.0, iq: 1.5 }
+            },
+            {
+                name: "Diplomatic Cipher",
+                desc: "Friendly to everyone, known by no one. You navigate social webs with perfect grace and zero vulnerability.",
+                vector: { eq: 0.9, a: 0.8, h: 0.3, e: 0.4 },
+                weights: { eq: 2.0, h: 1.5 }
+            },
+            {
+                name: "The Algo-Rhythm",
+                desc: "You process social dynamics with algorithmic precision. You don't just feel the vibe, you calculate it.",
+                vector: { iq: 0.8, eq: 0.8, c: 0.8, e: 0.2 },
+                weights: { iq: 1.5, eq: 1.5 }
             },
             {
                 name: "Ethical Guardian",
@@ -236,6 +355,18 @@ export class AnalysisEngine {
 
         const cx_desc = this.getInteractionDescriptor(hexaco.conscientiousness, hexaco.openness, 'c_o');
         strengths.push(cx_desc);
+
+        // Tier 3: New Holistic Strengths
+        const iq_risk_desc = this.getInteractionDescriptor(iq / 1.5, riskTolerance, 'iq_risk'); // Scale IQ to ~100 base for comparison if needed, but getInteraction expects 0-100 logic
+        // Note: getInteraction logic expects traits ~0-100. IQ is ~100 mean. We can pass it directly but mapped to 0-100 scale?
+        // Actually the logic uses <40 low >60 high. IQ 100 is "High" by that logic (100 > 60).
+        // Let's normalize IQ for descriptor: 100->50, 130->80, 70->20.
+        // iq_norm = (iq - 50).
+        const iq_norm = Math.max(0, Math.min(100, iq - 50));
+        strengths.push(this.getInteractionDescriptor(iq_norm, riskTolerance, 'iq_risk'));
+
+        const eq_c_desc = this.getInteractionDescriptor(eq - 50, hexaco.conscientiousness, 'eq_c');
+        strengths.push(eq_c_desc);
 
         // Fallbacks
         if (hexaco.extraversion > 70) strengths.push("Dynamic Social Presence");
@@ -387,7 +518,7 @@ export class AnalysisEngine {
 
         const careerVectors = [
             { role: "Systems Architect", vector: { iq: 0.8, o: 0.6, c: 0.5 } },
-            { role: "Crisis Negotiator", vector: { eq: 0.7, e: 0.2, a: 0.6, risk: 0.6 } }, // Low E (High stability)
+            { role: "Crisis Negotiator", vector: { eq: 0.7, e: 0.2, a: 0.6, risk: 0.6 } },
             { role: "Venture Capitalist", vector: { risk: 0.7, iq: 0.7, x: 0.5 } },
             { role: "Ethical Compliance Officer", vector: { h: 0.8, c: 0.7 } },
             { role: "Research Scientist", vector: { iq: 0.8, o: 0.7, c: 0.6 } },
@@ -395,7 +526,23 @@ export class AnalysisEngine {
             { role: "Clinical Psychologist", vector: { eq: 0.8, a: 0.6, h: 0.6 } },
             { role: "Algorithmic Trader", vector: { iq: 0.85, e: 0.2, risk: 0.6 } },
             { role: "Strategic Consultant", vector: { iq: 0.75, x: 0.6, c: 0.6 } },
-            { role: "Creative Director", vector: { o: 0.85, x: 0.6, iq: 0.6 } }
+            { role: "Creative Director", vector: { o: 0.85, x: 0.6, iq: 0.6 } },
+            // Expanded Careers
+            { role: "Prompt Engineer", vector: { iq: 0.7, o: 0.8, c: 0.6 } },
+            { role: "Bioinformatics Specialist", vector: { iq: 0.9, c: 0.7, o: 0.5 } },
+            { role: "Crisis PR Manager", vector: { eq: 0.8, x: 0.7, e: 0.3 } },
+            { role: "User Experience Researcher", vector: { eq: 0.8, iq: 0.6, o: 0.7 } },
+            { role: "Forensic Accountant", vector: { c: 0.9, iq: 0.7, h: 0.2, risk: 0.2 } }, // High C, Low H/Risk
+            { role: "Hostage Negotiator", vector: { eq: 0.9, e: 0.1, a: 0.7 } },
+            { role: "Chief of Staff", vector: { c: 0.9, eq: 0.7, x: 0.5 } },
+            { role: "Investigative Journalist", vector: { iq: 0.7, o: 0.8, risk: 0.6, h: 0.8 } },
+            { role: "Speculative Fiction Author", vector: { o: 0.95, iq: 0.6, x: 0.2 } },
+            { role: "Elite Sales Closer", vector: { x: 0.9, eq: 0.7, h: 0.2 } },
+            { role: "Information Security Analyst", vector: { iq: 0.8, c: 0.8, risk: 0.4 } },
+            { role: "Arbiter / Mediator", vector: { a: 0.8, eq: 0.8, e: 0.2 } },
+            { role: "Special Operations Command", vector: { risk: 0.8, e: 0.1, c: 0.8 } },
+            { role: "Political Campaign Manager", vector: { x: 0.8, iq: 0.7, h: 0.3 } },
+            { role: "Human Rights Advocate", vector: { h: 0.9, a: 0.8, risk: 0.6 } }
         ];
 
         const rankedCareers = careerVectors.map(job => {
@@ -429,8 +576,27 @@ export class AnalysisEngine {
         else if (hexaco.emotionality < 30 && hexaco.conscientiousness > 75) osType = "Real-Time OS (Mil-Spec)";
         else if (hexaco.conscientiousness > 80) osType = "Precision OS v9";
 
+        // === 6. HOLISTIC SYNTHESIS (MIRROR EFFECT) ===
+        // We ensure the narrative acknowledges potential contradictions
+        let holisticSummary = "";
+        if (riskTolerance > 80 && hexaco.conscientiousness > 80) {
+            holisticSummary = "Use Case: The 'Calculated Daredevil'. You plan your stunts with NASA-level precision. You are not reckless; you eliminate variables so you can take risks others can't.";
+        } else if (iq > 125 && eq > 120) {
+            holisticSummary = "Use Case: The 'Unfair Advantage'. You possess the rare dual-threat of elite logic and elite social calibration. You can engineer systems and charm the people who run them.";
+        } else if (hexaco.honesty > 90 && hexaco.agreeableness < 30) {
+            holisticSummary = "Use Case: The 'Bitter Pill'. You are the person people call when they need the hard truth, but not a hug. You are invaluable in crisis comparisons.";
+        } else {
+            holisticSummary = `Use Case: ${bestMatch.desc}`;
+        }
+
+        // Add specific metric callouts for "Mirror" feel
+        if (cognitive && cognitive.speed < 400 && cognitive.speed > 0) { // Assuming speed is reaction time in ms? Wait, input says 'speed' is score relative 100?
+            // checking input interface: cognitive.speed is a score.
+            if (cognitive.speed > 80) actionableSteps.push("Leverage your <200ms reaction time in high-frequency trading or rapid-response roles.");
+        }
+
         // Construct Raw Terminal Output
-        const raw = `> INITIALIZING DEEP SCAN v6.2...\n> DECRYPTING NEURAL SIGNATURE...\n> \n> SUBJECT ANALYTICS:\n> IQ[${iq}] EQ[${eq}] RISK[${riskTolerance}%]\n> H[${hexaco.honesty}] E[${hexaco.emotionality}] X[${hexaco.extraversion}] A[${hexaco.agreeableness}] C[${hexaco.conscientiousness}] O[${hexaco.openness}]\n> \n> DETECTED ARCHETYPE: [${bestMatch.name.toUpperCase()}] (${displayMatchScore}%)\n> "${bestMatch.desc}"\n> \n> PRIMARY ASSETS:\n> ${strengths.slice(0, 4).map(s => `+ ${s}`).join('\n> ')}\n> \n> CORE WEAKNESSES:\n> ${weaknesses.slice(0, 3).map(w => `! ${w}`).join('\n> ')}\n> \n> OPTIMAL DEPLOYMENT:\n> ${careerText}\n> \n> SYSTEM STATUS: OPTIMIZED.`;
+        const raw = `> INITIALIZING DEEP SCAN v6.2...\n> DECRYPTING NEURAL SIGNATURE...\n> \n> SUBJECT ANALYTICS:\n> IQ[${iq}] EQ[${eq}] RISK[${riskTolerance}%]\n> H[${hexaco.honesty}] E[${hexaco.emotionality}] X[${hexaco.extraversion}] A[${hexaco.agreeableness}] C[${hexaco.conscientiousness}] O[${hexaco.openness}]\n> \n> DETECTED ARCHETYPE: [${bestMatch.name.toUpperCase()}] (${displayMatchScore}%)\n> "${bestMatch.desc}"\n> \n> HOLISTIC SYNTHESIS:\n> ${holisticSummary}\n> \n> PRIMARY ASSETS:\n> ${strengths.slice(0, 4).map(s => `+ ${s}`).join('\n> ')}\n> \n> CORE WEAKNESSES:\n> ${weaknesses.slice(0, 3).map(w => `! ${w}`).join('\n> ')}\n> \n> OPTIMAL DEPLOYMENT:\n> ${careerText}\n> \n> SYSTEM STATUS: OPTIMIZED.`;
 
         return {
             archetype: bestMatch.name,

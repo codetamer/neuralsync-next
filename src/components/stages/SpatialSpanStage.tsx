@@ -221,6 +221,7 @@ export const SpatialSpanStage = ({ mode = 'forward' }: SpatialSpanStageProps) =>
                                 <button
                                     key={i}
                                     onClick={() => handleBlockClick(i)}
+                                    onMouseEnter={() => audio.playHover()}
                                     disabled={phase !== 'recall'}
                                     className={`
                                         relative rounded-xl border transition-all duration-200

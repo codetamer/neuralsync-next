@@ -6,8 +6,22 @@ import { GlassCard } from '../ui/GlassCard';
 import { useTestStore } from '../../store/useTestStore';
 import { Brain, Activity, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
 
-export const IntroStage = () => {
-    const { nextStage } = useTestStore();
+interface IntroStageProps {
+    isResumeMode?: boolean;
+    onResumeHandled?: () => void;
+}
+
+export const IntroStage = ({ isResumeMode = false, onResumeHandled }: IntroStageProps) => {
+    const { nextStage, resetTest, isTestComplete } = useTestStore();
+
+    const handleStartNew = () => {
+        resetTest();
+        onResumeHandled?.();
+    };
+
+    const handleResume = () => {
+        onResumeHandled?.();
+    };
 
     const containerVariants: Variants = {
         hidden: { opacity: 0 },
@@ -62,7 +76,7 @@ export const IntroStage = () => {
                         </h1>
                         <div className="flex items-center justify-center gap-2 text-neon-blue font-mono text-xs tracking-[0.3em] uppercase opacity-80">
                             <span className="w-1.5 h-1.5 bg-neon-blue rounded-full animate-pulse" />
-                            System Online
+                            {isResumeMode ? "SESSION PAUSED" : "SYSTEM ONLINE"}
                             <span className="w-1.5 h-1.5 bg-neon-blue rounded-full animate-pulse" />
                         </div>
                     </motion.div>
@@ -104,12 +118,29 @@ export const IntroStage = () => {
                     </motion.div>
 
                     {/* CTA */}
-                    <motion.div variants={itemVariants} className="pt-2">
-                        <NeonButton onClick={nextStage} size="lg" className="mx-auto w-64 group relative overflow-hidden" glow>
-                            <span className="relative z-10 flex items-center justify-center gap-2 font-bold tracking-wide">
-                                INITIALIZE EVALUATION <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </span>
-                        </NeonButton>
+                    <motion.div variants={itemVariants} className="pt-2 flex flex-col gap-3">
+                        {isResumeMode ? (
+                            <div className="flex flex-col gap-3 w-64 mx-auto">
+                                <NeonButton onClick={handleResume} size="lg" className="w-full group relative overflow-hidden" glow>
+                                    <span className="relative z-10 flex items-center justify-center gap-2 font-bold tracking-wide">
+                                        {isTestComplete ? "VIEW RESULTS" : "CONTINUE ASSESSMENT"} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    </span>
+                                </NeonButton>
+
+                                <NeonButton onClick={handleStartNew} variant="secondary" size="lg" className="w-full group relative overflow-hidden">
+                                    <span className="relative z-10 flex items-center justify-center gap-2 font-bold tracking-wide">
+                                        START NEW SESSION
+                                    </span>
+                                </NeonButton>
+                            </div>
+                        ) : (
+                            <NeonButton onClick={nextStage} size="lg" className="mx-auto w-64 group relative overflow-hidden" glow>
+                                <span className="relative z-10 flex items-center justify-center gap-2 font-bold tracking-wide">
+                                    INITIALIZE EVALUATION <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </span>
+                            </NeonButton>
+                        )}
+
                         <p className="mt-3 text-[10px] text-white/30 font-mono">
                             SESSION ESTIMATE: 12-15 MINUTES • QUIET ENVIRONMENT REQUIRED
                         </p>

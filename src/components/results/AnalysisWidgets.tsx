@@ -2,25 +2,17 @@
 
 import { GlassCard } from '../ui/GlassCard';
 import { Brain, Heart, Zap, TrendingUp, AlertCircle, Sparkles } from 'lucide-react';
+import { DeepInsight } from '../../engine/AnalysisEngine';
 
 interface AnalysisWidgetsProps {
+    analysis: DeepInsight;
     iq: number;
     eq: number;
     risk: number;
-    personalityType: string;
 }
 
-export const AnalysisWidgets = ({ iq, eq, risk, personalityType }: AnalysisWidgetsProps) => {
-    // Calculate percentiles
-    const getPercentile = (score: number, mean: number, sd: number) => {
-        const z = (score - mean) / sd;
-        return Math.max(1, Math.min(99, Math.round(50 + (z * 34))));
-    };
-
-    const iqPercentile = getPercentile(iq, 100, 15);
-    const eqPercentile = getPercentile(eq, 100, 15);
-
-    // Tier categorization
+export const AnalysisWidgets = ({ analysis, iq, eq, risk }: AnalysisWidgetsProps) => {
+    // Calculate percentiles and tiers for visualization
     const getTier = (score: number, thresholds: number[]) => {
         if (score >= thresholds[3]) return { label: 'Elite', color: 'text-neon-teal' };
         if (score >= thresholds[2]) return { label: 'Strong', color: 'text-neon-green' };
@@ -32,68 +24,17 @@ export const AnalysisWidgets = ({ iq, eq, risk, personalityType }: AnalysisWidge
     const eqTier = getTier(eq, [85, 100, 115, 130]);
     const riskTier = risk > 70 ? 'High' : risk > 40 ? 'Balanced' : 'Conservative';
 
-    // Generate insights (Granular coverage for all ranges)
-    const getStrengths = () => {
-        const strengths = [];
+    // Use derived insights from the engine
+    const strengths = analysis.strengths.slice(0, 5).map(s => ({ icon: Sparkles, text: s }));
+    const optimizations = analysis.actionableSteps.slice(0, 5);
 
-        // IQ Strengths
-        if (iq >= 130) strengths.push({ icon: Brain, text: "Elite Pattern Recognition (Top 2%)" });
-        else if (iq >= 120) strengths.push({ icon: Brain, text: "Advanced Analytical Capability" });
-        else if (iq >= 110) strengths.push({ icon: Brain, text: "Strong Rapid-Learning Ability" });
-        else if (iq >= 90) strengths.push({ icon: Brain, text: "Practical Problem Solving" });
-        else strengths.push({ icon: Brain, text: "Concrete Operational Logic" });
-
-        // EQ Strengths
-        if (eq >= 130) strengths.push({ icon: Heart, text: "Masterful Social Calibration" });
-        else if (eq >= 120) strengths.push({ icon: Heart, text: "High Empathic Resonance" });
-        else if (eq >= 110) strengths.push({ icon: Heart, text: "Effective Diplomatic Instincts" });
-        else if (eq >= 90) strengths.push({ icon: Heart, text: "Standard Social Awareness" });
-        else strengths.push({ icon: Heart, text: "Independent & Self-Contained" });
-
-        // Risk Strengths
-        if (risk >= 80) strengths.push({ icon: Zap, text: "High-Stakes Decision Confidence" });
-        else if (risk >= 60) strengths.push({ icon: Zap, text: "Dynamic Opportunity Capture" });
-        else if (risk >= 40) strengths.push({ icon: Zap, text: "Balanced Risk Mitigation" });
-        else strengths.push({ icon: Zap, text: "Methodical Safety Optimization" });
-
-        strengths.push({ icon: Sparkles, text: `${personalityType} Archetype Core` });
-
-        return strengths;
-    };
-
-    const getOptimizations = () => {
-        const optimizations = [];
-
-        // IQ Optimizations
-        if (iq < 95) optimizations.push("Pattern Training: Daily 'N-Back' memory exercises");
-        else if (iq < 110) optimizations.push("Abstract Reasoning: Constraint-based logic puzzles");
-        else if (iq < 125) optimizations.push("Cognitive Load: Speed-reading technical material");
-        else optimizations.push("Synthesis: Teaching complex concepts to laymen");
-
-        // EQ Optimizations
-        if (eq < 95) optimizations.push("Social Signals: Micro-expression recognition drills");
-        else if (eq < 110) optimizations.push("Active Listening: 'Echoing' conversation partners");
-        else if (eq < 125) optimizations.push("Conflict: Steel-manning opposing arguments");
-        else optimizations.push("Influence: Strategic negotiation mastery");
-
-        // Risk Optimizations
-        if (risk < 30) optimizations.push("Exposure Therapy: Make one low-info decision daily");
-        else if (risk < 60) optimizations.push("Speed Drills: Halve your decision-making timer");
-        else if (risk < 85) optimizations.push("Bias Audit: Check for 'Gambler's Fallacy'");
-        else optimizations.push("Stabilization: Implement mandatory 'cooling off' periods");
-
-        optimizations.push("Bio-Hack: Optimize sleep for neural plasticity");
-
-        return optimizations;
-    };
-
-    const strengths = getStrengths();
-    const optimizations = getOptimizations();
+    // Check for critical weakness (mirror reflection)
+    const criticalWeakness = analysis.detailedWeaknesses.find(w => w.impact.includes("Catastrophic") || w.impact.includes("failure"));
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full h-full">
             {/* Cognitive Profile */}
-            <GlassCard className="p-6 space-y-4">
+            <GlassCard className="p-6 space-y-4 flex flex-col justify-center">
                 <h3 className="text-lg font-display font-bold text-white flex items-center gap-2">
                     <Brain className="w-5 h-5 text-neon-blue" />
                     COGNITIVE PROFILE
@@ -124,7 +65,7 @@ export const AnalysisWidgets = ({ iq, eq, risk, personalityType }: AnalysisWidge
             </GlassCard>
 
             {/* Risk & Strategy */}
-            <GlassCard className="p-6 space-y-4">
+            <GlassCard className="p-6 space-y-4 flex flex-col justify-center">
                 <h3 className="text-lg font-display font-bold text-white flex items-center gap-2">
                     <Zap className="w-5 h-5 text-neon-orange" />
                     RISK DYNAMICS
@@ -136,14 +77,18 @@ export const AnalysisWidgets = ({ iq, eq, risk, personalityType }: AnalysisWidge
                         <div className="text-xs font-mono text-neon-orange">{riskTier}</div>
                     </div>
                 </div>
-                <p className="text-sm text-gray-400">
-                    {risk > 70 ? "You thrive in high-stakes environments and embrace uncertainty. Natural fit for entrepreneurial or high-pressure roles." :
-                        risk > 40 ? "You balance calculated risks with stability. Adaptable to both conservative and aggressive strategies." :
-                            "You prioritize safety and methodical planning. Excel in roles requiring precision and low error tolerance."}
+                <p className="text-sm text-gray-400 italic">
+                    {/* Use the holistic summary snippet if available or fallback */}
+                    {/* We can construct a specialized snippet here or rely on AnalysisEngine to pass it.
+                         For now, let's keep the simple dynamic text but maybe sourced from engine later.
+                         Keeping local logic for this specific small text as it's UI specific. */}
+                    {risk > 70 ? "Thriving in high-stakes environments." :
+                        risk > 40 ? "Balancing calculated risks with stability." :
+                            "Prioritizing safety and methodical planning."}
                 </p>
             </GlassCard>
 
-            {/* Strengths */}
+            {/* Strengths (Engine Sourced) */}
             <GlassCard className="p-6 space-y-4 border-l-4 border-l-neon-green">
                 <h3 className="text-lg font-display font-bold text-white flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-neon-green" />
@@ -159,12 +104,21 @@ export const AnalysisWidgets = ({ iq, eq, risk, personalityType }: AnalysisWidge
                 </ul>
             </GlassCard>
 
-            {/* Optimization */}
+            {/* Optimization - Growth Pathways (Engine Sourced) */}
             <GlassCard className="p-6 space-y-4 border-l-4 border-l-neon-blue">
-                <h3 className="text-lg font-display font-bold text-white flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-neon-blue" />
-                    GROWTH PATHWAYS
-                </h3>
+                <div className="flex justify-between items-start">
+                    <h3 className="text-lg font-display font-bold text-white flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5 text-neon-blue" />
+                        GROWTH PATHWAYS
+                    </h3>
+                </div>
+
+                {criticalWeakness && (
+                    <div className="bg-red-500/10 border border-red-500/20 p-2 rounded mb-2">
+                        <p className="text-xs text-red-400 font-bold">CRITICAL BOTTLENECK DETECTED</p>
+                    </div>
+                )}
+
                 <ul className="space-y-2 text-sm text-gray-300">
                     {optimizations.map((opt, idx) => (
                         <li key={idx} className="flex gap-2 items-start">

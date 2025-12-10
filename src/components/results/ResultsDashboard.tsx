@@ -183,10 +183,10 @@ export const ResultsDashboard = () => {
                             />
                         ) : (
                             <AnalysisWidgets
+                                analysis={analysis}
                                 iq={results.iq}
                                 eq={results.eq}
                                 risk={results.riskTolerance}
-                                personalityType={apexTrait.trait}
                             />
                         )}
                     </ThreeDCard>

@@ -133,10 +133,12 @@ export const AppShell = ({ children }: AppShellProps) => {
 
                         <button
                             onClick={() => {
+                                audio.playClick();
                                 const newMuted = !muted;
                                 setMuted(newMuted);
                                 audio.setMuted(newMuted);
                             }}
+                            onMouseEnter={() => audio.playHover()}
                             className="p-2 rounded-full hover:bg-white/5 text-neural-muted hover:text-white transition-colors"
                         >
                             {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}

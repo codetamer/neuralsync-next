@@ -227,12 +227,14 @@ export const ReactionTimeStage = ({ mode = 'simple' }: ReactionTimeStageProps) =
                             <div className="flex justify-center gap-4">
                                 <button
                                     onPointerDown={(e) => { e.stopPropagation(); handleResponse('left'); }}
+                                    onMouseEnter={() => audio.playHover()}
                                     className="px-8 py-4 bg-white/10 rounded-xl text-2xl hover:bg-white/20"
                                 >
                                     ← Left
                                 </button>
                                 <button
                                     onPointerDown={(e) => { e.stopPropagation(); handleResponse('right'); }}
+                                    onMouseEnter={() => audio.playHover()}
                                     className="px-8 py-4 bg-white/10 rounded-xl text-2xl hover:bg-white/20"
                                 >
                                     Right →

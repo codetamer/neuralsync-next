@@ -6,6 +6,7 @@ import { useTestStore } from '../../store/useTestStore';
 import { GlassCard } from '../ui/GlassCard';
 import { NeonButton } from '../ui/NeonButton';
 import { cn } from '../../lib/utils';
+import { audio } from '../../engine/AudioEngine';
 import { Brain, Zap, CheckCircle, XCircle, Volume2 } from 'lucide-react';
 
 // ============================================================================
@@ -335,10 +336,12 @@ export const NBackStage: React.FC = () => {
                                     className="md:hidden active:scale-95 transition-transform w-24 h-24 rounded-full bg-neon-purple/20 border-2 border-neon-purple flex items-center justify-center"
                                     onTouchStart={(e) => {
                                         e.preventDefault();
+                                        audio.playClick();
                                         handleKeyPress({ code: 'Space', preventDefault: () => { } } as any);
                                     }}
                                     onClick={(e) => {
                                         // Fallback for click
+                                        audio.playClick();
                                         handleKeyPress({ code: 'Space', preventDefault: () => { } } as any);
                                     }}
                                 >

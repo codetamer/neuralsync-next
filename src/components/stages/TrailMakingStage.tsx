@@ -293,6 +293,7 @@ export const TrailMakingStage = ({ mode = 'A' }: TrailMakingStageProps) => {
                                 <button
                                     key={node.id}
                                     onClick={() => handleNodeClick(node)}
+                                    onMouseEnter={() => audio.playHover()}
                                     style={{
                                         position: 'absolute',
                                         left: `${node.x}%`,
