@@ -70,6 +70,7 @@ class AudioEngine {
     }
 
     public playClick() {
+        if (!this.initialized) this.initialize();
         if (!this.ctx || !this.masterGain || this.isMuted) return;
         if (this.ctx.state === 'suspended') this.ctx.resume();
 
@@ -103,6 +104,7 @@ class AudioEngine {
     }
 
     public playSuccess() {
+        if (!this.initialized) this.initialize();
         if (!this.ctx || !this.masterGain || this.isMuted) return;
         const theme = this.getTheme();
         const now = this.ctx.currentTime;
@@ -148,6 +150,7 @@ class AudioEngine {
     }
 
     public playError() {
+        if (!this.initialized) this.initialize();
         if (!this.ctx || !this.masterGain || this.isMuted) return;
         const theme = this.getTheme();
         const now = this.ctx.currentTime;

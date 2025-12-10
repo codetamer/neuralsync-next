@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useThemeStore } from '../../store/useThemeStore';
 import { cn } from '../../lib/utils';
+import { audio } from '../../engine/AudioEngine';
 
 export const ThemeToggle = () => {
     const { theme, toggleTheme } = useThemeStore();
@@ -18,7 +19,11 @@ export const ThemeToggle = () => {
 
     return (
         <button
-            onClick={toggleTheme}
+            onClick={() => {
+                audio.playClick();
+                toggleTheme();
+            }}
+            onMouseEnter={() => audio.playHover()}
             className="relative h-6 w-11 rounded-full bg-neural-card border border-neural-border overflow-hidden shadow-inner transition-colors duration-300 hover:border-white/20"
             aria-label="Toggle theme"
         >

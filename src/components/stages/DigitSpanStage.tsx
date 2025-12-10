@@ -269,6 +269,7 @@ export const DigitSpanStage = ({ mode = 'forward' }: DigitSpanStageProps) => {
                                 <button
                                     key={digit}
                                     onClick={() => handleDigitClick(digit)}
+                                    onMouseEnter={() => audio.playHover()}
                                     disabled={userInput.length >= spanLength}
                                     className="aspect-square text-2xl font-bold rounded-xl bg-white/5 border border-white/10 text-white hover:bg-neon-cyan/20 hover:border-neon-cyan/50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                                 >
@@ -277,12 +278,14 @@ export const DigitSpanStage = ({ mode = 'forward' }: DigitSpanStageProps) => {
                             ))}
                             <button
                                 onClick={handleBackspace}
+                                onMouseEnter={() => audio.playHover()}
                                 className="aspect-square text-xl rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-red-500/20 hover:border-red-500/50 transition-all flex items-center justify-center"
                             >
                                 <RotateCcw className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={() => handleDigitClick(0)}
+                                onMouseEnter={() => audio.playHover()}
                                 disabled={userInput.length >= spanLength}
                                 className="aspect-square text-2xl font-bold rounded-xl bg-white/5 border border-white/10 text-white hover:bg-neon-cyan/20 hover:border-neon-cyan/50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                             >
