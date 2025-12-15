@@ -81,7 +81,7 @@ export const UserDropdown = ({ user, userProfile, onSignOut }: UserDropdownProps
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-neural-card border border-white/10 rounded-xl shadow-xl overflow-hidden z-50 backdrop-blur-xl"
+                        className="absolute right-0 top-full mt-2 w-56 bg-neural-card border border-white/10 rounded-xl shadow-xl overflow-hidden z-[100] backdrop-blur-xl"
                     >
                         {/* Mobile User Info (Only visible on small screens inside menu) */}
                         <div className="sm:hidden p-4 border-b border-white/10 bg-white/5">
