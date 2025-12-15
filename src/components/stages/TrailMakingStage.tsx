@@ -117,11 +117,6 @@ export const TrailMakingStage = ({ mode = 'A' }: TrailMakingStageProps) => {
         setStartTime(Date.now());
         setElapsedTime(0);
         setPhase('playing');
-
-        // Start timer
-        timerRef.current = setInterval(() => {
-            setElapsedTime(Date.now() - Date.now() + (Date.now() - startTime));
-        }, 100);
     };
 
     // Update timer

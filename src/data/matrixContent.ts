@@ -1415,6 +1415,999 @@ export const MATRIX_PUZZLES: MatrixPuzzle[] = [
         ],
         correctIndex: 0,
     },
+
+    // ============================================================================
+    // EXPANSION SET: PUZZLES 31-50 (Added for CAT precision)
+    // ============================================================================
+
+    // PUZZLE 31: Simple Color Pattern (Easy)
+    {
+        id: 'GF_031',
+        category: 'distribution',
+        difficulty: 2,
+        discrimination: 0.9,
+        explanation: 'Each row contains one item of each color. Missing: accent color.',
+        rules: [{ type: 'distribution', elements: ['primary', 'secondary', 'accent'], scope: 'row' }],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.secondary, size: 'lg', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'outline' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 32: Diagonal Mirror (Medium)
+    {
+        id: 'GF_032',
+        category: 'symmetry',
+        difficulty: 4,
+        discrimination: 1.2,
+        explanation: 'The grid has diagonal symmetry. Top-left mirrors bottom-right.',
+        rules: [{ type: 'symmetry', axis: 'diagonal' }],
+        grid: [
+            [
+                makeCell([{ type: 'triangle', color: c.primary, size: 'md', rotation: 0 }]),
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md' }]),
+                makeCell([{ type: 'square', color: c.accent, size: 'md' }]),
+            ],
+            [
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md' }]),
+                makeCell([{ type: 'dot', color: c.primary, size: 'md', position: 'center' }]),
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.accent, size: 'md' }]),
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'triangle', color: c.primary, size: 'md', rotation: 0 }]),
+            makeCell([{ type: 'triangle', color: c.primary, size: 'md', rotation: 180 }]),
+            makeCell([{ type: 'square', color: c.primary, size: 'md' }]),
+            makeCell([{ type: 'circle', color: c.primary, size: 'md' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', rotation: 0 }]),
+            makeCell([{ type: 'triangle', color: c.secondary, size: 'md', rotation: 0 }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 33: Shape Subtraction (Medium)
+    {
+        id: 'GF_033',
+        category: 'operation',
+        difficulty: 5,
+        discrimination: 1.3,
+        explanation: 'Third cell = First cell minus Second cell shapes. 3 shapes - 1 shape = 2 shapes.',
+        rules: [{ type: 'operation', operation: 'subtraction', direction: 'row' }],
+        grid: [
+            [
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-left' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-right' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-left' },
+                ]),
+                makeCell([{ type: 'dot', color: c.primary, size: 'sm', position: 'top-right' }]),
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-left' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-left' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'center' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'left' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'right' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'center' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'left' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'right' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'top-left' },
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'top-right' },
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-left' },
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-right' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'top-left' },
+                ]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'center' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.primary, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'square', color: c.accent, size: 'sm', position: 'center' },
+            ]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 34: Rotation 45° (Easy-Medium)
+    {
+        id: 'GF_034',
+        category: 'rotation',
+        difficulty: 3,
+        discrimination: 1.0,
+        explanation: 'Square rotates 45° each step across rows, alternating between square and diamond orientation.',
+        rules: [{ type: 'rotation', degrees: 45, direction: 'row' }],
+        grid: [
+            [
+                makeCell([{ type: 'square', color: c.primary, size: 'md', rotation: 0 }]),
+                makeCell([{ type: 'square', color: c.primary, size: 'md', rotation: 45 }]),
+                makeCell([{ type: 'square', color: c.primary, size: 'md', rotation: 0 }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', rotation: 45 }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', rotation: 0 }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', rotation: 45 }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.accent, size: 'md', rotation: 0 }]),
+                makeCell([{ type: 'square', color: c.accent, size: 'md', rotation: 45 }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'square', color: c.accent, size: 'md', rotation: 0 }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', rotation: 45 }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', rotation: 90 }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'md' }]),
+            makeCell([{ type: 'square', color: c.primary, size: 'md', rotation: 0 }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'lg', rotation: 0 }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 35: Fill Pattern Progression (Easy)
+    {
+        id: 'GF_035',
+        category: 'progression',
+        difficulty: 2,
+        discrimination: 0.8,
+        explanation: 'Fill alternates: solid → outline → solid across each row.',
+        rules: [{ type: 'fill_cycle', pattern: ['solid', 'outline', 'solid'], direction: 'row' }],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'outline' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'outline' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'outline' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'outline' }]),
+            makeCell([{ type: 'triangle', color: c.primary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'lg', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 36: Nested Shapes (Hard)
+    {
+        id: 'GF_036',
+        category: 'nested',
+        difficulty: 7,
+        discrimination: 1.6,
+        explanation: 'Each cell has nested shapes. Outer shape follows row pattern, inner shape follows column pattern.',
+        rules: [
+            { type: 'distribution', elements: ['circle', 'square', 'triangle'], scope: 'row' },
+            { type: 'distribution', elements: ['circle', 'square', 'triangle'], scope: 'col' },
+        ],
+        grid: [
+            [
+                makeCell([
+                    { type: 'circle', color: c.primary, size: 'lg', fill: 'outline' },
+                    { type: 'circle', color: c.primary, size: 'sm', fill: 'solid' },
+                ]),
+                makeCell([
+                    { type: 'square', color: c.primary, size: 'lg', fill: 'outline' },
+                    { type: 'square', color: c.primary, size: 'sm', fill: 'solid' },
+                ]),
+                makeCell([
+                    { type: 'triangle', color: c.primary, size: 'lg', fill: 'outline' },
+                    { type: 'triangle', color: c.primary, size: 'sm', fill: 'solid' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'square', color: c.secondary, size: 'lg', fill: 'outline' },
+                    { type: 'circle', color: c.secondary, size: 'sm', fill: 'solid' },
+                ]),
+                makeCell([
+                    { type: 'triangle', color: c.secondary, size: 'lg', fill: 'outline' },
+                    { type: 'square', color: c.secondary, size: 'sm', fill: 'solid' },
+                ]),
+                makeCell([
+                    { type: 'circle', color: c.secondary, size: 'lg', fill: 'outline' },
+                    { type: 'triangle', color: c.secondary, size: 'sm', fill: 'solid' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'triangle', color: c.accent, size: 'lg', fill: 'outline' },
+                    { type: 'circle', color: c.accent, size: 'sm', fill: 'solid' },
+                ]),
+                makeCell([
+                    { type: 'circle', color: c.accent, size: 'lg', fill: 'outline' },
+                    { type: 'square', color: c.accent, size: 'sm', fill: 'solid' },
+                ]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([
+                { type: 'square', color: c.accent, size: 'lg', fill: 'outline' },
+                { type: 'triangle', color: c.accent, size: 'sm', fill: 'solid' },
+            ]),
+            makeCell([
+                { type: 'triangle', color: c.accent, size: 'lg', fill: 'outline' },
+                { type: 'triangle', color: c.accent, size: 'sm', fill: 'solid' },
+            ]),
+            makeCell([
+                { type: 'circle', color: c.accent, size: 'lg', fill: 'outline' },
+                { type: 'triangle', color: c.accent, size: 'sm', fill: 'solid' },
+            ]),
+            makeCell([
+                { type: 'square', color: c.accent, size: 'lg', fill: 'outline' },
+                { type: 'circle', color: c.accent, size: 'sm', fill: 'solid' },
+            ]),
+            makeCell([
+                { type: 'square', color: c.primary, size: 'lg', fill: 'outline' },
+                { type: 'triangle', color: c.primary, size: 'sm', fill: 'solid' },
+            ]),
+            makeCell([
+                { type: 'square', color: c.accent, size: 'lg', fill: 'solid' },
+                { type: 'triangle', color: c.accent, size: 'sm', fill: 'outline' },
+            ]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 37: XOR Pattern (Hard)
+    {
+        id: 'GF_037',
+        category: 'operation',
+        difficulty: 8,
+        discrimination: 1.8,
+        explanation: 'Third cell = XOR of first two cells. Shapes present in exactly one of the first two appear in the third.',
+        rules: [{ type: 'operation', operation: 'xor', direction: 'row' }],
+        grid: [
+            [
+                makeCell([
+                    { type: 'circle', color: c.primary, size: 'sm', position: 'top' },
+                    { type: 'square', color: c.primary, size: 'sm', position: 'bottom' },
+                ]),
+                makeCell([
+                    { type: 'circle', color: c.primary, size: 'sm', position: 'top' },
+                    { type: 'triangle', color: c.primary, size: 'sm', position: 'center' },
+                ]),
+                makeCell([
+                    { type: 'square', color: c.primary, size: 'sm', position: 'bottom' },
+                    { type: 'triangle', color: c.primary, size: 'sm', position: 'center' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'left' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'right' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'right' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'center' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'left' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'center' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'circle', color: c.accent, size: 'sm', position: 'top-left' },
+                    { type: 'circle', color: c.accent, size: 'sm', position: 'bottom-right' },
+                ]),
+                makeCell([
+                    { type: 'circle', color: c.accent, size: 'sm', position: 'top-right' },
+                    { type: 'circle', color: c.accent, size: 'sm', position: 'bottom-right' },
+                ]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([
+                { type: 'circle', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'circle', color: c.accent, size: 'sm', position: 'top-right' },
+            ]),
+            makeCell([
+                { type: 'circle', color: c.accent, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'circle', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'circle', color: c.accent, size: 'sm', position: 'bottom-left' },
+            ]),
+            makeCell([
+                { type: 'circle', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'circle', color: c.accent, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'circle', color: c.primary, size: 'sm', position: 'top-left' },
+                { type: 'circle', color: c.primary, size: 'sm', position: 'top-right' },
+            ]),
+            makeCell([
+                { type: 'square', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'square', color: c.accent, size: 'sm', position: 'top-right' },
+            ]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 38: Count Modulo (Medium)
+    {
+        id: 'GF_038',
+        category: 'progression',
+        difficulty: 5,
+        discrimination: 1.3,
+        explanation: 'Dot count = (row + col) mod 3 + 1. For row 3, col 3: (3+3) mod 3 + 1 = 1.',
+        rules: [{ type: 'formula', formula: '(row + col) % 3 + 1', property: 'count' }],
+        grid: [
+            [
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'center' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'center' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'bottom' },
+                ]),
+                makeCell([{ type: 'dot', color: c.primary, size: 'sm', position: 'center' }]),
+            ],
+            [
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'center' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'bottom' },
+                ]),
+                makeCell([{ type: 'dot', color: c.secondary, size: 'sm', position: 'center' }]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'center' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top' },
+                ]),
+            ],
+            [
+                makeCell([{ type: 'dot', color: c.accent, size: 'sm', position: 'center' }]),
+                makeCell([
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'center' },
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'top' },
+                ]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'center' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom' },
+            ]),
+            makeCell([{ type: 'dot', color: c.accent, size: 'sm', position: 'center' }]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'center' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.primary, size: 'sm', position: 'center' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'top' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'bottom' },
+            ]),
+            makeCell([
+                { type: 'square', color: c.accent, size: 'sm', position: 'center' },
+            ]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 39: Arrow Direction Cycle (Medium)
+    {
+        id: 'GF_039',
+        category: 'rotation',
+        difficulty: 4,
+        discrimination: 1.1,
+        explanation: 'Arrow direction cycles: Up → Right → Down → Left (90° clockwise per cell).',
+        rules: [{ type: 'rotation', degrees: 90, direction: 'sequential' }],
+        grid: [
+            [
+                makeCell([{ type: 'arrow', color: c.primary, size: 'md', rotation: 0 }]),
+                makeCell([{ type: 'arrow', color: c.primary, size: 'md', rotation: 90 }]),
+                makeCell([{ type: 'arrow', color: c.primary, size: 'md', rotation: 180 }]),
+            ],
+            [
+                makeCell([{ type: 'arrow', color: c.secondary, size: 'md', rotation: 270 }]),
+                makeCell([{ type: 'arrow', color: c.secondary, size: 'md', rotation: 0 }]),
+                makeCell([{ type: 'arrow', color: c.secondary, size: 'md', rotation: 90 }]),
+            ],
+            [
+                makeCell([{ type: 'arrow', color: c.accent, size: 'md', rotation: 180 }]),
+                makeCell([{ type: 'arrow', color: c.accent, size: 'md', rotation: 270 }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'arrow', color: c.accent, size: 'md', rotation: 0 }]),
+            makeCell([{ type: 'arrow', color: c.accent, size: 'md', rotation: 90 }]),
+            makeCell([{ type: 'arrow', color: c.accent, size: 'md', rotation: 180 }]),
+            makeCell([{ type: 'arrow', color: c.accent, size: 'md', rotation: 270 }]),
+            makeCell([{ type: 'arrow', color: c.primary, size: 'md', rotation: 0 }]),
+            makeCell([{ type: 'line', color: c.accent, size: 'md', rotation: 0 }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 40: Shape AND Color Distribution (Hard)
+    {
+        id: 'GF_040',
+        category: 'distribution',
+        difficulty: 6,
+        discrimination: 1.5,
+        explanation: 'Each row has all 3 shapes AND each column has all 3 colors. Latin square condition.',
+        rules: [
+            { type: 'distribution', elements: ['circle', 'square', 'triangle'], scope: 'row' },
+            { type: 'distribution', elements: ['primary', 'secondary', 'accent'], scope: 'col' },
+        ],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.secondary, size: 'md', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'outline' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 41: Size Decrease (Easy)
+    {
+        id: 'GF_041',
+        category: 'progression',
+        difficulty: 1,
+        discrimination: 0.7,
+        explanation: 'Size decreases across each row: large → medium → small.',
+        rules: [{ type: 'progression', property: 'size', direction: 'row', step: -1 }],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'sm', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.secondary, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'sm', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.accent, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'triangle', color: c.accent, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'lg', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.primary, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'sm', fill: 'outline' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 42: Row Sum Constant (Very Hard)
+    {
+        id: 'GF_042',
+        category: 'operation',
+        difficulty: 9,
+        discrimination: 1.9,
+        explanation: 'Each row sums to 6 dots. Row 3 has 2 + ? = 6, so ? = 4 dots.',
+        rules: [{ type: 'sum', target: 6, property: 'count', scope: 'row' }],
+        grid: [
+            [
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-left' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-right' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'center' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-left' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-right' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'bottom' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top-left' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top-right' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'bottom-left' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'bottom' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'center' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'left' },
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'right' },
+                ]),
+                empty(),
+                makeCell([]),
+            ],
+        ],
+        options: [
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'center' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'center' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.primary, size: 'sm', position: 'top-left' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'square', color: c.accent, size: 'sm', position: 'center' },
+            ]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 43: Conditional Color (Expert)
+    {
+        id: 'GF_043',
+        category: 'conditional',
+        difficulty: 10,
+        discrimination: 2.1,
+        explanation: 'If shape is circle → primary color. If square → secondary. If triangle → accent. Shape determined by distribution rule.',
+        rules: [
+            { type: 'distribution', elements: ['circle', 'square', 'triangle'], scope: 'row' },
+            { type: 'conditional', condition: { property: 'shape', value: 'circle' }, thenApply: { type: 'color_cycle', colors: ['#22d3ee'], direction: 'row' }, elseApply: { type: 'color_cycle', colors: ['#a855f7'], direction: 'row' } },
+        ],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.primary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'outline' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 44: Alternating Rows (Easy-Medium)
+    {
+        id: 'GF_044',
+        category: 'progression',
+        difficulty: 3,
+        discrimination: 1.0,
+        explanation: 'Odd rows have circles, even rows have squares. Row 3 (odd) should have circles.',
+        rules: [{ type: 'alternating', pattern: ['circle', 'square'], scope: 'row' }],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'outline' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 45: Shape Shift Columns (Hard)
+    {
+        id: 'GF_045',
+        category: 'progression',
+        difficulty: 7,
+        discrimination: 1.6,
+        explanation: 'Each column shifts shapes down: circle→square→triangle→circle.',
+        rules: [{ type: 'shift', direction: 'col', cycle: ['circle', 'square', 'triangle'] }],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.primary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.primary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'outline' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 46: Double Dots (Easy)
+    {
+        id: 'GF_046',
+        category: 'progression',
+        difficulty: 2,
+        discrimination: 0.9,
+        explanation: 'Dots double each step across columns: 1 → 2 → 4.',
+        rules: [{ type: 'progression', property: 'count', direction: 'col', step: 2 }],
+        grid: [
+            [
+                makeCell([{ type: 'dot', color: c.primary, size: 'md', position: 'center' }]),
+                makeCell([{ type: 'dot', color: c.secondary, size: 'md', position: 'center' }]),
+                makeCell([{ type: 'dot', color: c.accent, size: 'md', position: 'center' }]),
+            ],
+            [
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'left' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'right' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'left' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'right' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'left' },
+                    { type: 'dot', color: c.accent, size: 'sm', position: 'right' },
+                ]),
+            ],
+            [
+                makeCell([
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-left' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'top-right' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-left' },
+                    { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-right' },
+                ]),
+                makeCell([
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top-left' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'top-right' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'bottom-left' },
+                    { type: 'dot', color: c.secondary, size: 'sm', position: 'bottom-right' },
+                ]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'right' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom-right' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'center' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'top' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'bottom' },
+                { type: 'dot', color: c.accent, size: 'sm', position: 'left' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.primary, size: 'sm', position: 'top-left' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'top-right' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-left' },
+                { type: 'dot', color: c.primary, size: 'sm', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'dot', color: c.accent, size: 'md', position: 'top-left' },
+                { type: 'dot', color: c.accent, size: 'md', position: 'top-right' },
+                { type: 'dot', color: c.accent, size: 'md', position: 'bottom-left' },
+                { type: 'dot', color: c.accent, size: 'md', position: 'bottom-right' },
+            ]),
+            makeCell([
+                { type: 'square', color: c.accent, size: 'sm', position: 'center' },
+            ]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 47: Diagonal Shift (Hard)
+    {
+        id: 'GF_047',
+        category: 'operation',
+        difficulty: 8,
+        discrimination: 1.7,
+        explanation: 'Each diagonal (top-left to bottom-right) has the same shape type.',
+        rules: [{ type: 'identity', scope: 'diagonal' }],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.primary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.secondary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'outline' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 48: Three Rules Combined (Expert)
+    {
+        id: 'GF_048',
+        category: 'conditional',
+        difficulty: 10,
+        discrimination: 2.3,
+        explanation: 'Shape cycles rows (C→S→T), Color cycles cols (P→S→A), Size alternates (lg-sm-lg / sm-lg-sm / lg-sm-lg).',
+        rules: [
+            { type: 'distribution', elements: ['circle', 'square', 'triangle'], scope: 'row' },
+            { type: 'distribution', elements: ['primary', 'secondary', 'accent'], scope: 'col' },
+            { type: 'alternating', property: 'size', pattern: ['lg', 'sm'], scope: 'row' },
+        ],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'sm', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'lg', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.primary, size: 'sm', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.secondary, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.accent, size: 'sm', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.primary, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.secondary, size: 'sm', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'square', color: c.accent, size: 'lg', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'lg', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'lg', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.primary, size: 'lg', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.secondary, size: 'lg', fill: 'solid' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 49: Inverse Fill (Medium)
+    {
+        id: 'GF_049',
+        category: 'negation',
+        difficulty: 5,
+        discrimination: 1.4,
+        explanation: 'Third cell has inverse fill of first two combined. If first two are solid, third is outline.',
+        rules: [{ type: 'negation', property: 'fill', direction: 'row' }],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.primary, size: 'md', fill: 'outline' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'outline' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'outline' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'outline' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'md', fill: 'outline' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.accent, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.primary, size: 'md', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.accent, size: 'lg', fill: 'solid' }]),
+        ],
+        correctIndex: 0,
+    },
+
+    // PUZZLE 50: Complete Triple Rule (Very Hard)
+    {
+        id: 'GF_050',
+        category: 'conditional',
+        difficulty: 9,
+        discrimination: 2.0,
+        explanation: 'Each row/col has unique shape+color+size combo. Latin 3D cube constraint.',
+        rules: [
+            { type: 'latin_square', dimensions: ['shape', 'color', 'size'] },
+        ],
+        grid: [
+            [
+                makeCell([{ type: 'circle', color: c.primary, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.secondary, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.accent, size: 'sm', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'triangle', color: c.secondary, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'circle', color: c.accent, size: 'md', fill: 'solid' }]),
+                makeCell([{ type: 'square', color: c.primary, size: 'sm', fill: 'solid' }]),
+            ],
+            [
+                makeCell([{ type: 'square', color: c.accent, size: 'lg', fill: 'solid' }]),
+                makeCell([{ type: 'triangle', color: c.primary, size: 'md', fill: 'solid' }]),
+                empty(),
+            ],
+        ],
+        options: [
+            makeCell([{ type: 'circle', color: c.secondary, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.accent, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.primary, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'triangle', color: c.secondary, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'square', color: c.secondary, size: 'sm', fill: 'solid' }]),
+            makeCell([{ type: 'circle', color: c.secondary, size: 'lg', fill: 'solid' }]),
+        ],
+        correctIndex: 0,
+    },
 ];
 
 export default MATRIX_PUZZLES;

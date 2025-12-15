@@ -24,13 +24,17 @@ export const ReactionTimeStage = ({ mode = 'simple' }: ReactionTimeStageProps) =
     const [currentRT, setCurrentRT] = useState(0);
     const [targetDirection, setTargetDirection] = useState<'left' | 'right' | null>(null);
     const stimulusTime = useRef(0);
-    const [startTime] = useState(Date.now());
+    const taskStartTimeRef = useRef(0);
 
     const waitTimerRef = useRef<NodeJS.Timeout | null>(null);
-    const TOTAL_TRIALS = 10;
+    const TOTAL_TRIALS = 5;
 
     // Start a trial
     const startTrial = useCallback(() => {
+        // Track task start time on first trial
+        if (taskStartTimeRef.current === 0) {
+            taskStartTimeRef.current = Date.now();
+        }
         setPhase('waiting');
         setTargetDirection(null);
 
@@ -125,7 +129,7 @@ export const ReactionTimeStage = ({ mode = 'simple' }: ReactionTimeStageProps) =
 
         recordResponse({
             choice: Math.round(avgRT), // Store avg RT as choice
-            latency_ms: Date.now() - startTime,
+            latency_ms: Date.now() - taskStartTimeRef.current, // Total stage time
             accuracy: true
         });
 

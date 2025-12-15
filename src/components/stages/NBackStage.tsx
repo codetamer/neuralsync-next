@@ -63,6 +63,7 @@ export const NBackStage: React.FC = () => {
     // Response tracking
     const responsesRef = useRef<Map<number, { pressed: boolean; rt?: number; timestamp: number }>>(new Map());
     const trialStartTimeRef = useRef<number>(0);
+    const taskStartTimeRef = useRef<number>(0);
 
     // Generate sequence
     useEffect(() => {
@@ -213,6 +214,7 @@ export const NBackStage: React.FC = () => {
         setPhase('running');
         setCurrentTrialIndex(0);
         responsesRef.current.clear();
+        taskStartTimeRef.current = Date.now(); // Track when task actually starts
     };
 
     const completeTask = () => {
@@ -224,9 +226,7 @@ export const NBackStage: React.FC = () => {
 
         recordResponse({
             choice: result.dPrime, // Store d-prime as choice
-            latency_ms: result.reactionTimes.length > 0
-                ? result.reactionTimes.reduce((a, b) => a + b, 0) / result.reactionTimes.length
-                : 0,
+            latency_ms: Date.now() - taskStartTimeRef.current, // Total stage time
             accuracy: accuracy > 0.7,
             // Additional data stored in response
         });

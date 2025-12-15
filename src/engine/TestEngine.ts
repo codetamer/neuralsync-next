@@ -25,6 +25,46 @@ const selectRandomItems = <T>(pool: T[], count: number): T[] => {
     return shuffled.slice(0, count);
 };
 
+// --- RANKED FACTORY: Fixed, high-stakes session ---
+export const createRankedSession = (): StageDefinition[] => {
+    // Select 3 random hard matrix puzzles (Diff 6-10) for variety
+    const matrixPool = MATRIX_PUZZLES.filter(p => p.difficulty >= 6);
+    const selectedMatrices = selectRandomItems(matrixPool, 3);
+
+    // Core Cognitive Tasks (to be shuffled)
+    const coreTasks: StageDefinition[] = [
+        // Processing Speed
+        { stage: 0, type: 'symbolmatch', title: 'Pattern Velocity', difficulty: 6, description: 'High-speed pattern recognition.', contentId: 'rk-sym-1' },
+        // Working Memory
+        { stage: 0, type: 'nback', title: 'Working Memory', difficulty: 7, description: '2-Back memory challenge.', contentId: 'rk-nback-1' },
+        // Executive Function
+        { stage: 0, type: 'trailmaking', title: 'Executive Control', difficulty: 7, description: 'Rapid cognitive switching (Num/Alpha).', contentId: 'rk-tm-1' },
+        // Visuospatial Memory
+        { stage: 0, type: 'spatialspan', title: 'Spatial Recall', difficulty: 7, description: 'Memorize complex spatial sequences.', contentId: 'rk-ss-1' },
+    ];
+
+    // Shuffle Core Tasks
+    const shuffledCore = coreTasks.sort(() => 0.5 - Math.random());
+
+    // Construct final stage list
+    const stages: StageDefinition[] = [
+        { stage: 0, type: 'intro', title: 'Start Gauntlet', difficulty: 1, description: 'Competitive Mode: No Retries.' },
+
+        // 1. Warmup - Reaction Time (Always First)
+        { stage: 1, type: 'reactiontime', title: 'Neural Reflex', difficulty: 5, description: 'Measure your baseline reaction speed.', contentId: 'rk-rt-1' },
+
+        // 2-5. Shuffled Core Tasks
+        ...shuffledCore.map((task, idx) => ({ ...task, stage: 2 + idx })),
+
+        // 6-8. Fluid Intelligence - The Boss Fight (Always Last)
+        { stage: 6, type: 'matrix', title: 'Abstract Logic I', difficulty: (selectedMatrices[0]?.difficulty || 7) as DifficultyLevel, description: 'Advanced pattern recognition.', contentId: selectedMatrices[0]?.id || 'GF_010' },
+        { stage: 7, type: 'matrix', title: 'Abstract Logic II', difficulty: (selectedMatrices[1]?.difficulty || 8) as DifficultyLevel, description: 'Complex logical deduction.', contentId: selectedMatrices[1]?.id || 'GF_015' },
+        { stage: 8, type: 'matrix', title: 'Abstract Logic III', difficulty: (selectedMatrices[2]?.difficulty || 9) as DifficultyLevel, description: 'Elite-level reasoning challenge.', contentId: selectedMatrices[2]?.id || 'GF_020' },
+    ];
+
+    return stages;
+};
+
 // --- FACTORY FUNCTION: Create a new unique test session ---
 export const createTestSession = (): StageDefinition[] => {
     // 0. Intro

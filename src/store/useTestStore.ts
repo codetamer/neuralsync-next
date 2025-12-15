@@ -3,10 +3,13 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import {
     calculateFinalScores,
     createTestSession,
+    createRankedSession,
     adaptStagePath,
     type StageDefinition
 } from '../engine/TestEngine';
+import { EloEngine, type RankTier } from '../engine/EloEngine';
 import type { FinalScores, ResponseData } from '../utils/storage';
+import type { UserProfile } from '../services/UserService';
 
 interface TestState {
     currentStage: number;
@@ -14,20 +17,31 @@ interface TestState {
     stages: StageDefinition[]; // Dynamic sequence of stages
     isTestComplete: boolean;
     isPaused: boolean; // Track if test is paused
+    isRanked: boolean;
+    isDisqualified: boolean;
     xp: number;
     currentSection: 'INTRO' | 'IQ' | 'EQ' | 'RISK' | 'PERSONALITY';
+
+    // Competitive Stats
+    elo: number;
+    matchesPlayed: number;
+    rankTier: RankTier;
 
     // Actions
     recordResponse: (data: Omit<ResponseData, 'timestamp' | 'stage'>) => void;
     nextStage: () => void;
     resetTest: () => void;
+    startRankedSession: () => void;
+    disqualify: () => void;
     returnToHome: () => void;
     resumeTest: () => void;
     getProgress: () => number;
     getResults: () => FinalScores;
     addXp: (amount: number) => void;
+    updateElo: (performanceScore: number) => void;
     setSection: (section: 'INTRO' | 'IQ' | 'EQ' | 'RISK' | 'PERSONALITY') => void;
     setStage: (index: number) => void;
+    syncWithRemote: (data: Partial<UserProfile>) => void;
 }
 
 export const useTestStore = create<TestState>()(
@@ -38,8 +52,24 @@ export const useTestStore = create<TestState>()(
             stages: createTestSession(), // Initialize with a unique random session
             isTestComplete: false,
             isPaused: false,
+            isRanked: false,
+            isDisqualified: false,
             xp: 0,
             currentSection: 'INTRO',
+
+            // Competitive Defaults
+            elo: 1000,
+            matchesPlayed: 0,
+            rankTier: 'SILVER', // Start at Silver equivalent for baseline
+
+            syncWithRemote: (data) => {
+                set((state) => ({
+                    elo: data.elo ?? state.elo,
+                    matchesPlayed: data.matchesPlayed ?? state.matchesPlayed,
+                    rankTier: data.tier ?? state.rankTier,
+                    // We could also sync xp if that was part of the profile
+                }));
+            },
 
             recordResponse: (data) => {
                 const { currentStage, responses } = get();
@@ -88,9 +118,32 @@ export const useTestStore = create<TestState>()(
                     stages: createTestSession(), // RE-ROLL the session content
                     isTestComplete: false,
                     isPaused: false,
+                    isRanked: false,
+                    isDisqualified: false,
                     xp: 0,
-                    currentSection: 'INTRO'
+                    currentSection: 'INTRO',
+                    // Don't reset ELO on test reset? Or maybe we should? 
+                    // Usually ELO is persistent across sessions.
+                    // For now, let's KEEP ELO across resets. 
+                    // user can manually reset profile if needed.
                 });
+            },
+
+            startRankedSession: () => {
+                set({
+                    currentStage: 0,
+                    responses: [],
+                    stages: createRankedSession(),
+                    isTestComplete: false,
+                    isPaused: false,
+                    isRanked: true,
+                    isDisqualified: false,
+                    currentSection: 'INTRO' // Set to INTRO so StageController detects change to IQ and animates
+                });
+            },
+
+            disqualify: () => {
+                set({ isDisqualified: true, isTestComplete: true });
             },
 
             returnToHome: () => {
@@ -116,6 +169,18 @@ export const useTestStore = create<TestState>()(
 
             addXp: (amount) => set((state) => ({ xp: state.xp + amount })),
 
+            updateElo: (performanceScore) => {
+                const { elo, matchesPlayed } = get();
+                const newElo = EloEngine.calculateNewElo(elo, performanceScore, matchesPlayed);
+                const newTier = EloEngine.getRankTier(newElo);
+
+                set({
+                    elo: newElo,
+                    matchesPlayed: matchesPlayed + 1,
+                    rankTier: newTier
+                });
+            },
+
             setSection: (section) => set({ currentSection: section }),
 
             // Dev Utils
@@ -130,10 +195,10 @@ export const useTestStore = create<TestState>()(
         }),
         {
             name: 'neuralsync-storage',
-            storage: createJSONStorage(() => sessionStorage),
+            storage: createJSONStorage(() => localStorage),
         }
     )
 );
 
 // Deprecated export proxy to prevent breaking other imports temporarily
-export const STAGE_DEFINITIONS = []; 
+export const STAGE_DEFINITIONS = [];

@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useState, useEffect } from 'react';
+import Link from 'next/link';
 import { AnimatedBackground } from '../ui/AnimatedBackground';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { Logo } from '../ui/Logo';
@@ -8,11 +9,15 @@ import { AdSlotA } from '../ads/AdSlotA';
 import { useTestStore } from '../../store/useTestStore';
 import { useThemeStore } from '../../store/useThemeStore';
 import { NeonButton } from '../ui/NeonButton';
-import { Home, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Home, RotateCcw, Volume2, VolumeX, User, LogOut } from 'lucide-react';
 import { ConfirmationModal } from '../ui/ConfirmationModal';
 
 import { audio } from '../../engine/AudioEngine';
 import { DevControls } from '../dev/DevControls';
+import { FocusMonitor } from './FocusMonitor';
+import { AuthModal } from '../auth/AuthModal';
+import { useAuth } from '../../context/AuthContext';
+import { UserDropdown } from './UserDropdown';
 
 
 interface AppShellProps {
@@ -21,8 +26,10 @@ interface AppShellProps {
 
 export const AppShell = ({ children }: AppShellProps) => {
     const { resetTest, returnToHome, getProgress, currentStage, isTestComplete, xp } = useTestStore();
+    const { user, signOut } = useAuth();
     const [muted, setMuted] = useState(false);
     const [showDevControls, setShowDevControls] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [modalConfig, setModalConfig] = useState<{
         isOpen: boolean;
         title: string;
@@ -104,6 +111,7 @@ export const AppShell = ({ children }: AppShellProps) => {
 
     return (
         <div className="min-h-screen w-full text-white overflow-x-hidden font-sans selection:bg-neon-teal/30">
+            <FocusMonitor />
             <AnimatedBackground />
             <AnimatedBackground />
 
@@ -120,15 +128,36 @@ export const AppShell = ({ children }: AppShellProps) => {
                 <AdSlotA />
 
                 <header className="w-full p-4 flex justify-between items-center border-b border-white/5 bg-neural-card backdrop-blur-sm">
-                    <div className="flex items-center gap-3">
+                    <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                         <Logo className="w-12 h-12" />
                         <h1 className="text-xl font-display font-bold tracking-wide">
                             NEURAL<span className="text-neon-teal">SYNC</span>
                         </h1>
-                    </div>
+                    </Link>
 
                     {/* Gamification Controls */}
                     <div className="flex items-center gap-4">
+
+
+                        {user ? (
+                            <UserDropdown
+                                user={user}
+                                userProfile={{ tier: 'SILVER' }} // In a real app we might want to fetch this globally or from a store
+                                onSignOut={signOut}
+                            />
+                        ) : (
+                            <NeonButton
+                                onClick={() => setIsAuthModalOpen(true)}
+                                variant="primary"
+                                size="sm"
+                                glow
+                            >
+                                <User className="w-4 h-4 mr-2" />
+                                Login
+                            </NeonButton>
+                        )}
+
+                        <div className="w-px h-8 bg-white/10 mx-1"></div>
 
 
                         <button
@@ -263,6 +292,8 @@ export const AppShell = ({ children }: AppShellProps) => {
 
             {/* Dev Controls Overlay - Toggle with Shift+D */}
             {showDevControls && <DevControls />}
+
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         </div>
     );
 };

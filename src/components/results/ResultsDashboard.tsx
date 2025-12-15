@@ -8,6 +8,7 @@ import { NeuralAnalysis } from './NeuralAnalysis';
 import { NeuralSignature } from './NeuralSignature';
 import { HeroArchetype } from './HeroArchetype';
 import { ShareModal } from './ShareModal';
+import { RankedResultsDashboard } from './RankedResultsDashboard';
 import { motion } from 'framer-motion';
 import { Share2, Download, Home, RotateCcw } from 'lucide-react';
 import { NeonButton } from '../ui/NeonButton';
@@ -16,27 +17,41 @@ import { getArchetypeTheme } from '../../utils/themeMapping';
 import { ThreeDCard } from '../ui/ThreeDCard';
 import { CognitiveDomainCard } from './CognitiveDomainCard';
 import { ValidationCard } from './ValidationCard';
+import { useAuth } from '../../context/AuthContext';
+import { UserService } from '../../services/UserService';
 
 export const ResultsDashboard = () => {
-    const { getResults, resetTest, returnToHome, stages } = useTestStore();
+    const { getResults, resetTest, returnToHome, stages, isDisqualified, isRanked, updateElo, isTestComplete } = useTestStore();
+
+
+
+    // --- ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS ---
     const [results, setResults] = useState<any>(null);
     const [isShareOpen, setIsShareOpen] = useState(false);
+    const [eloUpdated, setEloUpdated] = useState(false);
     const dashboardRef = useRef<HTMLDivElement>(null);
 
     const handleRetakeTest = () => {
         resetTest();
-        window.location.reload();
     };
 
     const handleReturnHome = () => {
-        returnToHome();
-        window.location.reload();
+        resetTest();
     };
 
+    // Calculate Results & Update ELO
     useEffect(() => {
+        if (!isTestComplete) return; // Don't calculate if test isn't complete
+
         const data = getResults();
         setResults(data);
-    }, [getResults]);
+
+        // Update ELO if Ranked, Completed, Not Disqualified, and Not yet updated
+        if (isRanked && !isDisqualified && isTestComplete && !eloUpdated) {
+            updateElo(data.iqPercentile); // Use percentile as "Performance Score" (0-100)
+            setEloUpdated(true);
+        }
+    }, [getResults, isRanked, isDisqualified, isTestComplete, eloUpdated, updateElo]);
 
     // Generate Deep Analysis from Engine
     const analysis = useMemo(() => {
@@ -58,6 +73,58 @@ export const ResultsDashboard = () => {
     const theme = useMemo(() => {
         return analysis ? getArchetypeTheme(analysis.archetype) : getArchetypeTheme("Adaptive Generalist");
     }, [analysis]);
+
+    // Save Neural Profile to Backend (Once)
+    const [profileSaved, setProfileSaved] = useState(false);
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (analysis && user && !profileSaved && !isRanked && !isDisqualified) {
+            UserService.saveNeuralProfile(user.uid, {
+                ...analysis,
+                iqEstimate: results.iq,
+                eqEstimate: results.eq,
+                riskEstimate: results.riskTolerance,
+                hexaco: results.hexaco,
+                cognitive: results.cognitive // Pass granular scores
+            }).then(() => {
+                setProfileSaved(true);
+                console.log("Neural Profile Saved");
+            }).catch(console.error);
+        }
+    }, [analysis, user, profileSaved, isRanked, isDisqualified, results]);
+
+    // --- GUARD CLAUSE: Prevent rendering invalid state during reset ---
+    if (!isTestComplete) return null;
+
+    // --- RANKED MODE: Use dedicated dashboard ---
+    if (isRanked && !isDisqualified) {
+        return <RankedResultsDashboard />;
+    }
+
+    // --- DISQUALIFIED STATE ---
+    if (isDisqualified) {
+        return (
+            <div className="w-full h-screen flex flex-col items-center justify-center bg-black text-red-500 space-y-6">
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-6xl font-bold tracking-tighter border-4 border-red-600 p-8 rounded-lg uppercase"
+                >
+                    Disqualified
+                </motion.div>
+                <p className="text-xl text-red-400 font-mono">
+                    Focus loss detected during Ranked Gauntlet.
+                </p>
+                <p className="text-sm text-red-900/50">
+                    Your session has been voided.
+                </p>
+                <NeonButton onClick={handleReturnHome} variant="primary" className="mt-8">
+                    RETURN TO LOBBY
+                </NeonButton>
+            </div>
+        );
+    }
 
     if (!results || !analysis) return null;
 
@@ -97,7 +164,7 @@ export const ResultsDashboard = () => {
             />
 
             {/* Validity Warning */}
-            {results.isFlagged && (
+            {results.isFlagged && !isDisqualified && (
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -272,6 +339,7 @@ export const ResultsDashboard = () => {
                     hexaco: results.hexaco,
                     apexTrait: apexTrait
                 }}
+                archetype={analysis.archetype}
             />
         </div >
     );

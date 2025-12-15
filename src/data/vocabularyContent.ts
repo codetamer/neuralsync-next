@@ -385,6 +385,258 @@ export const VOCABULARY_ITEMS: VocabularyItem[] = [
         ],
         difficulty: 8,
         discrimination: 1.6
+    },
+
+    // ========================================================================
+    // EXPANSION SET: 20 Additional Vocabulary Items (VOC_031-VOC_050)
+    // ========================================================================
+
+    // EASY (Difficulty 1-3) - 5 new items
+    {
+        id: 'VOC_031',
+        word: 'Resilient',
+        definition: 'Able to recover quickly from difficulties',
+        distractors: [
+            'Easily broken or damaged',
+            'Related to silence or quietness',
+            'Having a pleasant smell'
+        ],
+        difficulty: 2,
+        discrimination: 0.9
+    },
+    {
+        id: 'VOC_032',
+        word: 'Mundane',
+        definition: 'Lacking interest or excitement; ordinary',
+        distractors: [
+            'Related to the moon',
+            'Clean and tidy',
+            'Worldly in a sophisticated way'
+        ],
+        difficulty: 3,
+        discrimination: 1.0
+    },
+    {
+        id: 'VOC_033',
+        word: 'Verbose',
+        definition: 'Using more words than necessary',
+        distractors: [
+            'Related to verbs in grammar',
+            'Spoken aloud rather than written',
+            'Extremely brief'
+        ],
+        difficulty: 3,
+        discrimination: 1.0
+    },
+    {
+        id: 'VOC_034',
+        word: 'Prudent',
+        definition: 'Acting with or showing care for the future',
+        distractors: [
+            'Excessively proud',
+            'Related to pruning plants',
+            'Overly cautious to a fault'
+        ],
+        difficulty: 3,
+        discrimination: 1.0
+    },
+    {
+        id: 'VOC_035',
+        word: 'Lucid',
+        definition: 'Clear and easy to understand',
+        distractors: [
+            'Related to luck or fortune',
+            'Shining brightly',
+            'Occurring during sleep'
+        ],
+        difficulty: 3,
+        discrimination: 0.9
+    },
+
+    // MEDIUM (Difficulty 4-6) - 7 new items
+    {
+        id: 'VOC_036',
+        word: 'Fastidious',
+        definition: 'Attentive to detail; very concerned about accuracy',
+        distractors: [
+            'Moving quickly',
+            'Relating to fasting or hunger',
+            'Easily disgusted'
+        ],
+        difficulty: 6,
+        discrimination: 1.3
+    },
+    {
+        id: 'VOC_037',
+        word: 'Capricious',
+        definition: 'Given to sudden changes of mood or behavior',
+        distractors: [
+            'Related to goats',
+            'Extremely cautious',
+            'Having a large capacity'
+        ],
+        difficulty: 6,
+        discrimination: 1.4
+    },
+    {
+        id: 'VOC_038',
+        word: 'Prolific',
+        definition: 'Producing great quantities or results',
+        distractors: [
+            'Against something',
+            'Professional in manner',
+            'Slow and methodical'
+        ],
+        difficulty: 4,
+        discrimination: 1.1
+    },
+    {
+        id: 'VOC_039',
+        word: 'Innocuous',
+        definition: 'Not harmful or offensive',
+        distractors: [
+            'Lacking knowledge',
+            'Not able to be occupied',
+            'Extremely dangerous'
+        ],
+        difficulty: 5,
+        discrimination: 1.2
+    },
+    {
+        id: 'VOC_040',
+        word: 'Penchant',
+        definition: 'A strong liking or tendency',
+        distractors: [
+            'A type of pendant jewelry',
+            'A fence or enclosure',
+            'A pencil case'
+        ],
+        difficulty: 5,
+        discrimination: 1.2
+    },
+    {
+        id: 'VOC_041',
+        word: 'Nonchalant',
+        definition: 'Appearing casually calm and relaxed',
+        distractors: [
+            'Not challenging or difficult',
+            'Refusing to comply',
+            'Having no charge or cost'
+        ],
+        difficulty: 4,
+        discrimination: 1.1
+    },
+    {
+        id: 'VOC_042',
+        word: 'Altruistic',
+        definition: 'Showing selfless concern for others',
+        distractors: [
+            'Related to high altitude',
+            'Focused on alternative solutions',
+            'Extremely artistic'
+        ],
+        difficulty: 5,
+        discrimination: 1.2
+    },
+
+    // HARD (Difficulty 7-8) - 5 new items
+    {
+        id: 'VOC_043',
+        word: 'Insidious',
+        definition: 'Proceeding harmfully in a subtle way',
+        distractors: [
+            'Located on the inside',
+            'Having insight or wisdom',
+            'Lacking in sincerity'
+        ],
+        difficulty: 7,
+        discrimination: 1.5
+    },
+    {
+        id: 'VOC_044',
+        word: 'Egregious',
+        definition: 'Outstandingly bad; shocking',
+        distractors: [
+            'Related to eagles',
+            'Living in a group',
+            'Extremely eager'
+        ],
+        difficulty: 7,
+        discrimination: 1.5
+    },
+    {
+        id: 'VOC_045',
+        word: 'Magnanimous',
+        definition: 'Generous or forgiving, especially toward rivals',
+        distractors: [
+            'Related to magnets',
+            'Very large in size',
+            'Possessing great wealth'
+        ],
+        difficulty: 7,
+        discrimination: 1.4
+    },
+    {
+        id: 'VOC_046',
+        word: 'Surreptitious',
+        definition: 'Kept secret, especially because improper',
+        distractors: [
+            'Related to surrender',
+            'Extremely repetitive',
+            'Having surplus resources'
+        ],
+        difficulty: 8,
+        discrimination: 1.6
+    },
+    {
+        id: 'VOC_047',
+        word: 'Desultory',
+        definition: 'Lacking a plan, purpose, or enthusiasm',
+        distractors: [
+            'Related to desserts',
+            'Insulting or offensive',
+            'Resulting from something'
+        ],
+        difficulty: 8,
+        discrimination: 1.6
+    },
+
+    // EXPERT (Difficulty 9-10) - 3 new items
+    {
+        id: 'VOC_048',
+        word: 'Ineffable',
+        definition: 'Too great or extreme to be expressed in words',
+        distractors: [
+            'Not able to fail',
+            'Lacking in effect',
+            'Impossible to achieve'
+        ],
+        difficulty: 9,
+        discrimination: 1.8
+    },
+    {
+        id: 'VOC_049',
+        word: 'Solipsistic',
+        definition: 'Characterized by extreme self-centeredness',
+        distractors: [
+            'Related to solar energy',
+            'Seeking solitude',
+            'Moving in a circular pattern'
+        ],
+        difficulty: 10,
+        discrimination: 2.0
+    },
+    {
+        id: 'VOC_050',
+        word: 'Otiose',
+        definition: 'Serving no practical purpose; pointless',
+        distractors: [
+            'Related to the ear',
+            'Extremely active and busy',
+            'Having eight parts'
+        ],
+        difficulty: 10,
+        discrimination: 2.0
     }
 ];
 

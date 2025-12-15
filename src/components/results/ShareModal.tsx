@@ -1,10 +1,10 @@
-'use client';
-
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toPng, toBlob } from 'html-to-image';
-import { X, Download, Copy, Share2, Check, Brain, Heart, Zap, TrendingUp } from 'lucide-react';
+import { X, Download, Copy, Share2, Check, Brain, Heart, Zap, TrendingUp, Smartphone, Layout, Award } from 'lucide-react';
 import { NeonButton } from '../ui/NeonButton';
+import { useTestStore } from '../../store/useTestStore';
+import { RankBadge } from '../ui/RankBadge';
 
 interface ShareModalProps {
     isOpen: boolean;
@@ -25,49 +25,34 @@ interface ShareModalProps {
         };
         apexTrait: { trait: string; score: number; description: string };
     };
+    archetype?: string;
 }
 
-export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
+export const ShareModal = ({ isOpen, onClose, scores, archetype = "Adaptive Generalist" }: ShareModalProps) => {
     const [copied, setCopied] = useState(false);
     const [isCapturing, setIsCapturing] = useState(false);
+    const [shareMode, setShareMode] = useState<'classic' | 'story'>('classic');
+    const { elo, rankTier } = useTestStore();
     const cardRef = useRef<HTMLDivElement>(null);
-
-    const getArchetype = () => {
-        const { iq, eq, riskTolerance, hexaco } = scores;
-        if (hexaco.honesty > 80) return "Ethical Guardian";
-        if (iq > 130 && hexaco.openness > 75) return "Visionary Architect";
-        if (iq > 125 && hexaco.conscientiousness > 80) return "Precision Engineer";
-        if (eq > 125 && hexaco.agreeableness > 70) return "Harmonic Resonator";
-        if (eq > 120 && hexaco.extraversion > 75) return "Social Catalyst";
-        if (riskTolerance > 80) return "Chaos Navigator";
-        if (riskTolerance > 70 && iq > 110) return "Calculated Maverick";
-        if (Math.abs(iq - eq) < 15) return "Renaissance Synthesizer";
-        return "Adaptive Generalist";
-    };
-
-    const archetype = getArchetype();
 
     const handleDownload = async () => {
         if (!cardRef.current) return;
         setIsCapturing(true);
 
         try {
-            // Wait for fonts/images to be ready
             await new Promise(resolve => setTimeout(resolve, 500));
 
             const dataUrl = await toPng(cardRef.current, {
                 cacheBust: true,
-                pixelRatio: 3, // High resolution
+                pixelRatio: 3,
                 quality: 0.95,
                 backgroundColor: '#050505',
-                style: {
-                    margin: '0',
-                }
+                style: { margin: '0' }
             });
 
             const link = document.createElement('a');
             link.href = dataUrl;
-            link.download = `neuralsync-profile-${Date.now()}.png`;
+            link.download = `neuralsync-${shareMode}-${Date.now()}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -85,21 +70,16 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
 
         try {
             await new Promise(resolve => setTimeout(resolve, 500));
-
             const blob = await toBlob(cardRef.current, {
                 cacheBust: true,
                 pixelRatio: 3,
                 quality: 0.95,
                 backgroundColor: '#050505',
-                style: {
-                    margin: '0',
-                }
+                style: { margin: '0' }
             });
 
             if (blob) {
-                await navigator.clipboard.write([
-                    new ClipboardItem({ 'image/png': blob })
-                ]);
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
             }
@@ -119,90 +99,198 @@ export const ShareModal = ({ isOpen, onClose, scores }: ShareModalProps) => {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
-                        className="bg-neural-bg border border-white/10 rounded-2xl max-w-2xl w-full max-h-[95vh] overflow-hidden flex flex-col shadow-2xl"
+                        className="bg-neural-bg border border-white/10 rounded-2xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl overflow-hidden"
                     >
-                        <div className="p-4 border-b border-white/10 flex justify-between items-center">
+                        <div className="p-4 border-b border-white/10 flex justify-between items-center bg-neural-bg z-10">
                             <h3 className="text-lg md:text-xl font-display font-bold text-white flex items-center gap-2">
                                 <Share2 className="w-4 h-4 md:w-5 md:h-5 text-neon-teal" />
-                                SHARE YOUR RESULTS
+                                SHARE RANKING
                             </h3>
                             <button onClick={onClose} className="text-white/50 hover:text-white transition-colors">
                                 <X className="w-5 h-5 md:w-6 md:h-6" />
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-auto p-4 md:p-6 flex flex-col items-center justify-center bg-grid-white/[0.02]">
-                            <div ref={cardRef} className="w-full max-w-[450px] bg-gradient-to-br from-neural-bg via-slate-900 to-neural-bg p-5 md:p-7 rounded-2xl border border-white/20 shadow-2xl">
-                                <div className="text-center mb-4">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neon-teal/10 border border-neon-teal/30 rounded-full mb-2">
-                                        <Brain className="w-3 h-3 text-neon-teal" />
-                                        <span className="text-[10px] font-mono font-bold text-neon-teal tracking-wider">NEURALSYNC v4.2</span>
-                                    </div>
-                                    <h2 className="text-2xl md:text-3xl font-display font-bold text-white mb-1">Neural Profile</h2>
-                                    <p className="text-xs text-white/60 font-mono">Multidimensional Psychometric Analysis</p>
-                                </div>
+                        {/* Mode Selector */}
+                        <div className="flex justify-center p-4 bg-white/5 border-b border-white/5 z-10">
+                            <div className="bg-neural-card border border-white/10 rounded-lg p-1 flex gap-1">
+                                <button
+                                    onClick={() => setShareMode('classic')}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all ${shareMode === 'classic'
+                                        ? 'bg-neon-teal text-neural-bg shadow-sm'
+                                        : 'text-white/50 hover:text-white hover:bg-white/5'
+                                        }`}
+                                >
+                                    <Layout className="w-3.5 h-3.5" />
+                                    CLASSIC CARD
+                                </button>
+                                <button
+                                    onClick={() => setShareMode('story')}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all ${shareMode === 'story'
+                                        ? 'bg-neon-teal text-neural-bg shadow-sm'
+                                        : 'text-white/50 hover:text-white hover:bg-white/5'
+                                        }`}
+                                >
+                                    <Smartphone className="w-3.5 h-3.5" />
+                                    STORY MODE
+                                </button>
+                            </div>
+                        </div>
 
-                                <div className="mb-4 p-3 bg-gradient-to-r from-neon-purple/10 to-neon-blue/10 border border-neon-purple/30 rounded-xl text-center">
-                                    <p className="text-[10px] text-white/60 mb-1 font-mono">ARCHETYPE</p>
-                                    <p className="text-base md:text-lg font-display font-bold bg-gradient-to-r from-neon-purple to-neon-blue bg-clip-text text-transparent">{archetype}</p>
-                                </div>
+                        <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col items-center justify-start bg-grid-white/[0.02]">
 
-                                <div className="grid grid-cols-3 gap-2 mb-4">
-                                    <div className="bg-white/5 border border-white/10 rounded-lg p-2 text-center">
-                                        <Brain className="w-4 h-4 text-neon-blue mx-auto mb-1" />
-                                        <p className="text-xl font-bold text-white font-mono">{scores.iq}</p>
-                                        <p className="text-[10px] text-white/50 font-mono">IQ</p>
-                                        <p className="text-[10px] text-neon-blue mt-0.5">Top {100 - scores.iqPercentile}%</p>
-                                    </div>
-                                    <div className="bg-white/5 border border-white/10 rounded-lg p-2 text-center">
-                                        <Heart className="w-4 h-4 text-neon-purple mx-auto mb-1" />
-                                        <p className="text-xl font-bold text-white font-mono">{scores.eq}</p>
-                                        <p className="text-[10px] text-white/50 font-mono">EQ</p>
-                                        <p className="text-[10px] text-neon-purple mt-0.5">Top {100 - scores.eqPercentile}%</p>
-                                    </div>
-                                    <div className="bg-white/5 border border-white/10 rounded-lg p-2 text-center">
-                                        <Zap className="w-4 h-4 text-neon-orange mx-auto mb-1" />
-                                        <p className="text-xl font-bold text-white font-mono">{scores.riskTolerance}</p>
-                                        <p className="text-[10px] text-white/50 font-mono">RISK</p>
-                                        <p className="text-[10px] text-neon-orange mt-0.5">{scores.riskTolerance > 70 ? 'High' : scores.riskTolerance > 40 ? 'Balanced' : 'Conservative'}</p>
-                                    </div>
-                                </div>
+                            {/* RENDER CARD CONTAINER */}
+                            <div
+                                ref={cardRef}
+                                className={`
+                                    bg-gradient-to-br from-neural-bg via-slate-900 to-neural-bg 
+                                    border border-white/20 shadow-2xl relative overflow-hidden my-auto
+                                    ${shareMode === 'story'
+                                        ? 'aspect-[9/16] w-[360px] p-6 flex flex-col justify-between shrink-0'
+                                        : 'w-full max-w-[500px] p-6 rounded-2xl shrink-0'
+                                    }
+                                `}
+                            >
+                                {/* Background Patterns */}
+                                <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(circle_at_50%_0%,rgba(45,212,191,0.2),transparent_70%)]" />
 
-                                <div className="mb-4 p-3 bg-neon-green/5 border border-neon-green/30 rounded-xl">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <TrendingUp className="w-3 h-3 text-neon-green" />
-                                        <p className="text-[10px] text-white/60 font-mono">dominating trait</p>
-                                    </div>
-                                    <p className="text-sm md:text-base font-bold text-white mb-1">{scores.apexTrait.trait}</p>
-                                    <p className="text-[10px] text-white/60 leading-relaxed line-clamp-2">{scores.apexTrait.description}</p>
-                                </div>
-
-                                <div className="space-y-1.5 mb-4">
-                                    <p className="text-[10px] text-white/60 font-mono mb-2">HEXACO PERSONALITY</p>
-                                    {[
-                                        { name: 'Honesty', value: scores.hexaco.honesty, color: 'bg-cyan-500' },
-                                        { name: 'Emotionality', value: scores.hexaco.emotionality, color: 'bg-red-500' },
-                                        { name: 'Extraversion', value: scores.hexaco.extraversion, color: 'bg-yellow-500' },
-                                        { name: 'Agreeableness', value: scores.hexaco.agreeableness, color: 'bg-pink-500' },
-                                        { name: 'Conscientious', value: scores.hexaco.conscientiousness, color: 'bg-green-500' },
-                                        { name: 'Openness', value: scores.hexaco.openness, color: 'bg-blue-500' }
-                                    ].map((trait, i) => (
-                                        <div key={i} className="flex items-center gap-1.5">
-                                            <p className="text-[10px] text-white/60 w-20 font-mono truncate">{trait.name}</p>
-                                            <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
-                                                <div className={`h-full ${trait.color}`} style={{ width: `${trait.value}%` }} />
-                                            </div>
-                                            <p className="text-[10px] text-white/80 w-6 text-right font-mono">{trait.value}</p>
+                                <div className="relative z-10">
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-2">
+                                            <Brain className="w-5 h-5 text-neon-teal" />
+                                            <span className="font-display font-bold text-white tracking-widest text-sm">NEURAL<span className="text-neon-teal">SYNC</span></span>
                                         </div>
-                                    ))}
-                                </div>
+                                        <div className="px-2 py-1 bg-white/5 rounded text-[10px] font-mono text-white/50 border border-white/5">
+                                            VERIFIED
+                                        </div>
+                                    </div>
 
-                                <div className="pt-3 border-t border-white/10 text-center">
-                                    <p className="text-[10px] text-white/40 font-mono">neuralsync.ai • HEXACO-60 Verified</p>
+                                    {shareMode === 'story' ? (
+                                        // --- STORY LAYOUT ---
+                                        <div className="flex flex-col items-center gap-6 mt-4">
+                                            <div className="relative">
+                                                <div className="absolute inset-0 bg-neon-teal/20 blur-3xl rounded-full" />
+                                                <RankBadge tier={rankTier} size="xl" showLabel />
+                                            </div>
+
+                                            <div className="text-center space-y-2">
+                                                <h1 className="text-4xl font-display font-bold text-white tracking-tight">{elo}</h1>
+                                                <p className="text-neon-blue font-mono text-xs tracking-widest uppercase">Global Rank: {rankTier}</p>
+                                            </div>
+
+                                            <div className="w-full space-y-3 mt-4">
+                                                <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex justify-between items-center">
+                                                    <span className="text-xs text-white/70 font-mono">Archetype</span>
+                                                    <span className="text-sm font-bold text-neon-purple">{archetype}</span>
+                                                </div>
+                                                <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex justify-between items-center">
+                                                    <span className="text-xs text-white/70 font-mono">Top Trait</span>
+                                                    <span className="text-sm font-bold text-neon-green">{scores.apexTrait.trait}</span>
+                                                </div>
+                                                <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex justify-between items-center">
+                                                    <span className="text-xs text-white/70 font-mono">IQ Percentile</span>
+                                                    <span className="text-sm font-bold text-neon-blue">Top {Math.max(1, 100 - scores.iqPercentile)}%</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-8 text-center text-white/30 text-[10px] font-mono">
+                                                Beat my score at neuralsync.ai
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        // --- CLASSIC LAYOUT ---
+                                        <>
+                                            <div className="text-center mb-4">
+                                                <h2 className="text-2xl font-display font-bold text-white mb-1">Neural Profile</h2>
+                                                <p className="text-[10px] text-white/60 font-mono">Multidimensional Psychometric Analysis</p>
+                                            </div>
+
+                                            {/* Archetype Banner */}
+                                            <div className="mb-4 p-3 bg-gradient-to-r from-neon-purple/10 to-neon-blue/10 border border-neon-purple/30 rounded-xl text-center">
+                                                <p className="text-[10px] text-white/60 mb-1 font-mono">ARCHETYPE</p>
+                                                <p className="text-lg font-display font-bold bg-gradient-to-r from-neon-purple to-neon-blue bg-clip-text text-transparent">{archetype}</p>
+                                            </div>
+
+                                            {/* Core Metrics - 2x2 Grid */}
+                                            <div className="grid grid-cols-2 gap-2 mb-4">
+                                                <div className="bg-white/5 border border-white/10 rounded-lg p-2.5">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Brain className="w-3.5 h-3.5 text-neon-blue" />
+                                                        <span className="text-[10px] text-white/50 font-mono">COGNITIVE</span>
+                                                    </div>
+                                                    <p className="text-2xl font-bold text-white font-mono">{scores.iq}</p>
+                                                    <p className="text-[9px] text-neon-blue mt-0.5">Top {Math.max(1, 100 - scores.iqPercentile)}% globally</p>
+                                                </div>
+                                                <div className="bg-white/5 border border-white/10 rounded-lg p-2.5">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Heart className="w-3.5 h-3.5 text-pink-400" />
+                                                        <span className="text-[10px] text-white/50 font-mono">EMOTIONAL</span>
+                                                    </div>
+                                                    <p className="text-2xl font-bold text-white font-mono">{scores.eq}</p>
+                                                    <p className="text-[9px] text-pink-400 mt-0.5">Top {Math.max(1, 100 - scores.eqPercentile)}% empathy</p>
+                                                </div>
+                                                <div className="bg-white/5 border border-white/10 rounded-lg p-2.5">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Award className="w-3.5 h-3.5 text-amber-400" />
+                                                        <span className="text-[10px] text-white/50 font-mono">RANK</span>
+                                                    </div>
+                                                    <p className="text-2xl font-bold text-white font-mono">{elo}</p>
+                                                    <p className="text-[9px] text-amber-400 mt-0.5">{rankTier} tier</p>
+                                                </div>
+                                                <div className="bg-white/5 border border-white/10 rounded-lg p-2.5">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <Zap className="w-3.5 h-3.5 text-orange-400" />
+                                                        <span className="text-[10px] text-white/50 font-mono">RISK</span>
+                                                    </div>
+                                                    <p className="text-2xl font-bold text-white font-mono">{scores.riskTolerance}%</p>
+                                                    <p className="text-[9px] text-orange-400 mt-0.5">{scores.riskTolerance > 70 ? 'Bold' : scores.riskTolerance > 40 ? 'Balanced' : 'Cautious'}</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Apex Trait Highlight */}
+                                            <div className="mb-4 p-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <TrendingUp className="w-4 h-4 text-green-400" />
+                                                    <span className="text-[10px] text-white/60 font-mono">APEX STRENGTH</span>
+                                                </div>
+                                                <p className="text-sm font-bold text-green-400">{scores.apexTrait.trait}</p>
+                                                <p className="text-[10px] text-white/50 mt-1 leading-tight">{scores.apexTrait.description}</p>
+                                            </div>
+
+                                            {/* HEXACO Personality Bars */}
+                                            <div className="space-y-1.5">
+                                                <p className="text-[9px] text-white/40 font-mono mb-1">HEXACO PERSONALITY MODEL</p>
+                                                {[
+                                                    { name: 'Honesty', value: scores.hexaco.honesty, color: 'bg-cyan-500' },
+                                                    { name: 'Emotionality', value: scores.hexaco.emotionality, color: 'bg-rose-500' },
+                                                    { name: 'Extraversion', value: scores.hexaco.extraversion, color: 'bg-yellow-500' },
+                                                    { name: 'Agreeableness', value: scores.hexaco.agreeableness, color: 'bg-green-500' },
+                                                    { name: 'Conscientiousness', value: scores.hexaco.conscientiousness, color: 'bg-blue-500' },
+                                                    { name: 'Openness', value: scores.hexaco.openness, color: 'bg-purple-500' },
+                                                ].map((trait, i) => (
+                                                    <div key={i} className="flex items-center gap-2">
+                                                        <p className="text-[9px] text-white/60 w-20 font-mono truncate">{trait.name}</p>
+                                                        <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                                            <div className={`h-full ${trait.color} rounded-full`} style={{ width: `${trait.value}%` }} />
+                                                        </div>
+                                                        <p className="text-[9px] text-white/40 w-8 text-right font-mono">{trait.value}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Footer */}
+                                            <div className="mt-4 pt-3 border-t border-white/10 text-center">
+                                                <p className="text-[9px] text-white/30 font-mono">Discover your cognitive profile at neuralsync.ai</p>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
-                            <p className="text-xs text-white/50 mt-3 text-center">Card optimized for social sharing</p>
+                            <p className="text-xs text-white/50 mt-4 text-center">
+                                {shareMode === 'story' ? 'Perfect for Stories & TikTok' : 'Detailed Report Card'}
+                            </p>
                         </div>
 
                         <div className="p-4 md:p-6 border-t border-white/10 flex flex-col gap-4 bg-neural-bg">

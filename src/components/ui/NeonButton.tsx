@@ -11,6 +11,8 @@ interface NeonButtonProps extends HTMLMotionProps<"button"> {
     size?: 'sm' | 'md' | 'lg';
     className?: string;
     glow?: boolean;
+    color?: 'teal' | 'amber' | 'purple' | 'blue'; // Extend color support while we are at it
+    fullWidth?: boolean;
 }
 
 export const NeonButton = ({
@@ -19,6 +21,8 @@ export const NeonButton = ({
     size = 'md',
     className,
     glow = true,
+    fullWidth = false,
+    color,
     ...props
 }: NeonButtonProps) => {
 
@@ -28,6 +32,11 @@ export const NeonButton = ({
         danger: "bg-neon-red/10 border-neon-red/50 text-neon-red hover:bg-neon-red/20 hover:border-neon-red",
         ghost: "bg-transparent border-transparent text-neural-muted hover:text-neural-text hover:bg-white/5",
     };
+
+    // Override colors if specified (quick fix for amber buttons requested in dashboard)
+    const colorStyles = color === 'amber'
+        ? "bg-amber-500/10 border-amber-500/50 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500 hover:shadow-amber-500"
+        : variants[variant];
 
     const sizes = {
         sm: "px-4 py-2 text-sm",
@@ -46,9 +55,10 @@ export const NeonButton = ({
             }}
             className={cn(
                 "relative rounded-xl border backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2",
-                variants[variant],
+                color ? colorStyles : variants[variant],
                 sizes[size],
                 glow && variant !== 'ghost' ? "shadow-[0_0_15px_rgba(0,0,0,0.2)]" : "",
+                fullWidth ? "w-full" : "",
                 className
             )}
             {...props}

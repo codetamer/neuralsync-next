@@ -219,6 +219,115 @@ export const BIAS_ITEMS: BiasItem[] = [
         ],
         explanation: 'Hindsight bias often makes us misremember our past predictions to align with known outcomes.',
         difficulty: 5
+    },
+
+    // ========================================================================
+    // EXPANSION SET: Additional Bias Items (7 new items, one per type)
+    // ========================================================================
+
+    // ANCHORING - New
+    {
+        id: 'BIAS_ANCHOR_03',
+        type: 'anchoring',
+        scenario: 'A store lists a jacket at $400 with a "50% off" sticker showing $200. A similar jacket elsewhere costs $180. Which is the better deal?',
+        options: [
+            { text: 'The $200 jacket - I\'m saving 50%', score: 1, biased: true },
+            { text: 'The $180 jacket - actual lower price', score: 5, biased: false },
+            { text: 'The $200 jacket - higher original price means higher quality', score: 1, biased: true },
+            { text: 'They\'re about the same', score: 2, biased: true }
+        ],
+        explanation: 'The $400 "original price" is an anchor. The actual cost matters more than the perceived discount.',
+        difficulty: 4
+    },
+
+    // SUNK COST - New
+    {
+        id: 'BIAS_SUNK_03',
+        type: 'sunk_cost',
+        scenario: 'You\'ve been in a relationship for 5 years but are deeply unhappy. When considering leaving, what should matter most?',
+        options: [
+            { text: 'The 5 years I\'ve already invested', score: 1, biased: true },
+            { text: 'My future happiness and wellbeing', score: 5, biased: false },
+            { text: 'What friends and family will think', score: 2, biased: true },
+            { text: 'Whether things might eventually improve', score: 3, biased: false }
+        ],
+        explanation: 'Time already spent cannot be recovered. Decisions should focus on future outcomes, not past investments.',
+        difficulty: 6
+    },
+
+    // CONFIRMATION - New
+    {
+        id: 'BIAS_CONFIRM_03',
+        type: 'confirmation',
+        scenario: 'You\'ve formed an opinion about a political issue. To be intellectually honest, you should:',
+        options: [
+            { text: 'Read articles from news sources that share my view', score: 1, biased: true },
+            { text: 'Actively seek out and consider opposing viewpoints', score: 5, biased: false },
+            { text: 'Discuss with friends who agree with me to strengthen my argument', score: 1, biased: true },
+            { text: 'Avoid the topic to prevent conflict', score: 2, biased: true }
+        ],
+        explanation: 'Confirmation bias is strongest on emotionally charged topics. Intellectual honesty requires engaging with opposing views.',
+        difficulty: 5
+    },
+
+    // AVAILABILITY - New
+    {
+        id: 'BIAS_AVAIL_03',
+        type: 'availability',
+        scenario: 'You can think of several friends who became successful entrepreneurs. This makes you feel:',
+        options: [
+            { text: 'Starting a business is fairly easy and likely to succeed', score: 1, biased: true },
+            { text: 'I should check actual success rates for new businesses', score: 5, biased: false },
+            { text: 'I\'m surrounded by talented people, so I must be talented too', score: 2, biased: true },
+            { text: 'Now is a great time to start a business', score: 1, biased: true }
+        ],
+        explanation: 'We remember successes more than failures (survivorship bias). Most businesses fail; easy recall of successes distorts perception.',
+        difficulty: 5
+    },
+
+    // FRAMING - New
+    {
+        id: 'BIAS_FRAME_03',
+        type: 'framing',
+        scenario: 'A manager describes layoffs as "rightsizing for efficiency." An employee calls it "cutting jobs to boost profits." These are:',
+        options: [
+            { text: 'Different situations - one sounds positive, one negative', score: 1, biased: true },
+            { text: 'The same event framed from different perspectives', score: 5, biased: false },
+            { text: 'The manager is more accurate because they have more information', score: 1, biased: true },
+            { text: 'The employee is more honest', score: 2, biased: false }
+        ],
+        explanation: 'Both describe the same action. The framing changes emotional response but not the underlying reality.',
+        difficulty: 4
+    },
+
+    // BANDWAGON - New
+    {
+        id: 'BIAS_BAND_03',
+        type: 'bandwagon',
+        scenario: 'A restaurant has a long line while the one next door is empty. You should:',
+        options: [
+            { text: 'Join the line - so many people can\'t be wrong', score: 2, biased: true },
+            { text: 'Check reviews for both and decide based on your preferences', score: 5, biased: false },
+            { text: 'The empty one must have something wrong with it', score: 1, biased: true },
+            { text: 'Go to the popular one - crowds indicate quality', score: 2, biased: true }
+        ],
+        explanation: 'Crowds can form for many reasons (timing, viral post, one good review). Your own research is more reliable.',
+        difficulty: 4
+    },
+
+    // HINDSIGHT - New
+    {
+        id: 'BIAS_HIND_03',
+        type: 'hindsight',
+        scenario: 'A stock you considered buying tripled in value. Looking back, you think:',
+        options: [
+            { text: 'I knew it would go up - I should have trusted my instincts', score: 1, biased: true },
+            { text: 'Success wasn\'t predictable; I made a reasonable decision with the info I had', score: 5, biased: false },
+            { text: 'I\'ll definitely act on my hunches next time', score: 1, biased: true },
+            { text: 'Missing this proves I\'m bad at investing', score: 2, biased: true }
+        ],
+        explanation: 'After outcomes are known, we overestimate our ability to have predicted them. Past uncertainty felt real at the time.',
+        difficulty: 6
     }
 ];
 

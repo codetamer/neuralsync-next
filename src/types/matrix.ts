@@ -70,7 +70,16 @@ export type RuleType =
     | 'color_cycle'      // colors rotate through cycle
     | 'size_cycle'       // sizes rotate through cycle
     | 'negation'         // fill inverts (solid <-> outline)
-    | 'conditional';     // if X then Y, else Z
+    | 'conditional'      // if X then Y, else Z
+    | 'symmetry'         // diagonal/horizontal/vertical symmetry
+    | 'alternating'      // pattern alternates (A-B-A)
+    | 'shift'            // shapes shift through cycle
+    | 'identity'         // same element on diagonal/scope
+    | 'formula'          // mathematical formula
+    | 'sum'              // elements sum to target
+    | 'latin_square'     // multi-dimensional constraints
+    | 'fill_cycle'       // fill alternates through cycle
+    | 'operation';       // generic operation (add/subtract/xor)
 
 export interface ProgressionRule {
     type: 'progression';
@@ -82,7 +91,7 @@ export interface ProgressionRule {
 export interface RotationRule {
     type: 'rotation';
     degrees: number;     // 45, 90, 180
-    direction: 'row' | 'col';
+    direction: 'row' | 'col' | 'sequential';
 }
 
 export interface DistributionRule {
@@ -112,6 +121,7 @@ export interface SizeCycleRule {
 export interface NegationRule {
     type: 'negation';
     direction: 'row' | 'col';
+    property?: 'fill' | 'color' | 'shape';
 }
 
 export interface ConditionalRule {
@@ -119,6 +129,60 @@ export interface ConditionalRule {
     condition: { property: string; value: any };
     thenApply: MatrixRule;
     elseApply: MatrixRule;
+}
+
+// Extended rules for new categories
+export interface SymmetryRule {
+    type: 'symmetry';
+    axis: 'diagonal' | 'horizontal' | 'vertical';
+}
+
+export interface AlternatingRule {
+    type: 'alternating';
+    pattern: string[];
+    scope: 'row' | 'col';
+    property?: 'shape' | 'color' | 'size' | 'fill';
+}
+
+export interface ShiftRule {
+    type: 'shift';
+    direction: 'row' | 'col';
+    cycle: string[];
+}
+
+export interface IdentityRule {
+    type: 'identity';
+    scope: 'diagonal' | 'row' | 'col';
+}
+
+export interface FormulaRule {
+    type: 'formula';
+    formula: string;
+    property: string;
+}
+
+export interface SumRule {
+    type: 'sum';
+    target: number;
+    property: 'count' | 'size';
+    scope: 'row' | 'col';
+}
+
+export interface LatinSquareRule {
+    type: 'latin_square';
+    dimensions: string[];
+}
+
+export interface FillCycleRule {
+    type: 'fill_cycle';
+    pattern: string[];
+    direction: 'row' | 'col';
+}
+
+export interface OperationRule {
+    type: 'operation';
+    operation: 'add' | 'subtract' | 'xor' | 'subtraction';
+    direction: 'row' | 'col';
 }
 
 export type MatrixRule =
@@ -129,7 +193,16 @@ export type MatrixRule =
     | ColorCycleRule
     | SizeCycleRule
     | NegationRule
-    | ConditionalRule;
+    | ConditionalRule
+    | SymmetryRule
+    | AlternatingRule
+    | ShiftRule
+    | IdentityRule
+    | FormulaRule
+    | SumRule
+    | LatinSquareRule
+    | FillCycleRule
+    | OperationRule;
 
 // ============================================================================
 // MATRIX PUZZLE
@@ -154,7 +227,11 @@ export type MatrixCategory =
     | 'distribution'
     | 'overlay'
     | 'multi_rule'
-    | 'conditional';
+    | 'conditional'
+    | 'symmetry'
+    | 'operation'
+    | 'nested'
+    | 'negation';
 
 // ============================================================================
 // COLOR PALETTE

@@ -34,6 +34,10 @@ export default function MainApp() {
     useEffect(() => {
         if (isTestComplete && !showResults) {
             setShowGatedAd(true);
+        } else if (!isTestComplete) {
+            // Reset view when test is reset/restarted
+            setShowResults(false);
+            setShowGatedAd(false);
         }
     }, [isTestComplete, showResults]);
 
@@ -48,7 +52,8 @@ export default function MainApp() {
 
     return (
         <AppShell>
-            <AnimatePresence mode="wait">
+            {/* Overlays */}
+            <AnimatePresence>
                 {showInterstitial && (
                     <AdSlotB key="ad-b" onComplete={handleInterstitialComplete} />
                 )}
@@ -56,13 +61,14 @@ export default function MainApp() {
                 {showGatedAd && (
                     <AdSlotD key="ad-d" onComplete={handleGatedAdComplete} />
                 )}
+            </AnimatePresence>
 
-                {showResults && (
+            {/* Main Content */}
+            <AnimatePresence mode="wait">
+                {showResults ? (
                     <ResultsCertificate key="results" />
-                )}
-
-                {!showInterstitial && !showGatedAd && !showResults && (
-                    <StageController />
+                ) : (
+                    <StageController key="stage-controller" />
                 )}
             </AnimatePresence>
         </AppShell>

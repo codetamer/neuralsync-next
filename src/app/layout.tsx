@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
+import { AuthProvider } from "../context/AuthContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -30,9 +31,11 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} antialiased min-h-screen relative`}
       >
-        <div className="relative z-10">
-          {children}
-        </div>
+        <AuthProvider>
+          <div className="relative z-10">
+            {children}
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '../../lib/utils';
+import { useThemeStore } from '../../store/useThemeStore';
 
 interface Particle {
     id: number;
@@ -23,10 +24,12 @@ const generateParticles = (count: number): Particle[] => {
     }));
 };
 
-import { useThemeStore } from '../../store/useThemeStore';
-
 export const AnimatedBackground = () => {
-    const particles = useMemo(() => generateParticles(25), []);
+    const [particles, setParticles] = useState<Particle[]>([]);
+
+    useEffect(() => {
+        setParticles(generateParticles(25));
+    }, []);
     const { theme } = useThemeStore();
 
     // Theme Configuration
