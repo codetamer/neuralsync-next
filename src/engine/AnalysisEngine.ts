@@ -41,6 +41,7 @@ export interface DeepInsight {
         hook: string;
         flex: string;
         path: string;
+        roast?: string;
     };
     brutalTruth: string;
     roast: string;

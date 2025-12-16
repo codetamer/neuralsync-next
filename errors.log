@@ -1,0 +1,3 @@
+﻿src/components/ads/AdSlotD.tsx(172,25): error TS2322: Type '"purple" | "slate"' is not assignable to type '"teal" | "amber" | "purple" | "blue" | "red" | undefined'.
+  Type '"slate"' is not assignable to type '"teal" | "amber" | "purple" | "blue" | "red" | undefined'.
+src/components/results/ResultsStoryMode.tsx(183,65): error TS2339: Property 'roast' does not exist on type '{ hook: string; flex: string; path: string; }'.

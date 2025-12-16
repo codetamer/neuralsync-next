@@ -169,7 +169,7 @@ export const AdSlotD = ({ onComplete }: AdSlotDProps) => {
                         size="lg"
                         className="w-full max-w-sm h-14 text-lg tracking-widest font-bold"
                         glow={timeLeft === 0}
-                        color={timeLeft === 0 ? 'purple' : 'slate'}
+                        color={timeLeft === 0 ? 'purple' : undefined}
                     >
                         {timeLeft > 0 ? (
                             <span className="flex items-center gap-3 opacity-50">
