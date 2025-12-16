@@ -4,6 +4,7 @@ import {
     calculateFinalScores,
     createTestSession,
     createRankedSession,
+    createQuickSession,
     adaptStagePath,
     type StageDefinition
 } from '../engine/TestEngine';
@@ -21,6 +22,7 @@ interface TestState {
     isDisqualified: boolean;
     xp: number;
     currentSection: 'INTRO' | 'IQ' | 'EQ' | 'RISK' | 'PERSONALITY';
+    sessionMode: 'STANDARD' | 'RANKED' | 'QUICK';
 
     // Competitive Stats
     elo: number;
@@ -32,6 +34,7 @@ interface TestState {
     nextStage: () => void;
     resetTest: () => void;
     startRankedSession: () => void;
+    startQuickSession: () => void;
     disqualify: () => void;
     returnToHome: () => void;
     resumeTest: () => void;
@@ -56,6 +59,7 @@ export const useTestStore = create<TestState>()(
             isDisqualified: false,
             xp: 0,
             currentSection: 'INTRO',
+            sessionMode: 'STANDARD',
 
             // Competitive Defaults
             elo: 1000,
@@ -87,6 +91,7 @@ export const useTestStore = create<TestState>()(
                 if (currentStage < stages.length - 1) {
                     // --- CAT LOGIC INTEGRATION ---
                     // Before moving to next stage, we check if we should adapt the path
+                    // We look at the LAST response to determine if we should adjust difficulty 
                     // We look at the LAST response to determine if we should adjust difficulty 
                     const lastResponse = responses[responses.length - 1]; // This is the response for currentStage
 
@@ -122,6 +127,7 @@ export const useTestStore = create<TestState>()(
                     isDisqualified: false,
                     xp: 0,
                     currentSection: 'INTRO',
+                    sessionMode: 'STANDARD',
                     // Don't reset ELO on test reset? Or maybe we should? 
                     // Usually ELO is persistent across sessions.
                     // For now, let's KEEP ELO across resets. 
@@ -131,14 +137,30 @@ export const useTestStore = create<TestState>()(
 
             startRankedSession: () => {
                 set({
-                    currentStage: 0,
+                    currentStage: 1, // Skip Intro (Stage 0) -> Go directly to first test (Stage 1)
                     responses: [],
                     stages: createRankedSession(),
                     isTestComplete: false,
                     isPaused: false,
                     isRanked: true,
                     isDisqualified: false,
-                    currentSection: 'INTRO' // Set to INTRO so StageController detects change to IQ and animates
+                    currentSection: 'INTRO',
+                    sessionMode: 'RANKED'
+                });
+            },
+
+            startQuickSession: () => {
+                set({
+                    currentStage: 1, // Skip Intro (Stage 0) -> Go directly to first test (Stage 1)
+                    responses: [],
+                    stages: createQuickSession(),
+                    isTestComplete: false,
+                    isPaused: false,
+                    isRanked: false,
+                    isDisqualified: false,
+                    xp: 0,
+                    currentSection: 'INTRO',
+                    sessionMode: 'QUICK'
                 });
             },
 

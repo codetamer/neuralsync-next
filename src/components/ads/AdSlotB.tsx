@@ -7,9 +7,10 @@ import { Zap } from 'lucide-react';
 
 interface AdSlotBProps {
     onComplete: () => void;
+    nextSection: string;
 }
 
-export const AdSlotB = ({ onComplete }: AdSlotBProps) => {
+export const AdSlotB = ({ onComplete, nextSection }: AdSlotBProps) => {
     const [timeLeft, setTimeLeft] = useState(3);
     const [canSkip, setCanSkip] = useState(false);
 
@@ -42,26 +43,31 @@ export const AdSlotB = ({ onComplete }: AdSlotBProps) => {
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                         className="w-16 h-16 border-4 border-neon-teal border-t-transparent rounded-full mx-auto"
                     />
-                    <h2 className="text-2xl font-display font-bold text-white">NEURAL RECHARGE IN PROGRESS</h2>
-                    <p className="text-neural-muted">Optimizing synaptic pathways...</p>
+                    <h2 className="text-2xl font-display font-bold text-white">SYSTEM CALIBRATION</h2>
+                    <p className="text-neural-muted">
+                        Initializing {nextSection} protocols...
+                    </p>
                 </div>
 
                 {/* Ad Container */}
                 <div className="w-full aspect-video bg-neural-bg/50 rounded-xl border border-white/10 flex items-center justify-center relative overflow-hidden group">
                     <div className="absolute inset-0 bg-gradient-to-tr from-neon-purple/10 to-neon-blue/10 opacity-50" />
                     <span className="font-mono text-sm text-neural-muted group-hover:text-white transition-colors">
-                        ADVERTISEMENT_SLOT_B_INTERSTITIAL
+                        SPONSORED_CONTENT_SLOT
                     </span>
+                    <div className="absolute bottom-2 right-2 text-[10px] text-white/20 font-mono">
+                        ADVERTISEMENT
+                    </div>
                 </div>
 
                 <div className="h-12 flex items-center justify-center">
                     {canSkip ? (
                         <NeonButton onClick={onComplete} className="w-full" glow>
-                            RESUME EVALUATION <Zap className="ml-2 w-4 h-4" />
+                            PROCEED TO {nextSection} <Zap className="ml-2 w-4 h-4" />
                         </NeonButton>
                     ) : (
-                        <div className="font-mono text-neon-teal">
-                            RESUME IN {timeLeft}s
+                        <div className="font-mono text-neon-teal animate-pulse">
+                            CALIBRATING... {timeLeft}s
                         </div>
                     )}
                 </div>

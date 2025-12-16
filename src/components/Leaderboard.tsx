@@ -40,11 +40,15 @@ export const Leaderboard = ({ onClose }: LeaderboardProps) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let isMounted = true;
+
         const fetchLeaderboard = async () => {
             setLoading(true);
             try {
                 // Fetch top 50 players
                 const profiles = await UserService.getLeaderboard(50);
+
+                if (!isMounted) return;
 
                 const mappedEntries: LeaderboardEntry[] = profiles.map((profile, index) => ({
                     rank: index + 1,
@@ -57,13 +61,17 @@ export const Leaderboard = ({ onClose }: LeaderboardProps) => {
 
                 setEntries(mappedEntries);
             } catch (error) {
-                console.error("Failed to fetch leaderboard:", error);
+                if (isMounted) console.error("Failed to fetch leaderboard:", error);
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
 
         fetchLeaderboard();
+
+        return () => {
+            isMounted = false;
+        };
     }, [user]); // Re-fetch if user auth state changes (to highlight correctly)
 
 

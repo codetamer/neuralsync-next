@@ -18,6 +18,7 @@ import { FocusMonitor } from './FocusMonitor';
 import { AuthModal } from '../auth/AuthModal';
 import { useAuth } from '../../context/AuthContext';
 import { UserDropdown } from './UserDropdown';
+import { ProgressBar } from '../ui/ProgressBar';
 
 
 interface AppShellProps {
@@ -25,7 +26,7 @@ interface AppShellProps {
 }
 
 export const AppShell = ({ children }: AppShellProps) => {
-    const { resetTest, returnToHome, getProgress, currentStage, isTestComplete, xp } = useTestStore();
+    const { resetTest, returnToHome, getProgress, currentStage, isTestComplete, xp, isPaused, currentSection, stages } = useTestStore();
     const { user, signOut } = useAuth();
     const [muted, setMuted] = useState(false);
     const [showDevControls, setShowDevControls] = useState(false);
@@ -127,7 +128,7 @@ export const AppShell = ({ children }: AppShellProps) => {
             <div className="relative z-10 flex flex-col min-h-screen">
                 <AdSlotA />
 
-                <header className="w-full p-4 flex justify-between items-center border-b border-white/5 bg-neural-card backdrop-blur-sm">
+                <header className="w-full p-4 flex justify-between items-center border-b border-white/5 bg-neural-card backdrop-blur-sm relative z-[999]">
                     <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                         <Logo className="w-12 h-12" />
                         <h1 className="text-xl font-display font-bold tracking-wide">
@@ -175,23 +176,19 @@ export const AppShell = ({ children }: AppShellProps) => {
                     </div>
                 </header>
 
-                {/* Progress Bar */}
-                {currentStage > 0 && !isTestComplete && (
+                {/* Enhanced Progress Bar - Only show during active test */}
+                {currentStage > 0 && !isTestComplete && !isPaused && (
                     <div className="w-full bg-neural-card backdrop-blur-sm border-b border-white/5">
-                        <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-between">
-                            <div className="flex-1 mr-4">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className="text-[11px] font-mono text-neural-muted">PROGRESS</span>
-                                    <span className="text-[11px] font-mono text-neon-teal">{progress}%</span>
-                                </div>
-                                <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-neon-teal to-neon-blue transition-all duration-500 shadow-[0_0_10px_rgba(34,211,238,0.5)]"
-                                        style={{ width: `${progress}%` }}
-                                    />
-                                </div>
+                        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+                            <div className="flex-1">
+                                <ProgressBar
+                                    currentStage={currentStage}
+                                    totalStages={stages.length}
+                                    currentSection={currentSection}
+                                    estimatedTotalMinutes={8}
+                                />
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-shrink-0">
                                 <NeonButton
                                     onClick={handleHomeClick}
                                     variant="secondary"

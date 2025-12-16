@@ -29,6 +29,7 @@ export const RankedResultsDashboard = () => {
         responses,
         stages,
         resetTest,
+        startRankedSession,
         updateElo,
         isTestComplete
     } = useTestStore();
@@ -214,14 +215,14 @@ export const RankedResultsDashboard = () => {
                         <div className={`absolute inset-0 opacity-10 blur-3xl ${gradeStyle.bg}`} />
                         <h3 className="text-neural-muted font-mono tracking-widest text-sm mb-4">MATCH GRADE</h3>
                         <motion.div
-                            initial={{ scale: 0.5, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ type: "spring", stiffness: 200 }}
-                            className={`text-9xl font-display font-bold ${gradeStyle.color} drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]`}
+                            initial={{ scale: 3, opacity: 0, rotate: -10 }}
+                            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.2 }}
+                            className={`text-9xl font-display font-bold ${gradeStyle.color} drop-shadow-[0_0_50px_rgba(255,255,255,0.4)]`}
                         >
                             {rankedScore.grade}
                         </motion.div>
-                        <RankBadge tier={newTier} size="lg" className="mt-6" />
+                        <RankBadge tier={newTier} size="lg" className="mt-6 scale-110" />
                         <div className="mt-2 text-2xl font-bold text-white">{elo} <span className="text-sm font-normal text-white/50">RP</span></div>
                     </GlassCard>
 
@@ -252,33 +253,56 @@ export const RankedResultsDashboard = () => {
                         </div>
 
                         {/* Micro Stats */}
-                        <div className="space-y-6 flex flex-col justify-center">
+                        <motion.div
+                            initial="hidden"
+                            animate="visible"
+                            variants={{
+                                hidden: { opacity: 0 },
+                                visible: {
+                                    opacity: 1,
+                                    transition: { staggerChildren: 0.1, delayChildren: 0.5 }
+                                }
+                            }}
+                            className="space-y-6 flex flex-col justify-center"
+                        >
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                                <motion.div
+                                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                                    className="bg-white/5 p-4 rounded-xl border border-white/10"
+                                >
                                     <div className="flex items-center gap-2 text-neon-cyan mb-1">
                                         <Zap className="w-4 h-4" />
                                         <span className="text-xs font-bold">APM</span>
                                     </div>
                                     <div className="text-3xl font-mono text-white">{cognitiveAPM}</div>
                                     <div className="text-xs text-white/40">Actions / Min</div>
-                                </div>
-                                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                                </motion.div>
+                                <motion.div
+                                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                                    className="bg-white/5 p-4 rounded-xl border border-white/10"
+                                >
                                     <div className="flex items-center gap-2 text-purple-400 mb-1">
                                         <Crosshair className="w-4 h-4" />
                                         <span className="text-xs font-bold">ACCURACY</span>
                                     </div>
                                     <div className="text-3xl font-mono text-white">{rankedScore.accuracy}%</div>
                                     <div className="text-xs text-white/40">Precision Rating</div>
-                                </div>
-                                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                                </motion.div>
+                                <motion.div
+                                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                                    className="bg-white/5 p-4 rounded-xl border border-white/10"
+                                >
                                     <div className="flex items-center gap-2 text-amber-400 mb-1">
                                         <Activity className="w-4 h-4" />
                                         <span className="text-xs font-bold">CONSISTENCY</span>
                                     </div>
                                     <div className="text-3xl font-mono text-white">{consistencyScore}%</div>
                                     <div className="text-xs text-white/40">Mental Stability</div>
-                                </div>
-                                <div className="bg-white/5 p-4 rounded-xl border border-white/10">
+                                </motion.div>
+                                <motion.div
+                                    variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                                    className="bg-white/5 p-4 rounded-xl border border-white/10"
+                                >
                                     <div className="flex items-center gap-2 text-green-400 mb-1">
                                         <TrendingUp className="w-4 h-4" />
                                         <span className="text-xs font-bold">ELO CHANGE</span>
@@ -287,9 +311,9 @@ export const RankedResultsDashboard = () => {
                                         {eloDelta > 0 ? '+' : ''}{eloDelta}
                                     </div>
                                     <div className="text-xs text-white/40">Rank Points</div>
-                                </div>
+                                </motion.div>
                             </div>
-                        </div>
+                        </motion.div>
                     </GlassCard>
                 </div>
 
@@ -365,7 +389,7 @@ export const RankedResultsDashboard = () => {
                             <NeonButton onClick={() => setShowLeaderboard(true)} fullWidth color="amber" glow>
                                 <Crown className="w-4 h-4 mr-2" /> LEADERBOARD
                             </NeonButton>
-                            <NeonButton onClick={resetTest} fullWidth variant="secondary">
+                            <NeonButton onClick={startRankedSession} fullWidth variant="secondary">
                                 <RotateCcw className="w-4 h-4 mr-2" /> PLAY AGAIN
                             </NeonButton>
                             <NeonButton onClick={resetTest} fullWidth variant="ghost">

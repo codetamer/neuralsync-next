@@ -7,7 +7,7 @@ import { ValidationEngine } from './ValidationEngine';
 import { BIAS_ITEMS } from '../data/biasContent';
 import { VOCABULARY_ITEMS } from '../data/vocabularyContent';
 
-export type StageType = 'matrix' | 'stroop' | 'bart' | 'personality' | 'intro' | 'scenario' | 'debug' | 'outro' | 'nback' | 'digitspan' | 'spatialspan' | 'symbolmatch' | 'reactiontime' | 'vocabulary' | 'trailmaking' | 'biasaudit';
+export type StageType = 'matrix' | 'stroop' | 'bart' | 'personality' | 'intro' | 'scenario' | 'debug' | 'outro' | 'nback' | 'digitspan' | 'spatialspan' | 'symbolmatch' | 'reactiontime' | 'vocabulary' | 'trailmaking' | 'biasaudit' | 'emotion';
 export type DifficultyLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 
 export interface StageDefinition {
@@ -65,7 +65,96 @@ export const createRankedSession = (): StageDefinition[] => {
     return stages;
 };
 
+// --- QUICK SCAN FACTORY: Ultra-fast ~4-5 minute assessment ---
+// Provides core insights without exhaustive testing
+export const createQuickSession = (): StageDefinition[] => {
+    const stages: StageDefinition[] = [
+        { stage: 0, type: 'intro', title: 'Quick Scan', difficulty: 1, description: 'Rapid cognitive snapshot - 4-5 minutes' }
+    ];
+
+    let stageCount = 1;
+
+    // 1. REACTION TIME (Quick cognitive speed baseline)
+    stages.push({
+        stage: stageCount++,
+        type: 'reactiontime',
+        title: 'Neural Reflex',
+        difficulty: 3,
+        description: 'Test your reflexes and response speed.'
+    });
+
+    // 2. MATRIX (4 puzzles only - covers fluid IQ)
+    const selectedMatrices = selectRandomItems(MATRIX_PUZZLES, 4);
+    selectedMatrices.forEach((puzzle, index) => {
+        stages.push({
+            stage: stageCount++,
+            type: 'matrix',
+            title: `Pattern ${index + 1}`,
+            difficulty: puzzle.difficulty as DifficultyLevel,
+            description: 'Quick pattern analysis.',
+            contentId: puzzle.id
+        });
+    });
+
+    // 3. EQ SCENARIOS (4 quick scenarios)
+    const selectedEQ = selectRandomItems(EQ_SCENARIOS, 4);
+    selectedEQ.forEach((scenario, index) => {
+        stages.push({
+            stage: stageCount++,
+            type: 'scenario',
+            title: `Scenario ${index + 1}`,
+            difficulty: 5,
+            description: 'Quick social assessment.',
+            contentId: scenario.id
+        });
+    });
+
+    // 4. EMOTION RECOGNITION (Quick)
+    stages.push({
+        stage: stageCount++,
+        type: 'emotion',
+        title: 'Micro-Expression',
+        difficulty: 5,
+        description: 'Rapid emotion identification.'
+    });
+
+    // 5. BART (Risk assessment - engaging and fast)
+    stages.push({
+        stage: stageCount++,
+        type: 'bart',
+        title: 'Risk Profile',
+        difficulty: 5,
+        description: 'Quick risk tolerance check.'
+    });
+
+    // 5. PERSONALITY (2 items per trait = 12 items for Quick Scan)
+    const hItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'honesty'), 2);
+    const eItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'emotionality'), 2);
+    const xItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'extraversion'), 2);
+    const aItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'agreeableness'), 2);
+    const cItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'conscientiousness'), 2);
+    const oItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'openness'), 2);
+    // Total 12 items
+    const personalityMix = [
+        ...hItems, ...eItems, ...xItems, ...aItems, ...cItems, ...oItems
+    ].sort(() => 0.5 - Math.random());
+
+    personalityMix.forEach((item, index) => {
+        stages.push({
+            stage: stageCount++,
+            type: 'personality',
+            title: `Quick Trait ${index + 1}`,
+            difficulty: 3,
+            description: 'Rapid self-assessment.',
+            contentId: item.id
+        });
+    });
+
+    return stages;
+};
+
 // --- FACTORY FUNCTION: Create a new unique test session ---
+// OPTIMIZED: Reduced from 12-15 min to ~7-8 min while maintaining validity
 export const createTestSession = (): StageDefinition[] => {
     // 0. Intro
     const stages: StageDefinition[] = [
@@ -74,10 +163,10 @@ export const createTestSession = (): StageDefinition[] => {
 
     let stageCount = 1;
 
-    // 1. FLUID INTELLIGENCE BLOCK (15 Stages)
-    // Use new MATRIX_PUZZLES as primary, supplement with legacy if needed
-    const selectedMatrices = selectRandomItems(MATRIX_PUZZLES, 10);
-    const selectedLogic = selectRandomItems(LOGIC_PUZZLES, 5);
+    // 1. FLUID INTELLIGENCE BLOCK (8 Stages total - reduced from 15)
+    // Use new MATRIX_PUZZLES as primary, supplement with logic puzzles
+    const selectedMatrices = selectRandomItems(MATRIX_PUZZLES, 6); // Reduced from 10
+    const selectedLogic = selectRandomItems(LOGIC_PUZZLES, 2);     // Reduced from 5
 
     // Interleave visual matrices with logic puzzles
     const iqMix: { id: string; difficulty: number; discrimination: number }[] = [];
@@ -167,8 +256,8 @@ export const createTestSession = (): StageDefinition[] => {
         description: 'Identify and resist common decision-making biases.'
     });
 
-    // 3. EQ BLOCK (10 items from 40 pool)
-    const selectedEQ = selectRandomItems(EQ_SCENARIOS, 10);
+    // 7. EQ BLOCK (6 items from 40 pool - reduced from 10)
+    const selectedEQ = selectRandomItems(EQ_SCENARIOS, 6);
     selectedEQ.forEach((scenario, index) => {
         stages.push({
             stage: stageCount++,
@@ -180,7 +269,16 @@ export const createTestSession = (): StageDefinition[] => {
         });
     });
 
-    // 4. RISK BLOCK (BART)
+    // 8. EMOTION RECOGNITION (Full)
+    stages.push({
+        stage: stageCount++,
+        type: 'emotion',
+        title: 'Micro-Expression Analysis',
+        difficulty: 7,
+        description: 'Identify fleeting emotional cues.'
+    });
+
+    // 9. RISK BLOCK (BART)
     stages.push({
         stage: stageCount++,
         type: 'bart',
@@ -189,14 +287,15 @@ export const createTestSession = (): StageDefinition[] => {
         description: 'Evaluate risk vs reward potential.'
     });
 
-    // 5. PERSONALITY BLOCK (6 per trait = 36 items + 2 checks = 38 total)
-    const hItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'honesty'), 6);
-    const eItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'emotionality'), 6);
-    const xItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'extraversion'), 6);
-    const aItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'agreeableness'), 6);
-    const cItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'conscientiousness'), 6);
-    const oItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'openness'), 6);
-    const checks = selectRandomItems(ATTENTION_CHECKS, 2);
+    // 9. PERSONALITY BLOCK (HEXACO-24: 4 per trait = 24 items + 1 check = 25 total)
+    // Detailed analysis
+    const hItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'honesty'), 4);
+    const eItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'emotionality'), 4);
+    const xItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'extraversion'), 4);
+    const aItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'agreeableness'), 4);
+    const cItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'conscientiousness'), 4);
+    const oItems = selectRandomItems(HEXACO_ITEMS.filter(i => i.category === 'openness'), 4);
+    const checks = selectRandomItems(ATTENTION_CHECKS, 1); // Reduced from 2 to 1
 
     const personalityMix = [
         ...hItems, ...eItems, ...xItems, ...aItems, ...cItems, ...oItems, ...checks
@@ -353,7 +452,10 @@ function calculateIQ(responses: ResponseData[], stages: StageDefinition[]): { sc
 
 // 2. EQ Calculation
 function calculateEQ(responses: ResponseData[], stages: StageDefinition[]): { score: number, percentile: number } {
-    const eqResponses = responses.filter(r => stages[r.stage]?.type === 'scenario');
+    const eqResponses = responses.filter(r => {
+        const type = stages[r.stage]?.type;
+        return type === 'scenario' || type === 'emotion';
+    });
 
     if (eqResponses.length === 0) return { score: 100, percentile: 50 };
 
@@ -362,18 +464,24 @@ function calculateEQ(responses: ResponseData[], stages: StageDefinition[]): { sc
 
     eqResponses.forEach(r => {
         const stageDef = stages[r.stage];
-        const scenario = EQ_SCENARIOS.find(s => s.id === stageDef.contentId);
 
-        if (scenario) {
-            const choiceIndex = Number(r.choice);
-            if (scenario.options[choiceIndex]) {
-                totalPoints += scenario.options[choiceIndex].score;
-            }
+        if (stageDef.type === 'emotion') {
+            // Emotion: 5 points for correct, 0 for incorrect
+            if (r.accuracy) totalPoints += 5;
             maxPoints += 5;
+        } else if (stageDef.type === 'scenario') {
+            const scenario = EQ_SCENARIOS.find(s => s.id === stageDef.contentId);
+            if (scenario) {
+                const choiceIndex = Number(r.choice);
+                if (scenario.options[choiceIndex]) {
+                    totalPoints += scenario.options[choiceIndex].score;
+                }
+                maxPoints += 5;
+            }
         }
     });
 
-    const percentage = totalPoints / maxPoints;
+    const percentage = maxPoints > 0 ? totalPoints / maxPoints : 0.5;
     const rawEQ = 65 + (percentage * 80); // 65-145 range
 
     return {

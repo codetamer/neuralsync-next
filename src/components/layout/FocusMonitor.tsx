@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTestStore } from '../../store/useTestStore';
 import { AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,6 +9,7 @@ export const FocusMonitor = () => {
     const { isTestComplete, isPaused, currentStage, stages, isRanked, disqualify } = useTestStore();
     const [blurCount, setBlurCount] = useState(0);
     const [showWarning, setShowWarning] = useState(false);
+    const blurCountRef = useRef(0);
 
     useEffect(() => {
         // Only monitor focus during active test stages (excluding Intro/Home)
@@ -19,22 +20,21 @@ export const FocusMonitor = () => {
         if (currentStageDef?.type === 'intro') return;
 
         const handleBlur = () => {
-            setBlurCount(prev => {
-                const newCount = prev + 1;
+            // Increment ref first for immediate logic
+            blurCountRef.current += 1;
+            const newCount = blurCountRef.current;
 
-                if (isRanked) {
-                    // STRICT MODE: Disqualify immediately or after threshold
-                    // For "Real" feature, let's be strict: Immediate DQ or strict warning then DQ
-                    if (newCount > 1) { // Allow 1 accidental slip, 2nd is DQ
-                        disqualify();
-                        // We don't return here because disqualify() updates isTestComplete which triggers effect cleanup
-                    }
+            // Sync with UI state
+            setBlurCount(newCount);
+            setShowWarning(true);
+
+            if (isRanked) {
+                // STRICT MODE: Disqualify immediately or after threshold
+                // For "Real" feature, let's be strict: Immediate DQ or strict warning then DQ
+                if (newCount > 1) { // Allow 1 accidental slip, 2nd is DQ
+                    disqualify();
                 }
-
-                // Show warning when blurred (cheat detected)
-                setShowWarning(true);
-                return newCount;
-            });
+            }
         };
 
         const handleFocus = () => {

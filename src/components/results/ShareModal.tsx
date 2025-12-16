@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toPng, toBlob } from 'html-to-image';
-import { X, Download, Copy, Share2, Check, Brain, Heart, Zap, TrendingUp, Smartphone, Layout, Award } from 'lucide-react';
+import { X, Download, Copy, Share2, Check, Brain, Heart, Zap, TrendingUp, Smartphone, Layout, Award, Swords, Link as LinkIcon } from 'lucide-react';
 import { NeonButton } from '../ui/NeonButton';
 import { useTestStore } from '../../store/useTestStore';
 import { RankBadge } from '../ui/RankBadge';
@@ -31,7 +31,7 @@ interface ShareModalProps {
 export const ShareModal = ({ isOpen, onClose, scores, archetype = "Adaptive Generalist" }: ShareModalProps) => {
     const [copied, setCopied] = useState(false);
     const [isCapturing, setIsCapturing] = useState(false);
-    const [shareMode, setShareMode] = useState<'classic' | 'story'>('classic');
+    const [shareMode, setShareMode] = useState<'classic' | 'story' | 'challenge'>('classic');
     const { elo, rankTier } = useTestStore();
     const cardRef = useRef<HTMLDivElement>(null);
 
@@ -52,7 +52,7 @@ export const ShareModal = ({ isOpen, onClose, scores, archetype = "Adaptive Gene
 
             const link = document.createElement('a');
             link.href = dataUrl;
-            link.download = `neuralsync-${shareMode}-${Date.now()}.png`;
+            link.download = 'neuralsync-' + shareMode + '-' + Date.now() + '.png';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -117,8 +117,8 @@ export const ShareModal = ({ isOpen, onClose, scores, archetype = "Adaptive Gene
                                 <button
                                     onClick={() => setShareMode('classic')}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all ${shareMode === 'classic'
-                                        ? 'bg-neon-teal text-neural-bg shadow-sm'
-                                        : 'text-white/50 hover:text-white hover:bg-white/5'
+                                            ? 'bg-neon-teal text-neural-bg shadow-sm'
+                                            : 'text-white/50 hover:text-white hover:bg-white/5'
                                         }`}
                                 >
                                     <Layout className="w-3.5 h-3.5" />
@@ -127,12 +127,22 @@ export const ShareModal = ({ isOpen, onClose, scores, archetype = "Adaptive Gene
                                 <button
                                     onClick={() => setShareMode('story')}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all ${shareMode === 'story'
-                                        ? 'bg-neon-teal text-neural-bg shadow-sm'
-                                        : 'text-white/50 hover:text-white hover:bg-white/5'
+                                            ? 'bg-neon-teal text-neural-bg shadow-sm'
+                                            : 'text-white/50 hover:text-white hover:bg-white/5'
                                         }`}
                                 >
                                     <Smartphone className="w-3.5 h-3.5" />
                                     STORY MODE
+                                </button>
+                                <button
+                                    onClick={() => setShareMode('challenge')}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all ${shareMode === 'challenge'
+                                            ? 'bg-red-500 text-white shadow-sm'
+                                            : 'text-white/50 hover:text-white hover:bg-white/5'
+                                        }`}
+                                >
+                                    <Swords className="w-3.5 h-3.5" />
+                                    CHALLENGE
                                 </button>
                             </div>
                         </div>
@@ -196,6 +206,29 @@ export const ShareModal = ({ isOpen, onClose, scores, archetype = "Adaptive Gene
 
                                             <div className="mt-8 text-center text-white/30 text-[10px] font-mono">
                                                 Beat my score at neuralsync.ai
+                                            </div>
+                                        </div>
+                                    ) : shareMode === 'challenge' ? (
+                                        <div className="flex flex-col items-center gap-4 text-center">
+                                            <div className="relative w-full aspect-video bg-black/40 rounded-xl border border-white/10 flex items-center justify-center overflow-hidden">
+                                                <div className="absolute inset-0 bg-gradient-to-r from-neon-blue/20 to-red-500/20" />
+                                                <div className="flex items-center gap-8 relative z-10">
+                                                    <div className="text-center">
+                                                        <div className="text-xs text-neon-blue font-mono mb-1">YOU</div>
+                                                        <div className="text-3xl font-bold text-white">{scores.iq}</div>
+                                                        <div className="text-[10px] text-white/50">IQ SCORE</div>
+                                                    </div>
+                                                    <div className="text-4xl font-black text-white italic drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">VS</div>
+                                                    <div className="text-center opacity-50">
+                                                        <div className="text-xs text-red-500 font-mono mb-1">THEM</div>
+                                                        <div className="text-3xl font-bold text-white">???</div>
+                                                        <div className="text-[10px] text-white/50">CHALLENGER</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h2 className="text-xl font-bold text-white uppercase italic">Can you beat me?</h2>
+                                                <p className="text-xs text-white/60 mt-1">Accept the gauntlet. Prove your neural architecture.</p>
                                             </div>
                                         </div>
                                     ) : (
@@ -289,7 +322,7 @@ export const ShareModal = ({ isOpen, onClose, scores, archetype = "Adaptive Gene
                             </div>
 
                             <p className="text-xs text-white/50 mt-4 text-center">
-                                {shareMode === 'story' ? 'Perfect for Stories & TikTok' : 'Detailed Report Card'}
+                                {shareMode === 'story' ? 'Perfect for Stories & TikTok' : shareMode === 'challenge' ? 'Send this to your smartest friend' : 'Detailed Report Card'}
                             </p>
                         </div>
 
@@ -319,6 +352,22 @@ export const ShareModal = ({ isOpen, onClose, scores, archetype = "Adaptive Gene
                                     </button>
                                 </div>
                             </div>
+
+                            {shareMode === 'challenge' && (
+                                <div className="flex justify-center pt-2">
+                                    <NeonButton
+                                        onClick={() => {
+                                            const link = `https://neuralsync.app/challenge?id=user-${Date.now()}`;
+                                            navigator.clipboard.writeText(link);
+                                            alert("Challenge link copied! (Simulated)");
+                                        }}
+                                        className="w-full max-w-sm"
+                                        color="red"
+                                    >
+                                        <LinkIcon className="w-4 h-4 mr-2" /> COPY CHALLENGE LINK
+                                    </NeonButton>
+                                </div>
+                            )}
                         </div>
                     </motion.div>
                 </div>

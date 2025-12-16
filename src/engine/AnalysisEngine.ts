@@ -1,4 +1,5 @@
 // Narrow interface for Analysis Engine
+import { validateInsightConsistency, applyConsistencyCorrections } from './ConsistencyValidator';
 export interface AnalysisInput {
     iq: number;
     eq: number;
@@ -36,6 +37,13 @@ export interface DeepInsight {
     raw: string;
     detailedWeaknesses: { title: string; description: string; impact: string }[];
     actionableSteps: string[];
+    storySections?: {
+        hook: string;
+        flex: string;
+        path: string;
+    };
+    brutalTruth: string;
+    roast: string;
 }
 
 export class AnalysisEngine {
@@ -101,6 +109,48 @@ export class AnalysisEngine {
         }
 
         return "Balanced Interaction";
+    }
+
+    private static getBrutalTruth(iq: number, eq: number, risk: number, hexaco: any): string {
+        const { honesty, emotionality, extraversion, agreeableness, conscientiousness } = hexaco;
+
+        // HIGH IQ COMBOS
+        if (iq > 130 && conscientiousness < 30) return "WASTED GENIUS: You have a Ferrari engine but no steering wheel. You're too smart to fail, yet too lazy to succeed.";
+        if (iq > 130 && eq < 40) return "SOCIAL ROBOT: Your logic is flawless, but you have the emotional depth of a spreadsheet. People admire your brain but avoid your company.";
+        if (iq > 120 && risk < 20) return "COWARDLY ARCHITECT: You see every possibility but fear them all. You will watch dumber people succeed because they actually jumped.";
+
+        // LOW IQ COMBOS (Careful here, punch up/sideways) (Assuming >85 average for user base mostly)
+        if (iq < 95 && risk > 80) return "CANNON FODDER: You are brave, but mostly because you don't understand the danger. You are natural selection's favorite toy.";
+
+        // EQ COMBOS
+        if (eq > 130 && agreeableness > 90) return "PROFESSIONAL DOORMAT: You understand everyone's feelings so well you forgot your own. You exist to be used.";
+        if (eq < 40 && agreeableness < 30) return "EMOTIONAL BLACK HOLE: You are not just 'direct', you are actively draining. Relationships die around you.";
+
+        // HEXACO SPECIFIC
+        if (emotionality > 90 && extraversion < 30) return "ANXIETY ENGINE: You suffer in silence and assume everyone is judging you. They aren't; they just don't notice you.";
+        if (honesty < 30 && iq > 110) return "MACHIAVELLIAN PUPPETEER: You don't have friends; you have assets. You think you're playing 4D chess, but you're just lonely.";
+
+        // GENERIC FALLBACKS
+        if (conscientiousness < 40) return "CHAOS AGENT: You confuse 'spontaneity' with being unreliable.";
+        if (agreeableness < 40) return "CONTROVERSY MAGNET: You start fights in empty rooms.";
+        if (emotionality > 80) return "CRISIS ACTOR: Everything is an emergency to you.";
+
+        return "AVERAGE IS SCARY: The most terrifying thing about you is how forgettable your profile is.";
+    }
+
+    private static getRoast(iq: number, eq: number, hexaco: any, archetype: string): string {
+        // A longer form paragraph
+        const parts = [];
+        if (iq > 120) parts.push("You think you're the smartest person in the room (and you might be), but that arrogance is why you eat lunch alone.");
+        else if (iq < 100) parts.push("You struggle to connect dots that others see instantly.");
+
+        if (hexaco.extraversion > 80) parts.push("You scream for attention because silence scares you.");
+        else if (hexaco.extraversion < 30) parts.push("You call it 'introversion', but it's mostly social incompetence.");
+
+        if (hexaco.conscientiousness > 80) parts.push("You have a plan for everything except how to be fun.");
+        else parts.push("You are a walking entropy machine.");
+
+        return `Analysis for ${archetype}: ${parts.join(" ")}`;
     }
 
     public static generate(results: AnalysisInput): DeepInsight {
@@ -598,7 +648,23 @@ export class AnalysisEngine {
         // Construct Raw Terminal Output
         const raw = `> INITIALIZING DEEP SCAN v6.2...\n> DECRYPTING NEURAL SIGNATURE...\n> \n> SUBJECT ANALYTICS:\n> IQ[${iq}] EQ[${eq}] RISK[${riskTolerance}%]\n> H[${hexaco.honesty}] E[${hexaco.emotionality}] X[${hexaco.extraversion}] A[${hexaco.agreeableness}] C[${hexaco.conscientiousness}] O[${hexaco.openness}]\n> \n> DETECTED ARCHETYPE: [${bestMatch.name.toUpperCase()}] (${displayMatchScore}%)\n> "${bestMatch.desc}"\n> \n> HOLISTIC SYNTHESIS:\n> ${holisticSummary}\n> \n> PRIMARY ASSETS:\n> ${strengths.slice(0, 4).map(s => `+ ${s}`).join('\n> ')}\n> \n> CORE WEAKNESSES:\n> ${weaknesses.slice(0, 3).map(w => `! ${w}`).join('\n> ')}\n> \n> OPTIMAL DEPLOYMENT:\n> ${careerText}\n> \n> SYSTEM STATUS: OPTIMIZED.`;
 
-        return {
+        // === 6. STORY MODE GENERATION ===
+        const storySections = {
+            hook: `You are rare. Your Neural Signature matches less than ${Math.max(1, 100 - displayMatchScore)}% of the population.`,
+            flex: strengths.length > 0
+                ? ` Your ${strengths[0].split('(')[0].trim()} is in the top ${100 - iqPercentile}% of all users.`
+                : "Your cognitive profile is incredibly balanced.",
+            roast: detailedWeaknesses.length > 0
+                ? `Your friends probably hate your "${detailedWeaknesses[0].title}". ${detailedWeaknesses[0].description}`
+                : "You are annoyingly perfect. That is your weakness.",
+            path: `Evolutionary Path: ${rankedCareers[0].role} -> ${rankedCareers[1].role}`
+        };
+
+        const brutalTruth = this.getBrutalTruth(iq, eq, riskTolerance, hexaco);
+        const roast = this.getRoast(iq, eq, hexaco, bestMatch.name);
+
+        // Build initial insight
+        const insight: DeepInsight = {
             archetype: bestMatch.name,
             archetypeDesc: bestMatch.desc,
             matchScore: displayMatchScore,
@@ -609,7 +675,24 @@ export class AnalysisEngine {
             osType,
             raw,
             detailedWeaknesses,
-            actionableSteps
+            actionableSteps,
+            storySections,
+            brutalTruth,
+            roast
         };
+
+        // === CONSISTENCY VALIDATION ===
+        // Ensure all insights align with measured scores
+        const consistencyReport = validateInsightConsistency(insight, results);
+
+        // Apply corrections if inconsistencies found (removes invalid weaknesses, etc.)
+        const validatedInsight = applyConsistencyCorrections(insight, consistencyReport);
+
+        // Log consistency issues in development (can be removed in production)
+        if (!consistencyReport.isConsistent && typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+            console.warn('[AnalysisEngine] Consistency issues detected:', consistencyReport.checks.filter(c => !c.passed));
+        }
+
+        return validatedInsight;
     }
 }

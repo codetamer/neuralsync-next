@@ -20,8 +20,8 @@ export const CognitiveDomainCard = ({ data }: CognitiveDomainCardProps) => {
             label: "Fluid Intelligence (Gf)",
             score: data.fluid,
             icon: Brain,
-            color: "text-neon-cyan",
-            bar: "bg-neon-cyan",
+            color: "text-neon-teal",
+            bar: "bg-neon-teal",
             desc: "Abstract reasoning & problem solving"
         },
         {
@@ -44,8 +44,8 @@ export const CognitiveDomainCard = ({ data }: CognitiveDomainCardProps) => {
             label: "Processing Speed (Gs)",
             score: data.speed,
             icon: Zap,
-            color: "text-neon-yellow",
-            bar: "bg-neon-yellow",
+            color: "text-neon-orange",
+            bar: "bg-neon-orange",
             desc: "Mental reaction time & fluency"
         },
         {
@@ -91,7 +91,7 @@ export const CognitiveDomainCard = ({ data }: CognitiveDomainCardProps) => {
                                 initial={{ width: 0 }}
                                 animate={{ width: `${domain.score}%` }}
                                 transition={{ duration: 1, ease: "easeOut", delay: i * 0.1 }}
-                                className={`h-full ${domain.bar} shadow-[0_0_10px_currentColor]`}
+                                className={`h-full ${domain.bar} ${domain.color} shadow-[0_0_10px_currentColor]`}
                             />
                         </div>
                     </motion.div>

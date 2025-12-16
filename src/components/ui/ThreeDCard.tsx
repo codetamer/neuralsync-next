@@ -59,7 +59,7 @@ export const ThreeDCard = ({ children, className = "" }: ThreeDCardProps) => {
                 rotateY,
                 transformStyle: "preserve-3d",
             }}
-            className={`perspective-1000 ${className}`}
+            className={`perspective-[1000px] ${className}`}
         >
             <div style={{ transform: "translateZ(20px)" }} className="h-full">
                 {children}

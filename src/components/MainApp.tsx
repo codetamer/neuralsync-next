@@ -10,25 +10,25 @@ import { useTestStore } from '../store/useTestStore';
 import { AnimatePresence } from 'framer-motion';
 
 export default function MainApp() {
-    const { currentStage, isTestComplete } = useTestStore();
+    const { currentStage, isTestComplete, currentSection } = useTestStore();
     const [showInterstitial, setShowInterstitial] = useState(false);
     const [showGatedAd, setShowGatedAd] = useState(false);
     const [showResults, setShowResults] = useState(false);
     const [lastTriggeredStage, setLastTriggeredStage] = useState(0);
 
-    // Trigger Interstitials at logical section breaks
-    // 15: End of Fluid IQ
-    // 25: End of Cognitive Battery
-    // 35: Start of Personality
-    // 48: Mid-Personality
-    // 60: Late-Personality
+    // Trigger Interstitials at Section Breaks (Context-Aware)
+    const [prevSection, setPrevSection] = useState(currentSection);
+
     useEffect(() => {
-        const interstitialStages = [15, 25, 35, 48, 60];
-        if (interstitialStages.includes(currentStage) && currentStage !== lastTriggeredStage) {
+        // If section changes (and it's not the initial mount or Intro), trigger ad
+        if (currentSection !== prevSection && prevSection !== 'INTRO' && currentSection !== 'INTRO') {
             setShowInterstitial(true);
-            setLastTriggeredStage(currentStage);
+            setPrevSection(currentSection);
+        } else if (currentSection !== prevSection) {
+            // Just update tracker for non-ad transitions (e.g. Intro -> Section 1)
+            setPrevSection(currentSection);
         }
-    }, [currentStage, lastTriggeredStage]);
+    }, [currentSection, prevSection]);
 
     // Trigger Gated Ad on completion
     useEffect(() => {
@@ -55,7 +55,7 @@ export default function MainApp() {
             {/* Overlays */}
             <AnimatePresence>
                 {showInterstitial && (
-                    <AdSlotB key="ad-b" onComplete={handleInterstitialComplete} />
+                    <AdSlotB key="ad-b" onComplete={handleInterstitialComplete} nextSection={currentSection} />
                 )}
 
                 {showGatedAd && (

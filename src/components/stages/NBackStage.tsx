@@ -7,91 +7,155 @@ import { GlassCard } from '../ui/GlassCard';
 import { NeonButton } from '../ui/NeonButton';
 import { cn } from '../../lib/utils';
 import { audio } from '../../engine/AudioEngine';
-import { Brain, Zap, CheckCircle, XCircle, Volume2 } from 'lucide-react';
+import { Brain, Zap, CheckCircle, XCircle, Timer, Activity, Database, AlertCircle } from 'lucide-react';
 
 // ============================================================================
-// N-BACK WORKING MEMORY TASK
+// N-BACK WORKING MEMORY TASK - Revamped Implementation
 // ============================================================================
 
 interface NBackConfig {
-    nLevel: 2 | 3;             // How far back to remember
-    sequenceLength: number;    // Total items to show
-    stimulusDuration: number;  // Ms to show each stimulus
+    nLevel: number;             // Dynamic N-back level (starts at 2)
+    sequenceLength: number;     // Total items to show
+    stimulusDuration: number;   // Ms to show each stimulus
     interStimulusInterval: number; // Ms between stimuli
-    targetPercentage: number;  // % of items that are matches
+    targetPercentage: number;   // % of items that are matches
 }
 
 interface NBackTrial {
     stimulus: string;
-    isTarget: boolean;        // Is this a match with n-back?
+    isTarget: boolean;          // Is this a match with n-back?
     position: number;
 }
 
 interface NBackResult {
-    hits: number;             // Correctly identified matches
-    misses: number;           // Missed matches
-    falseAlarms: number;      // Incorrectly pressed on non-match
-    correctRejections: number; // Correctly didn't press on non-match
-    dPrime: number;           // Signal detection metric
-    reactionTimes: number[];  // RT for hits
+    hits: number;               // Correctly identified matches
+    misses: number;             // Missed matches
+    falseAlarms: number;        // Incorrectly pressed on non-match
+    correctRejections: number;  // Correctly didn't press on non-match
+    dPrime: number;             // Signal detection metric
+    reactionTimes: number[];    // RT for hits
 }
 
-const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M'];
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'H', 'J', 'K', 'L', 'M', 'O', 'P', 'R', 'S', 'T'];
 
 const DEFAULT_CONFIG: NBackConfig = {
     nLevel: 2,
-    sequenceLength: 20,
-    stimulusDuration: 2000,
-    interStimulusInterval: 500,
-    targetPercentage: 0.25,
+    sequenceLength: 24,         // Increased slightly for better data
+    stimulusDuration: 1000,     // Faster pacing (1s show)
+    interStimulusInterval: 1000, // 1s gap = 2s total cycle
+    targetPercentage: 0.30,     // 30% targets
 };
 
 // ============================================================================
-// COMPONENT
+// COMPONENTS
+// ============================================================================
+
+const HexagonFrame = ({ children, active }: { children: React.ReactNode, active: boolean }) => (
+    <div className="relative w-48 h-48 flex items-center justify-center">
+        {/* Animated Hexagon Border */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+            <defs>
+                <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.2" />
+                    <stop offset="50%" stopColor="#818cf8" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="#c084fc" stopOpacity="0.2" />
+                </linearGradient>
+            </defs>
+            <motion.path
+                d="M50 0 L93.3 25 L93.3 75 L50 100 L6.7 75 L6.7 25 Z"
+                fill="none"
+                stroke={active ? "url(#hexGradient)" : "rgba(255,255,255,0.1)"}
+                strokeWidth={active ? "3" : "1"}
+                strokeLinecap="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 1, ease: "easeInOut" }}
+            />
+            {active && (
+                <motion.path
+                    d="M50 0 L93.3 25 L93.3 75 L50 100 L6.7 75 L6.7 25 Z"
+                    fill="none"
+                    stroke="#22d3ee"
+                    strokeWidth="2"
+                    strokeDasharray="10 10"
+                    initial={{ strokeDashoffset: 0 }}
+                    animate={{ strokeDashoffset: 100 }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                />
+            )}
+        </svg>
+
+        {/* Content */}
+        <div className="relative z-10 text-6xl font-bold font-display tracking-widest text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+            {children}
+        </div>
+
+        {/* Glitch Overlay (Optional) */}
+        {active && (
+            <div className="absolute inset-0 bg-neon-blue/5 blur-xl rounded-full animate-pulse" />
+        )}
+    </div>
+);
+
+// ============================================================================
+// MAIN STAGE
 // ============================================================================
 
 export const NBackStage: React.FC = () => {
-    const { recordResponse, nextStage, currentStage, addXp } = useTestStore();
+    const { recordResponse, nextStage, addXp } = useTestStore();
 
-    const [phase, setPhase] = useState<'instructions' | 'running' | 'feedback' | 'complete'>('instructions');
+    const [phase, setPhase] = useState<'instructions' | 'countdown' | 'running' | 'feedback' | 'complete'>('instructions');
     const [config] = useState<NBackConfig>(DEFAULT_CONFIG);
     const [trials, setTrials] = useState<NBackTrial[]>([]);
     const [currentTrialIndex, setCurrentTrialIndex] = useState(-1);
     const [showStimulus, setShowStimulus] = useState(false);
     const [result, setResult] = useState<NBackResult | null>(null);
+    const [userPressed, setUserPressed] = useState(false);
+    const [countdown, setCountdown] = useState(3);
 
     // Response tracking
-    const responsesRef = useRef<Map<number, { pressed: boolean; rt?: number; timestamp: number }>>(new Map());
+    const responsesRef = useRef<Map<number, { pressed: boolean; rt?: number }>>(new Map());
     const trialStartTimeRef = useRef<number>(0);
     const taskStartTimeRef = useRef<number>(0);
 
-    // Generate sequence
+    // ========================================================================
+    // SEQUENCE GENERATION
+    // ========================================================================
+
     useEffect(() => {
         const generateSequence = (): NBackTrial[] => {
             const sequence: NBackTrial[] = [];
+            const n = config.nLevel;
             const targetCount = Math.floor(config.sequenceLength * config.targetPercentage);
 
-            // Generate target positions
-            const targetPositions = new Set<number>();
-            while (targetPositions.size < targetCount) {
-                const pos = config.nLevel + Math.floor(Math.random() * (config.sequenceLength - config.nLevel));
-                targetPositions.add(pos);
+            // Determine target positions (must be at index >= n)
+            const availablePositions: number[] = [];
+            for (let i = n; i < config.sequenceLength; i++) {
+                availablePositions.push(i);
             }
+
+            // Shuffle and pick target positions
+            const shuffled = availablePositions.sort(() => Math.random() - 0.5);
+            const targetPositions = new Set(shuffled.slice(0, targetCount));
 
             // Build sequence
             for (let i = 0; i < config.sequenceLength; i++) {
                 const isTarget = targetPositions.has(i);
                 let stimulus: string;
 
-                if (isTarget && i >= config.nLevel) {
-                    // Match the letter from n positions back
-                    stimulus = sequence[i - config.nLevel].stimulus;
+                if (isTarget) {
+                    // FORCE MATCH: Copy the letter from n positions back
+                    stimulus = sequence[i - n].stimulus;
                 } else {
-                    // Pick a non-matching letter
+                    // FORCE NON-MATCH (Target): Pick a letter that does NOT match n-back
+                    const nBackLetter = i >= n ? sequence[i - n].stimulus : null;
                     let newLetter: string;
                     do {
                         newLetter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
-                    } while (i >= config.nLevel && newLetter === sequence[i - config.nLevel].stimulus);
+                    } while (newLetter === nBackLetter); // Ensure it's NOT a target
+
+                    // Note: We inherently allow 'Lures' (e.g. 1-back matches) because we don't check against i-1.
+                    // This is desirable for difficulty.
                     stimulus = newLetter;
                 }
 
@@ -104,22 +168,21 @@ export const NBackStage: React.FC = () => {
         setTrials(generateSequence());
     }, [config]);
 
-    // Handle keypress
+    // ========================================================================
+    // LOGIC
+    // ========================================================================
+
     const handleKeyPress = useCallback((e: KeyboardEvent) => {
-        if (phase !== 'running' || currentTrialIndex < 0) return;
         if (e.code === 'Space' || e.key === ' ') {
             e.preventDefault();
+
+            if (phase !== 'running' || currentTrialIndex < 0) return;
+            if (responsesRef.current.has(currentTrialIndex)) return; // Already responded
+
             const rt = Date.now() - trialStartTimeRef.current;
-
-            // Record response
-            responsesRef.current.set(currentTrialIndex, {
-                pressed: true,
-                rt,
-                timestamp: Date.now()
-            });
-
-            // Trigger re-render for visual feedback
-            setTrials(prev => [...prev]);
+            responsesRef.current.set(currentTrialIndex, { pressed: true, rt });
+            setUserPressed(true);
+            audio.playClick();
         }
     }, [phase, currentTrialIndex]);
 
@@ -128,52 +191,68 @@ export const NBackStage: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyPress);
     }, [handleKeyPress]);
 
-    // Run trial sequence
+    // Trial Loop
     useEffect(() => {
-        if (phase !== 'running' || currentTrialIndex >= trials.length) return;
+        if (phase !== 'running' || currentTrialIndex < 0) return;
 
-        // Show stimulus
+        // Check completion
+        if (currentTrialIndex >= trials.length) {
+            calculateResults();
+            return;
+        }
+
+        setUserPressed(false);
         setShowStimulus(true);
         trialStartTimeRef.current = Date.now();
 
-        // Initialize response as not pressed
-        if (!responsesRef.current.has(currentTrialIndex)) {
-            responsesRef.current.set(currentTrialIndex, { pressed: false, timestamp: Date.now() });
-        }
+        // Play subtle tick for new item
+        audio.playHover();
 
-        // Hide after duration
-        const hideTimer = setTimeout(() => {
+        // TIMING LOGIC
+        // 1. Show Stimulus
+        const stimulusTimer = setTimeout(() => {
             setShowStimulus(false);
+
+            // 2. Wait Inter-Stimulus Interval (ISI)
+            const isiTimer = setTimeout(() => {
+                // Determine if missed response for previous trial logic (internal tracking only)
+                if (!responsesRef.current.has(currentTrialIndex)) {
+                    responsesRef.current.set(currentTrialIndex, { pressed: false });
+                }
+
+                setCurrentTrialIndex(prev => prev + 1);
+            }, config.interStimulusInterval);
+
+            return () => clearTimeout(isiTimer);
         }, config.stimulusDuration);
 
-        // Move to next trial
-        const nextTimer = setTimeout(() => {
-            if (currentTrialIndex + 1 >= trials.length) {
-                // Calculate results
-                calculateResults();
-            } else {
-                setCurrentTrialIndex(prev => prev + 1);
-            }
-        }, config.stimulusDuration + config.interStimulusInterval);
+        return () => clearTimeout(stimulusTimer);
+    }, [phase, currentTrialIndex, trials.length, config]);
 
-        return () => {
-            clearTimeout(hideTimer);
-            clearTimeout(nextTimer);
-        };
-    }, [phase, currentTrialIndex, trials, config]);
+    // Countdown Logic
+    useEffect(() => {
+        if (phase === 'countdown') {
+            if (countdown > 0) {
+                const timer = setTimeout(() => setCountdown(c => c - 1), 1000);
+                return () => clearTimeout(timer);
+            } else {
+                startTask();
+            }
+        }
+    }, [phase, countdown]);
 
     const calculateResults = () => {
         let hits = 0, misses = 0, falseAlarms = 0, correctRejections = 0;
-        const hitRTs: number[] = [];
+        const reactionTimes: number[] = [];
 
-        trials.forEach((trial, idx) => {
-            const response = responsesRef.current.get(idx);
-            const pressed = response?.pressed || false;
+        trials.forEach((trial, index) => {
+            const response = responsesRef.current.get(index);
+            const pressed = response?.pressed ?? false;
 
             if (trial.isTarget) {
                 if (pressed) {
                     hits++;
-                    if (response?.rt) hitRTs.push(response.rt);
+                    if (response?.rt) reactionTimes.push(response.rt);
                 } else {
                     misses++;
                 }
@@ -186,327 +265,286 @@ export const NBackStage: React.FC = () => {
             }
         });
 
-        // Calculate d-prime (signal detection)
-        const hitRate = Math.max(0.01, Math.min(0.99, hits / (hits + misses)));
-        const faRate = Math.max(0.01, Math.min(0.99, falseAlarms / (falseAlarms + correctRejections)));
-        const zHitRate = normalZScore(hitRate);
-        const zFaRate = normalZScore(faRate);
-        const dPrime = zHitRate - zFaRate;
+        // d-prime Calculation
+        // Avoid infinity by clamping rates
+        const hitRate = Math.max(0.01, Math.min(0.99, hits / Math.max(1, hits + misses)));
+        const faRate = Math.max(0.01, Math.min(0.99, falseAlarms / Math.max(1, falseAlarms + correctRejections)));
 
-        const finalResult: NBackResult = {
+        // Inverse Error Function approximation
+        const invErf = (x: number): number => {
+            const a = 0.147;
+            const ln = Math.log(1 - x * x);
+            const t1 = (2 / (Math.PI * a)) + (ln / 2);
+            const t2 = ln / a;
+            return Math.sign(x) * Math.sqrt(Math.sqrt(t1 * t1 - t2) - t1);
+        };
+
+        const zHit = Math.sqrt(2) * invErf(2 * hitRate - 1);
+        const zFa = Math.sqrt(2) * invErf(2 * faRate - 1);
+        const dPrime = zHit - zFa;
+
+        setResult({
             hits,
             misses,
             falseAlarms,
             correctRejections,
-            dPrime,
-            reactionTimes: hitRTs,
-        };
-
-        setResult(finalResult);
+            dPrime: isNaN(dPrime) ? 0 : dPrime,
+            reactionTimes
+        });
         setPhase('feedback');
+    };
 
-        // Award XP based on performance
-        const accuracy = (hits + correctRejections) / trials.length;
-        addXp(Math.round(accuracy * 100));
+    const startCountdown = () => {
+        setPhase('countdown');
+        setCountdown(3);
+        taskStartTimeRef.current = Date.now();
     };
 
     const startTask = () => {
         setPhase('running');
         setCurrentTrialIndex(0);
         responsesRef.current.clear();
-        taskStartTimeRef.current = Date.now(); // Track when task actually starts
+        taskStartTimeRef.current = Date.now();
     };
 
-    const completeTask = () => {
+    const handleComplete = () => {
         if (!result) return;
-
-        // Convert d-prime to standardized score (mean 0, sd 1 -> mean 100, sd 15)
-        const standardizedScore = Math.round(100 + (result.dPrime * 15));
+        const totalTime = Date.now() - taskStartTimeRef.current;
         const accuracy = (result.hits + result.correctRejections) / trials.length;
 
+        // Normalize d-prime to 0-100 score
+        // Typical d' range: 0 (random) to 4.6 (perfect)
+        const normalizedScore = Math.min(100, Math.max(0, Math.round((result.dPrime / 4.0) * 100)));
+
         recordResponse({
-            choice: result.dPrime, // Store d-prime as choice
-            latency_ms: Date.now() - taskStartTimeRef.current, // Total stage time
-            accuracy: accuracy > 0.7,
-            // Additional data stored in response
+            choice: result.dPrime.toFixed(2), // Store raw d' as string choice
+            latency_ms: totalTime,
+            accuracy: accuracy >= 0.7
         });
 
-        nextStage();
+        addXp(Math.round(normalizedScore * 1.5));
+
+        setPhase('complete');
+        setTimeout(() => nextStage(), 1500);
     };
 
     // ========================================================================
-    // RENDER
+    // RENDER UI
     // ========================================================================
 
     return (
-        <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-neon-purple" />
-                    <h2 className="text-2xl font-display font-bold text-white">Working Memory</h2>
+        <div className="w-full max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[600px] gap-8">
+
+            {/* HUD Header */}
+            <div className="w-full flex justify-between items-end border-b border-white/10 pb-4">
+                <div className="space-y-1">
+                    <h2 className="text-3xl font-display font-bold text-white tracking-tight">
+                        WORKING<span className="text-neon-teal">MEMORY</span>
+                    </h2>
+                    <div className="flex items-center gap-2 text-xs font-mono text-neural-muted">
+                        <Activity className="w-4 h-4 text-neon-purple" />
+                        <span>N-BACK PROTOCOL: {config.nLevel} STEPS</span>
+                    </div>
                 </div>
-                <div className="text-xs text-neural-muted font-mono">
-                    {config.nLevel}-BACK TASK
-                </div>
+
+                {phase === 'running' && (
+                    <div className="text-right">
+                        <div className="text-xs font-mono text-neural-muted mb-1">BUFFER STREAM</div>
+                        <div className="flex gap-1">
+                            {Array.from({ length: 10 }).map((_, i) => {
+                                const progress = (currentTrialIndex / trials.length) * 10;
+                                const active = i < progress;
+                                return (
+                                    <div
+                                        key={i}
+                                        className={cn(
+                                            "w-2 h-4 rounded-sm transition-colors duration-300",
+                                            active ? "bg-neon-teal shadow-[0_0_8px_rgba(45,212,191,0.5)]" : "bg-white/10"
+                                        )}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
             </div>
 
-            <GlassCard className="p-8 bg-neural-card min-h-[400px] flex flex-col items-center justify-center">
+            {/* Main Stage Area */}
+            <div className="relative w-full max-w-lg aspect-square flex items-center justify-center">
+
+                {/* Background Decor */}
+                <div className="absolute inset-0 border border-white/5 rounded-full animate-[spin_10s_linear_infinite]" />
+                <div className="absolute inset-8 border border-white/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+
                 <AnimatePresence mode="wait">
+
+                    {/* INSTRUCTIONS */}
                     {phase === 'instructions' && (
                         <motion.div
-                            key="instructions"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="text-center space-y-6 max-w-md"
+                            key="intro"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="text-center z-10 glass-panel p-8 rounded-2xl max-w-md bg-black/40 backdrop-blur-xl border border-white/10"
                         >
-                            <div className="w-16 h-16 mx-auto bg-neon-purple/20 rounded-2xl flex items-center justify-center">
-                                <Brain className="w-8 h-8 text-neon-purple" />
+                            <Brain className="w-16 h-16 text-neon-teal mx-auto mb-6" />
+                            <h3 className="text-xl font-bold text-white mb-4">Establish Neural Link</h3>
+                            <div className="space-y-4 text-neural-muted text-sm leading-relaxed mb-8">
+                                <p>
+                                    A sequence of data fragments will appear. Your buffer size is <span className="text-white font-bold">{config.nLevel}</span>.
+                                </p>
+                                <p>
+                                    Press <span className="text-neon-teal font-mono font-bold bg-neon-teal/10 px-2 py-1 rounded">SPACE</span> when the current fragment MATCHES the one shown <span className="text-white font-bold">2 steps ago</span>.
+                                </p>
+
+                                <div className="grid grid-cols-5 gap-2 font-mono text-lg opacity-80 my-6">
+                                    <div className="flex flex-col items-center"><span className="text-white/30">A</span></div>
+                                    <div className="flex flex-col items-center"><span className="text-white/30">B</span></div>
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-neon-teal font-bold animate-pulse">A</span>
+                                        <span className="text-[10px] text-neon-teal mt-1">MATCH</span>
+                                    </div>
+                                    <div className="flex flex-col items-center"><span className="text-white/30">C</span></div>
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-neon-teal font-bold animate-pulse">C</span>
+                                        <span className="text-[10px] text-neon-teal mt-1">MATCH</span>
+                                    </div>
+                                </div>
                             </div>
-
-                            <h3 className="text-xl font-bold text-white">
-                                {config.nLevel}-Back Task
-                            </h3>
-
-                            <p className="text-neural-muted leading-relaxed">
-                                You will see a sequence of letters. Press <kbd className="px-2 py-1 bg-white/10 rounded text-neon-cyan font-mono">SPACE</kbd> when the current letter matches the one from <span className="text-neon-purple font-bold">{config.nLevel} positions ago</span>.
-                            </p>
-
-                            <div className="bg-white/5 rounded-lg p-4 text-sm text-neural-muted">
-                                <p className="font-mono mb-2">Example (2-back):</p>
-                                <p>A → B → <span className="text-neon-green">A</span> → C → <span className="text-neon-green">A</span> → ...</p>
-                                <p className="mt-2 text-xs">Press SPACE when you see the green letters</p>
-                            </div>
-
-                            <NeonButton onClick={startTask} variant="primary" className="w-full">
-                                <Zap className="w-4 h-4 mr-2" />
-                                START TASK
+                            <NeonButton onClick={startCountdown} variant="primary" size="lg" className="w-full">
+                                INITIALIZE
                             </NeonButton>
                         </motion.div>
                     )}
 
-                    {phase === 'running' && (
+                    {/* COUNTDOWN */}
+                    {phase === 'countdown' && (
                         <motion.div
-                            key="running"
-                            className="text-center space-y-8"
+                            key="count"
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 1.5 }}
+                            className="text-8xl font-bold font-display text-white z-10"
                         >
-                            {/* Progress */}
-                            <div className="w-full max-w-xs mx-auto">
-                                <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                                    <motion.div
-                                        className="h-full bg-neon-purple"
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${((currentTrialIndex + 1) / trials.length) * 100}%` }}
-                                    />
-                                </div>
-                                <p className="text-xs text-neural-muted mt-2 font-mono">
-                                    {currentTrialIndex + 1} / {trials.length}
-                                </p>
-                            </div>
+                            {countdown}
+                        </motion.div>
+                    )}
 
-                            {/* Stimulus Display */}
-                            <div className="relative w-32 h-32 mx-auto">
-                                <div className="absolute inset-0 bg-neon-purple/10 rounded-2xl border border-neon-purple/30" />
-                                <AnimatePresence>
-                                    {showStimulus && currentTrialIndex >= 0 && trials[currentTrialIndex] && (
-                                        <motion.div
-                                            key={currentTrialIndex}
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.8 }}
-                                            className="absolute inset-0 flex items-center justify-center"
+                    {/* ACTIVE GAME */}
+                    {phase === 'running' && (
+                        <div className="relative z-10 flex flex-col items-center">
+
+                            {/* Hex Frame */}
+                            <HexagonFrame active={showStimulus}>
+                                <AnimatePresence mode="wait">
+                                    {showStimulus && (
+                                        <motion.span
+                                            key={`stim-${currentTrialIndex}`}
+                                            initial={{ opacity: 0, filter: 'blur(10px)', scale: 1.5 }}
+                                            animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+                                            exit={{ opacity: 0, filter: 'blur(5px)', scale: 0.8 }}
+                                            transition={{ duration: 0.15 }} // Fast entry
+                                            className="block"
                                         >
-                                            <span className="text-6xl font-display font-bold text-white">
-                                                {trials[currentTrialIndex].stimulus}
-                                            </span>
+                                            {trials[currentTrialIndex]?.stimulus}
+                                        </motion.span>
+                                    )}
+                                </AnimatePresence>
+                            </HexagonFrame>
+
+                            {/* Interaction Feedback */}
+                            <div className="h-12 mt-8 flex items-center justify-center">
+                                <AnimatePresence>
+                                    {userPressed && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0 }}
+                                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-neon-purple/20 border border-neon-purple text-neon-purple font-mono text-sm tracking-wider"
+                                        >
+                                            <Zap className="w-4 h-4 fill-current" />
+                                            SIGNAL CAPTURED
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
                             </div>
 
-                            {/* Instructions reminder & Mobile Control */}
-                            <div className="flex flex-col items-center gap-4">
-                                <p className="text-sm text-neural-muted hidden md:block">
-                                    Press <kbd className="px-2 py-0.5 bg-white/10 rounded text-neon-cyan font-mono text-xs">SPACE</kbd> if this matches {config.nLevel} back
-                                </p>
-
-                                {/* Mobile/Tablet Touch Button */}
-                                <button
-                                    className="md:hidden active:scale-95 transition-transform w-24 h-24 rounded-full bg-neon-purple/20 border-2 border-neon-purple flex items-center justify-center"
-                                    onTouchStart={(e) => {
-                                        e.preventDefault();
-                                        audio.playClick();
-                                        handleKeyPress({ code: 'Space', preventDefault: () => { } } as any);
-                                    }}
-                                    onClick={(e) => {
-                                        // Fallback for click
-                                        audio.playClick();
-                                        handleKeyPress({ code: 'Space', preventDefault: () => { } } as any);
-                                    }}
-                                >
-                                    <span className="font-bold text-neon-purple">MATCH</span>
-                                </button>
-
-                                {/* Visual Feedback Indicator */}
-                                <div className={`h-2 w-2 rounded-full transition-colors duration-100 ${responsesRef.current.get(currentTrialIndex)?.pressed
-                                    ? 'bg-neon-cyan shadow-[0_0_10px_#0ff]'
-                                    : 'bg-transparent'
-                                    }`} />
-                            </div>
-                        </motion.div>
+                        </div>
                     )}
 
+                    {/* FEEDBACK */}
                     {phase === 'feedback' && result && (
                         <motion.div
-                            key="feedback"
+                            key="results"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="text-center space-y-6 w-full max-w-sm"
+                            className="z-10 w-full max-w-md glass-panel p-6 rounded-2xl bg-neural-card/90"
                         >
-                            <h3 className="text-xl font-bold text-white">Task Complete</h3>
+                            <h3 className="text-2xl font-bold text-center mb-6 text-white">Buffer Analysis</h3>
 
-                            {/* Results Grid */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <ResultStat
-                                    label="Hits"
-                                    value={result.hits}
-                                    total={result.hits + result.misses}
-                                    color="green"
-                                />
-                                <ResultStat
-                                    label="False Alarms"
-                                    value={result.falseAlarms}
-                                    total={result.falseAlarms + result.correctRejections}
-                                    color="red"
-                                    inverted
-                                />
-                                <ResultStat
-                                    label="d' Score"
-                                    value={result.dPrime.toFixed(2)}
-                                    color="cyan"
-                                />
-                                <ResultStat
-                                    label="Avg RT"
-                                    value={result.reactionTimes.length > 0
-                                        ? `${Math.round(result.reactionTimes.reduce((a, b) => a + b, 0) / result.reactionTimes.length)}ms`
-                                        : 'N/A'
-                                    }
-                                    color="purple"
-                                />
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                <div className="bg-black/40 p-4 rounded-xl border border-white/5 text-center">
+                                    <div className="text-neural-muted text-xs uppercase tracking-wider mb-2">Accuracy</div>
+                                    <div className="text-3xl font-bold text-neon-green">
+                                        {Math.round(((result.hits + result.correctRejections) / trials.length) * 100)}%
+                                    </div>
+                                </div>
+                                <div className="bg-black/40 p-4 rounded-xl border border-white/5 text-center">
+                                    <div className="text-neural-muted text-xs uppercase tracking-wider mb-2">Sensitivity (d')</div>
+                                    <div className="text-3xl font-bold text-neon-purple">
+                                        {result.dPrime.toFixed(2)}
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Performance interpretation */}
-                            <div className={cn(
-                                "p-3 rounded-lg text-sm",
-                                result.dPrime >= 2.0 ? "bg-neon-green/10 text-neon-green" :
-                                    result.dPrime >= 1.0 ? "bg-neon-cyan/10 text-neon-cyan" :
-                                        result.dPrime >= 0.5 ? "bg-yellow-500/10 text-yellow-400" :
-                                            "bg-red-500/10 text-red-400"
-                            )}>
-                                {result.dPrime >= 2.0 ? "Excellent working memory performance!" :
-                                    result.dPrime >= 1.0 ? "Good working memory capacity." :
-                                        result.dPrime >= 0.5 ? "Average working memory performance." :
-                                            "Below average - try focusing more on the task."}
+                            <div className="space-y-2 mb-8">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-neural-muted">Targets Identified</span>
+                                    <span className="text-white font-mono">{result.hits} / {trials.filter(t => t.isTarget).length}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-neural-muted">False Signals</span>
+                                    <span className="text-white font-mono">{result.falseAlarms}</span>
+                                </div>
                             </div>
 
-                            <NeonButton onClick={completeTask} variant="primary" className="w-full">
-                                CONTINUE
+                            <NeonButton onClick={handleComplete} variant="primary" className="w-full group">
+                                <span className="group-hover:tracking-widest transition-all duration-300">UPLOAD DATA</span>
                             </NeonButton>
                         </motion.div>
                     )}
+
+                    {/* COMPLETE */}
+                    {phase === 'complete' && (
+                        <motion.div
+                            key="done"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="z-10 text-center"
+                        >
+                            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-neon-green/20 border-2 border-neon-green/50 flex items-center justify-center animate-pulse">
+                                <Database className="w-10 h-10 text-neon-green" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white tracking-widest">DATA SYNCED</h3>
+                        </motion.div>
+                    )}
+
                 </AnimatePresence>
-            </GlassCard>
+            </div>
+
+            {/* Footer Hints */}
+            {phase === 'running' && (
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.5 }}
+                    className="text-white/30 text-xs font-mono"
+                >
+                    [SPACE] TO MATCH SIGNAL
+                </motion.p>
+            )}
+
         </div>
     );
 };
-
-// ============================================================================
-// HELPER COMPONENTS
-// ============================================================================
-
-interface ResultStatProps {
-    label: string;
-    value: string | number;
-    total?: number;
-    color: 'green' | 'red' | 'cyan' | 'purple';
-    inverted?: boolean;
-}
-
-const ResultStat: React.FC<ResultStatProps> = ({ label, value, total, color, inverted }) => {
-    const colors = {
-        green: 'text-neon-green',
-        red: 'text-red-400',
-        cyan: 'text-neon-cyan',
-        purple: 'text-neon-purple',
-    };
-
-    return (
-        <div className="bg-white/5 rounded-lg p-3 text-left">
-            <p className="text-xs text-neural-muted mb-1">{label}</p>
-            <p className={cn("text-2xl font-bold font-mono", colors[color])}>
-                {value}
-                {total !== undefined && (
-                    <span className="text-sm text-neural-muted">/{total}</span>
-                )}
-            </p>
-        </div>
-    );
-};
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-function normalZScore(p: number): number {
-    // Approximation of inverse normal CDF
-    if (p <= 0) return -3;
-    if (p >= 1) return 3;
-
-    const a1 = -3.969683028665376e+01;
-    const a2 = 2.209460984245205e+02;
-    const a3 = -2.759285104469687e+02;
-    const a4 = 1.383577518672690e+02;
-    const a5 = -3.066479806614716e+01;
-    const a6 = 2.506628277459239e+00;
-
-    const b1 = -5.447609879822406e+01;
-    const b2 = 1.615858368580409e+02;
-    const b3 = -1.556989798598866e+02;
-    const b4 = 6.680131188771972e+01;
-    const b5 = -1.328068155288572e+01;
-
-    const c1 = -7.784894002430293e-03;
-    const c2 = -3.223964580411365e-01;
-    const c3 = -2.400758277161838e+00;
-    const c4 = -2.549732539343734e+00;
-    const c5 = 4.374664141464968e+00;
-    const c6 = 2.938163982698783e+00;
-
-    const d1 = 7.784695709041462e-03;
-    const d2 = 3.224671290700398e-01;
-    const d3 = 2.445134137142996e+00;
-    const d4 = 3.754408661907416e+00;
-
-    const pLow = 0.02425;
-    const pHigh = 1 - pLow;
-
-    let q: number, r: number;
-
-    if (p < pLow) {
-        q = Math.sqrt(-2 * Math.log(p));
-        return (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
-            ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
-    } else if (p <= pHigh) {
-        q = p - 0.5;
-        r = q * q;
-        return (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q /
-            (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1);
-    } else {
-        q = Math.sqrt(-2 * Math.log(1 - p));
-        return -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
-            ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
-    }
-}
 
 export default NBackStage;

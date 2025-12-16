@@ -11,7 +11,7 @@ interface NeonButtonProps extends HTMLMotionProps<"button"> {
     size?: 'sm' | 'md' | 'lg';
     className?: string;
     glow?: boolean;
-    color?: 'teal' | 'amber' | 'purple' | 'blue'; // Extend color support while we are at it
+    color?: 'teal' | 'amber' | 'purple' | 'blue' | 'red'; // Extend color support while we are at it
     fullWidth?: boolean;
 }
 
@@ -33,10 +33,12 @@ export const NeonButton = ({
         ghost: "bg-transparent border-transparent text-neural-muted hover:text-neural-text hover:bg-white/5",
     };
 
-    // Override colors if specified (quick fix for amber buttons requested in dashboard)
+    // Override colors if specified
     const colorStyles = color === 'amber'
         ? "bg-amber-500/10 border-amber-500/50 text-amber-500 hover:bg-amber-500/20 hover:border-amber-500 hover:shadow-amber-500"
-        : variants[variant];
+        : color === 'red'
+            ? "bg-red-500/10 border-red-500/50 text-red-500 hover:bg-red-500/20 hover:border-red-500 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+            : variants[variant];
 
     const sizes = {
         sm: "px-4 py-2 text-sm",
