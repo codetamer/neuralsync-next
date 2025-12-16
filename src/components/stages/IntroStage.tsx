@@ -34,6 +34,15 @@ export const IntroStage = ({ isResumeMode = false, onResumeHandled }: IntroStage
         onResumeHandled?.();
     };
 
+    const handleReset = async () => {
+        setIsStarting(true);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        resetTest();
+        setIsStarting(false); // Fix: Ensure we exit the loading state
+        // Resetting returns to empty state (no nextStage call)
+        onResumeHandled?.();
+    };
+
     const handleRankedStart = async () => {
         if (isLocked) return;
         setIsStarting(true);
@@ -180,8 +189,8 @@ export const IntroStage = ({ isResumeMode = false, onResumeHandled }: IntroStage
                                                     RESUME SYNC <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                                 </span>
                                             </NeonButton>
-                                            <button onClick={handleStartNew} className="text-xs text-white/30 hover:text-white transition-colors w-full text-center hover:underline">
-                                                RESTART FROM BEGINNING
+                                            <button onClick={handleReset} className="text-xs text-white/30 hover:text-white transition-colors w-full text-center hover:underline">
+                                                CLEAR PROGRESS
                                             </button>
                                         </>
                                     ) : (
